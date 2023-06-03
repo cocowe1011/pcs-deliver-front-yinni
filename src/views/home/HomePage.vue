@@ -3,7 +3,11 @@
     <div class="maskDiv">
       <div class="maskDiv-top">
         <div class="maskDiv-top-left">
-          <img />
+          <img src="../../../build/icons/64x64.png" style="width:45px;height:45px;" />
+          <div>
+            <div class="maskDiv-top-left-top-title">全自动束下输送系统</div>
+            <div class="maskDiv-top-left-top-title2">ccs</div>
+          </div>
         </div>
         <div class="maskDiv-top-mid">
           <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
@@ -121,6 +125,12 @@ export default {
         height: 100%;
         -webkit-app-region: drag;
         text-align: left;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        &-top-title {
+          
+        }
       }
       &-min,&-close,&-max {
         height:45px;
