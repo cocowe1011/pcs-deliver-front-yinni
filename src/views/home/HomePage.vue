@@ -102,29 +102,31 @@
         <div class="maskDiv-down-right">
           <div>
             <div class="card-title">实时状态监控</div>
-            <div class="card-content chuansongpadding">
+            <div class="card-content chuansongpadding" style="display: flex;justify-content: center;">
               <img src="./img/fushe2x.png" class="fusheIcon"/>
-              <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
-              <img src="./img/chuansongdai.png" style="width:100%;height:100%" />
-              <div class="show-data-area" style="position: absolute;right: 150px;top: 475px;">
+              <transition name="el-fade-in-linear">
+                <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
+              </transition>
+              <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:115px" />
+              <div class="show-data-area" style="position: absolute;right: 150px;top: 475px;" v-show="false">
                 <div class="show-data-area-top">上货扫码信息</div>
                 <div class="show-data-area-content">
                   <el-input v-model="qrCode" readonly size="small"></el-input>
                 </div>
               </div>
-              <div class="show-data-area" style="position: absolute;right: 150px;top: 538px;">
+              <div class="show-data-area" style="position: absolute;right: 150px;top: 538px;" v-show="false">
                 <div class="show-data-area-top">当前上货数量</div>
                 <div class="show-data-area-content">
                   <el-input v-model="nowInNum" readonly size="small"></el-input>
                 </div>
               </div>
-              <div class="show-data-area" style="position: absolute;left: 150px;top: 475px;">
+              <div class="show-data-area" style="position: absolute;left: 150px;top: 475px;" v-show="false">
                 <div class="show-data-area-top">下货扫码信息</div>
                 <div class="show-data-area-content">
                   <el-input v-model="qrCode" readonly size="small"></el-input>
                 </div>
               </div>
-              <div class="show-data-area" style="position: absolute;left: 150px;top: 538px;">
+              <div class="show-data-area" style="position: absolute;left: 150px;top: 538px;" v-show="false">
                 <div class="show-data-area-top">当前下货数量</div>
                 <div class="show-data-area-content">
                   <el-input v-model="nowInNum" readonly size="small"></el-input>
@@ -149,7 +151,7 @@ export default {
       activeIndex: '1',
       windowSize: 'max-window',
       showLogout: true,
-      dengShow: false,
+      dengShow: true,
       qrCode: '202306140001',
       nowInNum: '20'
     };
@@ -377,19 +379,18 @@ export default {
         width:45px;
         height:45px;
         position: absolute;
-        left: 430px;
-        top: 7px;
+        right: 372px;
+        top: 59px;
       }
       .fusheguang {
-        width: 126px;
-        height: 140px;
+        width: 106px;
+        height: 100px;
         position: absolute;
-        top: 53px;
-        left: 389px;
+        top: 105px;
+        right: 342px;
       }
       .chuansongpadding {
         box-sizing: border-box;
-        padding: 100px 70px 62px 70px;
         .show-data-area {
           width:150px;
           height: 58px;
