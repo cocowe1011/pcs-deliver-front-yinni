@@ -104,8 +104,32 @@
             <div class="card-title">实时状态监控</div>
             <div class="card-content chuansongpadding">
               <img src="./img/fushe2x.png" class="fusheIcon"/>
-              <img src="./img/deng.png" class="fusheguang"/>
+              <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
               <img src="./img/chuansongdai.png" style="width:100%;height:100%" />
+              <div class="show-data-area" style="position: absolute;right: 150px;top: 475px;">
+                <div class="show-data-area-top">上货扫码信息</div>
+                <div class="show-data-area-content">
+                  <el-input v-model="qrCode" readonly size="small"></el-input>
+                </div>
+              </div>
+              <div class="show-data-area" style="position: absolute;right: 150px;top: 538px;">
+                <div class="show-data-area-top">当前上货数量</div>
+                <div class="show-data-area-content">
+                  <el-input v-model="nowInNum" readonly size="small"></el-input>
+                </div>
+              </div>
+              <div class="show-data-area" style="position: absolute;left: 150px;top: 475px;">
+                <div class="show-data-area-top">下货扫码信息</div>
+                <div class="show-data-area-content">
+                  <el-input v-model="qrCode" readonly size="small"></el-input>
+                </div>
+              </div>
+              <div class="show-data-area" style="position: absolute;left: 150px;top: 538px;">
+                <div class="show-data-area-top">当前下货数量</div>
+                <div class="show-data-area-content">
+                  <el-input v-model="nowInNum" readonly size="small"></el-input>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -124,7 +148,10 @@ export default {
     return {
       activeIndex: '1',
       windowSize: 'max-window',
-      showLogout: true
+      showLogout: true,
+      dengShow: false,
+      qrCode: '202306140001',
+      nowInNum: '20'
     };
   },
   watch: {},
@@ -170,7 +197,11 @@ export default {
     ipcRenderer.send('logStatus','login');
     this.changeIcon()
   },
-  mounted() {}
+  mounted() {
+    setInterval(() => {
+      this.dengShow = !this.dengShow;
+    }, 1000);
+  }
 };
 </script>
 <style lang="less" scoped>
@@ -359,6 +390,32 @@ export default {
       .chuansongpadding {
         box-sizing: border-box;
         padding: 100px 70px 62px 70px;
+        .show-data-area {
+          width:150px;
+          height: 58px;
+          &-top {
+            height: 25px;
+            width: 100%;
+            float: left;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:15px;
+            font-weight: 600;
+            color: #000000;
+          }
+          &-content {
+            height: 32px;
+            width: 100%;
+            float: left;
+            ::v-deep .el-input--small .el-input__inner {
+              text-align: center;
+              font-size: 15px;
+              font-weight: 600;
+              color: #000000;
+            }
+          }
+        }
       }
       &-left{
         width: calc(100% - 930px);
@@ -417,4 +474,5 @@ export default {
     }
   }
 }
+
 </style>
