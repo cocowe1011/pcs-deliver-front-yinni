@@ -422,7 +422,7 @@ export default {
         height: 100%;
         float: left;
         &-top {
-          height: 50%;
+          height: 384px;
           width: 100%;
           float: left;
           box-sizing: border-box;
@@ -438,7 +438,7 @@ export default {
           }
         }
         &-down {
-          height: 50%;
+          height: calc(100% - 384px);
           width: 100%;
           float: left;
           box-sizing: border-box;
