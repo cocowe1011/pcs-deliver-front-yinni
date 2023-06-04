@@ -107,7 +107,7 @@
               <transition name="el-fade-in-linear">
                 <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
               </transition>
-              <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:115px" />
+              <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:30px" />
               <div class="show-data-area" style="position: absolute;right: 150px;top: 475px;" v-show="false">
                 <div class="show-data-area-top">上货扫码信息</div>
                 <div class="show-data-area-content">
@@ -380,13 +380,13 @@ export default {
         height:45px;
         position: absolute;
         right: 372px;
-        top: 59px;
+        top: 10px;
       }
       .fusheguang {
         width: 106px;
         height: 100px;
         position: absolute;
-        top: 105px;
+        top: 56px;
         right: 342px;
       }
       .chuansongpadding {
