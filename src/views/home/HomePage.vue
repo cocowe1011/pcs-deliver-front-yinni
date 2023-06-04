@@ -95,7 +95,20 @@
           <div class="maskDiv-down-left-down">
             <div>
               <div class="card-title">操作日志</div>
-              <div class="card-content"></div>
+              <div class="card-content">
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+                <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+              </div>
             </div>
           </div>
         </div>
@@ -452,6 +465,34 @@ export default {
             background: rgba(246, 247, 251, 0.56);
             box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(88px);
+          }
+          // 滚动槽样式定义
+          ::-webkit-scrollbar {
+            width: 5px;
+            height: 8px;
+          }
+
+          ::-webkit-scrollbar-track {
+            border-radius: 10px;
+          }
+
+          ::-webkit-scrollbar-thumb {
+            border-radius: 3px;
+            background-color: #28253b !important;
+          }
+
+          ::-webkit-scrollbar-thumb:window-inactive {
+            background-color: #28253b !important;
+          }
+          .card-content {
+            padding-top: 6px;
+            overflow: auto;
+          }
+          .log-text {
+            height: 32px;
+            line-height: 32px;
+            padding-left: 18px;
+            color: rgba(0, 0, 0, 1);
           }
         }
       }
