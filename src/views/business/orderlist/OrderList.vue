@@ -52,35 +52,37 @@
             </el-form-item>
             <br/>
             <el-form-item label="束流：">
-              <el-input size="small" v-model="formInline.user" placeholder="束流："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="束流"></el-input>
             </el-form-item>
             <el-form-item label="功率：">
-              <el-input size="small" v-model="formInline.user" placeholder="功率："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="功率"></el-input>
             </el-form-item>
             <el-form-item label="扫宽：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫宽："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="扫宽"></el-input>
             </el-form-item>
             <el-form-item label="扫描频率：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫描频率："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="扫描频率"></el-input>
             </el-form-item>
             <el-form-item label="PFN电压：">
-              <el-input size="small" v-model="formInline.user" placeholder="PFN电压："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="PFN电压"></el-input>
             </el-form-item>
             <br/>
             <el-form-item label="能量：">
-              <el-input size="small" v-model="formInline.user" placeholder="能量："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="能量"></el-input>
             </el-form-item>
             <el-form-item label="订单箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="订单箱数："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="订单箱数"></el-input>
             </el-form-item>
             <el-form-item label="剔除箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="剔除箱数："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="剔除箱数"></el-input>
             </el-form-item>
             <el-form-item label="上货箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="上货箱数："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="上货箱数"></el-input>
             </el-form-item>
             <el-form-item label="合格箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="合格箱数："></el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="合格箱数">
+                <el-button slot="append">箱</el-button>
+              </el-input>
             </el-form-item>
           </el-form>
           <!-- <div class="caozuoButton">
@@ -112,44 +114,22 @@
           :data="tableData"
           border
           style="width: 100%">
-          <el-table-column
-            fixed
-            prop="date"
-            label="日期"
-            width="150">
-          </el-table-column>
-          <el-table-column
-            prop="name"
-            label="姓名"
-            width="120">
-          </el-table-column>
-          <el-table-column
-            prop="province"
-            label="省份"
-            width="120">
-          </el-table-column>
-          <el-table-column
-            prop="city"
-            label="市区"
-            width="120">
-          </el-table-column>
-          <el-table-column
-            prop="address"
-            label="地址"
-            width="300">
-          </el-table-column>
-          <el-table-column
-            prop="zip"
-            label="邮编"
-            width="120">
+          <el-table-column v-for="item in tableTitle" :key="item.prop"
+            :prop="item.prop"
+            :label="item.label"
+            :width="item.width">
           </el-table-column>
           <el-table-column
             fixed="right"
             label="操作"
-            width="100">
-            <template slot-scope="scope">
-              <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-              <el-button type="text" size="small">编辑</el-button>
+            width="320">
+            <template>
+              <el-link type="primary" icon="el-icon-edit">编辑</el-link>
+              <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" :loading="true">启动</el-link>
+              <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" disabled>运行中</el-link>
+              <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" disabled>停止</el-link>
+              <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;">完成</el-link>
+              <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;">动态图</el-link>
             </template>
           </el-table-column>
         </el-table>
@@ -169,6 +149,12 @@ export default {
         user: '',
         region: ''
       },
+      tableTitle:[
+        {prop:"no",label:"序号",width:"50"},{prop:"taskNo",label:"任务编号",width:"150"},{prop:"revert",label:"翻转",width:"150"},
+        {prop:"batchNo",label:"批次编号",width:"150"},{prop:"orderNo",label:"订单编号",width:"150"},{prop:"orderName",label:"订单名称",width:"150"},
+        {prop:"planNum",label:"计划数量",width:"150"},{prop:"productName",label:"产品名称",width:"150"},{prop:"date",label:"装载方式",width:"150"},
+        {prop:"pathName",label:"路径名称",width:"150"},{prop:"artName",label:"工艺名称",width:"150"},{prop:"eleDown",label:"电流下限值",width:"150"}
+      ],
       tableData: [{
         date: '2016-05-02',
         name: '王小虎',
@@ -295,6 +281,19 @@ export default {
           .el-input {
             left: -1px;
           }
+          .el-input__inner {
+            border-radius: 0px;
+            border: 1px #eee solid;
+          }
+        }
+      }
+    }
+    .listDiv {
+      box-sizing: border-box;
+      padding: 0px 16px;
+      ::v-deep {
+        .el-link [class*=el-icon-]+span {
+          margin-left: 2px;
         }
       }
     }

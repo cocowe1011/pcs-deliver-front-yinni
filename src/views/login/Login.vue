@@ -46,7 +46,7 @@ export default {
         // 跳转主页
         this.$nextTick(() => {
           this.$router.replace({
-            path: '/homePage/orderList'
+            path: '/homePage/dynamicGraph'
           });
         });
       }, 2000);
