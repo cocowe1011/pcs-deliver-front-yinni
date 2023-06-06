@@ -21,8 +21,13 @@ const routes = [
     component: HomePage,
     children: [
       {
+        path: 'orderList',
+        component: () => import('../views/business/orderlist/OrderList.vue'),
+        name: 'OrderList'
+      },
+      {
         path: 'dynamicGraph',
-        component: () => import('../views/business/DynamicGraph.vue'),
+        component: () => import('../views/business/dynamicgraph/DynamicGraph.vue'),
         name: 'DynamicGraph'
       }
     ]
