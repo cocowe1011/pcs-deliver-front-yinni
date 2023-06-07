@@ -36,7 +36,7 @@
         <div class="maskDiv-top-close" @click="closewindow"><i class="el-icon-close" style="font-size:18px;font-weight:600;"></i></div>
       </div>
       <div class="maskDiv-down">
-        <router-view />
+        <router-view @replaceRoute="replaceRoute"/>
       </div>
     </div>
   </div>
@@ -58,6 +58,13 @@ export default {
   watch: {},
   computed: {},
   methods: {
+    replaceRoute(path) {
+      this.$nextTick(() => {
+          this.$router.replace({
+            path: path
+          });
+        });
+    },
     handleSelect(key, keyPath) {
       // if(true) {
       // // this.$nextTick(() => {

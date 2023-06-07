@@ -85,6 +85,10 @@
               </el-input>
             </el-form-item>
           </el-form>
+          <div class="content-bottom">
+            <el-button type="primary" size="small" icon="el-icon-success">保存</el-button>
+            <el-button size="small" style="margin-left: 15px;" icon="el-icon-error">取消</el-button>
+          </div>
           <!-- <div class="caozuoButton">
             <div class="img">
                 <img src="./1.png">
@@ -110,29 +114,41 @@
       </div>
       <el-divider></el-divider>
       <div class="listDiv">
-        <el-table
-          :data="tableData"
-          border
-          style="width: 100%">
-          <el-table-column v-for="item in tableTitle" :key="item.prop"
-            :prop="item.prop"
-            :label="item.label"
-            :width="item.width">
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            label="操作"
-            width="320">
-            <template>
-              <el-link type="primary" icon="el-icon-edit">编辑</el-link>
-              <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" :loading="true">启动</el-link>
-              <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" disabled>运行中</el-link>
-              <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" disabled>停止</el-link>
-              <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;">完成</el-link>
-              <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;">动态图</el-link>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="list-top">
+          <el-button type="primary" icon="el-icon-plus" size="small">新建</el-button>
+        </div>
+        <div class="list-middle">
+          <el-table
+            :data="tableData"
+            border
+            style="width: 100%">
+            <el-table-column v-for="item in tableTitle" :key="item.prop"
+              :prop="item.prop"
+              :label="item.label"
+              :width="item.width">
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              label="操作"
+              width="320">
+              <template slot-scope="scope">
+                <el-link type="primary" icon="el-icon-edit">编辑</el-link>
+                <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning">启动</el-link>
+                <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else>运行中</el-link>
+                <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" :disabled="!scope.row.isRunning">停止</el-link>
+                <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;">完成</el-link>
+                <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph">动态图</el-link>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div class="list-bottom">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="1000">
+          </el-pagination>
+        </div>
       </div>
     </div>
   </div>
@@ -152,44 +168,78 @@ export default {
       tableTitle:[
         {prop:"no",label:"序号",width:"50"},{prop:"taskNo",label:"任务编号",width:"150"},{prop:"revert",label:"翻转",width:"150"},
         {prop:"batchNo",label:"批次编号",width:"150"},{prop:"orderNo",label:"订单编号",width:"150"},{prop:"orderName",label:"订单名称",width:"150"},
-        {prop:"planNum",label:"计划数量",width:"150"},{prop:"productName",label:"产品名称",width:"150"},{prop:"date",label:"装载方式",width:"150"},
+        {prop:"planNum",label:"计划数量",width:"150"},{prop:"productName",label:"产品名称",width:"150"},{prop:"loadMethod",label:"装载方式",width:"150"},
         {prop:"pathName",label:"路径名称",width:"150"},{prop:"artName",label:"工艺名称",width:"150"},{prop:"eleDown",label:"电流下限值",width:"150"}
       ],
       tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1518 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1517 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1519 弄',
-        zip: 200333
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        province: '上海',
-        city: '普陀区',
-        address: '上海市普陀区金沙江路 1516 弄',
-        zip: 200333
+        no: '1',
+        taskNo: '220508001',
+        revert: '是',
+        batchNo: '',
+        orderNo: '2023060802001',
+        orderName: '静脉穿刺辅助包',
+        planNum: '1000',
+        productName: '静脉穿刺辅助包',
+        loadMethod: '起重机',
+        pathName: '',
+        artName: '静脉穿刺辅助包',
+        eleDown: '10.2',
+        isRunning: true
+      },
+      {
+        no: '2',
+        taskNo: '220508002',
+        revert: '是',
+        batchNo: '',
+        orderNo: '2023060802001',
+        orderName: '静脉穿刺辅助包',
+        planNum: '1000',
+        productName: '静脉穿刺辅助包',
+        loadMethod: '起重机',
+        pathName: '',
+        artName: '静脉穿刺辅助包',
+        eleDown: '10.2',
+        isRunning: false
+      },
+      {
+        no: '3',
+        taskNo: '220508003',
+        revert: '是',
+        batchNo: '',
+        orderNo: '2023060802001',
+        orderName: '静脉穿刺辅助包',
+        planNum: '1000',
+        productName: '静脉穿刺辅助包',
+        loadMethod: '起重机',
+        pathName: '',
+        artName: '静脉穿刺辅助包',
+        eleDown: '10.2',
+        isRunning: false
+      },
+      {
+        no: '4',
+        taskNo: '220508004',
+        revert: '否',
+        batchNo: '',
+        orderNo: '2023060802001',
+        orderName: '静脉穿刺辅助包',
+        planNum: '1000',
+        productName: '静脉穿刺辅助包',
+        loadMethod: '起重机',
+        pathName: '',
+        artName: '静脉穿刺辅助包',
+        eleDown: '10.2',
+        isRunning: false
       }]
     };
   },
   watch: {},
   computed: {},
   methods: {
-    handleClick(){}
+    handleClick(){},
+    showDynamicGraph() {
+      this.$emit('replaceRoute','/homePage/dynamicGraph')
+    }
   },
   created() {},
   mounted() {}
@@ -227,6 +277,13 @@ export default {
         width: 100%;
         padding: 10px 0px 0px 16px;
         box-sizing: border-box;
+        .content-bottom {
+          height: 48px;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
         // margin: 0;
         // padding: 0;
         // height: 100vh;
@@ -288,6 +345,9 @@ export default {
         }
       }
     }
+    ::v-deep .el-divider--horizontal{
+      margin: 5px;
+    }
     .listDiv {
       box-sizing: border-box;
       padding: 0px 16px;
@@ -295,6 +355,26 @@ export default {
         .el-link [class*=el-icon-]+span {
           margin-left: 2px;
         }
+      }
+      .list-top {
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .list-middle {
+        height: calc(100% - 100px);
+        width: 100%;
+      }
+      .list-bottom {
+        width: 100%;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        box-sizing: border-box;
+        padding-right: 1px;
       }
     }
   }

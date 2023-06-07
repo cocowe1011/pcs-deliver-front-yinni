@@ -1,5 +1,6 @@
 <template>
   <div class="dynamic">
+    <el-button type="danger" icon="el-icon-close" style="position: absolute;z-index: 999;right: 35px;top: 70px;" @click="showOrderList">关闭</el-button>
     <div class="dynamic-left">
       <div class="dynamic-left-top">
         <div>
@@ -129,7 +130,11 @@ export default {
   },
   watch: {},
   computed: {},
-  methods: {},
+  methods: {
+    showOrderList() {
+      this.$emit('replaceRoute','/homePage/orderList')
+    }
+  },
   created() {},
   mounted() {
     setInterval(() => {
