@@ -2,14 +2,14 @@
   <div class="orderlist">
     <div>
       <div class="formDiv">
-        <div class="card-title">实际参数</div>
+        <div class="card-title">工艺参数</div>
         <div class="card-content">
-          <el-form :inline="true" label-position="right" label-width="90px" :model="formInline" class="demo-form-inline">
+          <el-form :inline="true" label-position="right" label-width="115px" :model="formInline" class="demo-form-inline">
             <el-form-item label="订单编号：">
-              <el-input size="small" v-model="formInline.user" placeholder="订单编号"></el-input>
+              <el-input size="small" v-model="formInline.orderNo" placeholder="订单编号"></el-input>
             </el-form-item>
             <el-form-item label="订单名称：">
-              <el-input size="small" v-model="formInline.user" placeholder="订单名称"></el-input>
+              <el-input size="small" v-model="formInline.orderName" placeholder="订单名称"></el-input>
             </el-form-item>
             <el-form-item>
               <el-checkbox>翻转</el-checkbox>
@@ -51,23 +51,58 @@
               <el-input size="small" v-model="formInline.user" placeholder="箱子重量"></el-input>
             </el-form-item>
             <br/>
-            <el-form-item label="束流：">
+            <el-form-item label="束流上限：">
               <el-input size="small" v-model="formInline.user" placeholder="束流"></el-input>
             </el-form-item>
-            <el-form-item label="功率：">
+            <el-form-item label="束流设定值：">
+              <el-input size="small" v-model="formInline.user" placeholder="束流"></el-input>
+            </el-form-item>
+            <el-form-item label="束流下限：">
+              <el-input size="small" v-model="formInline.user" placeholder="束流"></el-input>
+            </el-form-item>
+            <el-form-item label="功率上限：">
               <el-input size="small" v-model="formInline.user" placeholder="功率"></el-input>
             </el-form-item>
-            <el-form-item label="扫宽：">
+            <el-form-item label="功率设定值：">
+              <el-input size="small" v-model="formInline.user" placeholder="功率"></el-input>
+            </el-form-item>
+            <el-form-item label="功率下限：">
+              <el-input size="small" v-model="formInline.user" placeholder="功率"></el-input>
+            </el-form-item>
+            <el-form-item label="扫宽上限：">
               <el-input size="small" v-model="formInline.user" placeholder="扫宽"></el-input>
             </el-form-item>
-            <el-form-item label="扫描频率：">
+            <el-form-item label="扫宽设定值：">
+              <el-input size="small" v-model="formInline.user" placeholder="扫宽"></el-input>
+            </el-form-item>
+            <el-form-item label="扫宽下限：">
+              <el-input size="small" v-model="formInline.user" placeholder="扫宽"></el-input>
+            </el-form-item>
+            <el-form-item label="扫描频率上限：">
               <el-input size="small" v-model="formInline.user" placeholder="扫描频率"></el-input>
             </el-form-item>
-            <el-form-item label="PFN电压：">
+            <el-form-item label="扫描频率设定：">
+              <el-input size="small" v-model="formInline.user" placeholder="扫描频率"></el-input>
+            </el-form-item>
+            <el-form-item label="扫描频率下限：">
+              <el-input size="small" v-model="formInline.user" placeholder="扫描频率"></el-input>
+            </el-form-item>
+            <el-form-item label="PFN电压上限：">
               <el-input size="small" v-model="formInline.user" placeholder="PFN电压"></el-input>
             </el-form-item>
-            <br/>
-            <el-form-item label="能量：">
+            <el-form-item label="PFN电压设定：">
+              <el-input size="small" v-model="formInline.user" placeholder="PFN电压"></el-input>
+            </el-form-item>
+            <el-form-item label="PFN电压下限：">
+              <el-input size="small" v-model="formInline.user" placeholder="PFN电压"></el-input>
+            </el-form-item>
+            <el-form-item label="能量上限：">
+              <el-input size="small" v-model="formInline.user" placeholder="能量"></el-input>
+            </el-form-item>
+            <el-form-item label="能量设定值：">
+              <el-input size="small" v-model="formInline.user" placeholder="能量"></el-input>
+            </el-form-item>
+            <el-form-item label="能量下限：">
               <el-input size="small" v-model="formInline.user" placeholder="能量"></el-input>
             </el-form-item>
             <el-form-item label="订单箱数：">
@@ -80,36 +115,13 @@
               <el-input size="small" v-model="formInline.user" placeholder="上货箱数"></el-input>
             </el-form-item>
             <el-form-item label="合格箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="合格箱数">
-                <el-button slot="append">箱</el-button>
-              </el-input>
+              <el-input size="small" v-model="formInline.user" placeholder="合格箱数"></el-input>
             </el-form-item>
           </el-form>
           <div class="content-bottom">
             <el-button type="primary" size="small" icon="el-icon-success">保存</el-button>
             <el-button size="small" style="margin-left: 15px;" icon="el-icon-error">取消</el-button>
           </div>
-          <!-- <div class="caozuoButton">
-            <div class="img">
-                <img src="./1.png">
-            </div>
-            <el-divider direction="vertical"></el-divider>
-            <div class="img">
-                <img src="./2.png">
-            </div>
-            <el-divider direction="vertical"></el-divider>
-            <div class="img">
-                <img src="./3.png">
-            </div>
-            <el-divider direction="vertical"></el-divider>
-            <div class="img">
-                <img src="./4.png">
-            </div>
-            <el-divider direction="vertical"></el-divider>
-            <div class="img">
-                <img src="./5.png">
-            </div>
-          </div> -->
         </div>
       </div>
       <el-divider></el-divider>
@@ -161,7 +173,7 @@ export default {
   props: {},
   data() {
     return {
-      formInline: {
+      orderMain: {
         user: '',
         region: ''
       },
@@ -341,6 +353,7 @@ export default {
           .el-input__inner {
             border-radius: 0px;
             border: 1px #eee solid;
+            width: 140px;
           }
         }
       }
