@@ -19,6 +19,7 @@ module.exports = {
     'no-unused-vars': 'off',
     'space-before-function-paren': 0,
     'prettier/prettier': 'off',
-    "vue/multi-word-component-names":"off"
+    "vue/multi-word-component-names":"off",
+    "no-constant-condition": ["error", { "checkLoops": false }]
   }
 };

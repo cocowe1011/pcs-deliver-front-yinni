@@ -4,122 +4,122 @@
       <div class="formDiv">
         <div class="card-title">工艺参数</div>
         <div class="card-content">
-          <el-form :inline="true" label-position="right" label-width="115px" :model="formInline" class="demo-form-inline">
+          <el-form :inline="true" label-position="right" label-width="115px" :model="orderMainForm" class="demo-form-inline">
             <el-form-item label="订单编号：">
-              <el-input size="small" v-model="formInline.orderNo" placeholder="订单编号"></el-input>
+              <el-input size="small" v-model="orderMainForm.orderNo" placeholder="订单编号"></el-input>
             </el-form-item>
             <el-form-item label="订单名称：">
-              <el-input size="small" v-model="formInline.orderName" placeholder="订单名称"></el-input>
+              <el-input size="small" v-model="orderMainForm.orderName" placeholder="订单名称"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-checkbox>翻转</el-checkbox>
+              <el-checkbox v-model="orderMainForm.revertFlag">翻转</el-checkbox>
             </el-form-item>
             <br />
             <el-form-item label="批次编号：">
-              <el-input size="small" v-model="formInline.user" placeholder="批次编号"></el-input>
+              <el-input size="small" v-model="orderMainForm.batchId" placeholder="批次编号"></el-input>
             </el-form-item>
             <el-form-item label="产品名称：">
-              <el-input size="small" v-model="formInline.user" placeholder="产品名称"></el-input>
+              <el-input size="small" v-model="orderMainForm.productName" placeholder="产品名称"></el-input>
             </el-form-item>
             <el-form-item label="加速器k值：">
-              <el-input size="small" v-model="formInline.user" placeholder="加速器k值"></el-input>
+              <el-input size="small" v-model="orderMainForm.acceleratorKValue" placeholder="加速器k值"></el-input>
             </el-form-item>
             <br />
             <el-form-item label="工艺名称：">
-              <el-input size="small" v-model="formInline.user" placeholder="工艺名称"></el-input>
+              <el-input size="small" v-model="orderMainForm.artName" placeholder="工艺名称"></el-input>
             </el-form-item>
             <el-form-item label="装载方式：">
-              <el-input size="small" v-model="formInline.user" placeholder="装载方式"></el-input>
+              <el-input size="small" v-model="orderMainForm.loadMethod" placeholder="装载方式"></el-input>
             </el-form-item>
             <el-form-item label="路径名称：">
-              <el-input size="small" v-model="formInline.user" placeholder="路径名称"></el-input>
+              <el-input size="small" v-model="orderMainForm.pathName" placeholder="路径名称"></el-input>
             </el-form-item>
             <el-form-item label="圈数：">
-              <el-input size="small" v-model="formInline.user" placeholder="圈数"></el-input>
+              <el-input size="small" v-model="orderMainForm.numberTurns" placeholder="圈数"></el-input>
             </el-form-item>
             <br />
             <el-form-item label="箱子长度：">
-              <el-input size="small" v-model="formInline.user" placeholder="箱子长度"></el-input>
+              <el-input size="small" v-model="orderMainForm.boxLength" placeholder="箱子长度"></el-input>
             </el-form-item>
             <el-form-item label="箱子高度：">
-              <el-input size="small" v-model="formInline.user" placeholder="箱子高度"></el-input>
+              <el-input size="small" v-model="orderMainForm.boxWidth" placeholder="箱子高度"></el-input>
             </el-form-item>
             <el-form-item label="箱子宽度：">
-              <el-input size="small" v-model="formInline.user" placeholder="箱子宽度"></el-input>
+              <el-input size="small" v-model="orderMainForm.boxHeight" placeholder="箱子宽度"></el-input>
             </el-form-item>
             <el-form-item label="箱子重量：">
-              <el-input size="small" v-model="formInline.user" placeholder="箱子重量"></el-input>
+              <el-input size="small" v-model="orderMainForm.boxWeight" placeholder="箱子重量"></el-input>
             </el-form-item>
             <br/>
             <el-form-item label="束流上限：">
-              <el-input size="small" v-model="formInline.user" placeholder="束流"></el-input>
+              <el-input size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限"></el-input>
             </el-form-item>
             <el-form-item label="束流设定值：">
-              <el-input size="small" v-model="formInline.user" placeholder="束流"></el-input>
+              <el-input size="small" v-model="orderMainForm.slSet" placeholder="束流设定值"></el-input>
             </el-form-item>
             <el-form-item label="束流下限：">
-              <el-input size="small" v-model="formInline.user" placeholder="束流"></el-input>
+              <el-input size="small" v-model="orderMainForm.slLowerLimit" placeholder="束流下限"></el-input>
             </el-form-item>
             <el-form-item label="功率上限：">
-              <el-input size="small" v-model="formInline.user" placeholder="功率"></el-input>
+              <el-input size="small" v-model="orderMainForm.glUpperLimit" placeholder="功率上限"></el-input>
             </el-form-item>
             <el-form-item label="功率设定值：">
-              <el-input size="small" v-model="formInline.user" placeholder="功率"></el-input>
+              <el-input size="small" v-model="orderMainForm.glSet" placeholder="功率设定值"></el-input>
             </el-form-item>
             <el-form-item label="功率下限：">
-              <el-input size="small" v-model="formInline.user" placeholder="功率"></el-input>
+              <el-input size="small" v-model="orderMainForm.glLowerLimit" placeholder="功率下限"></el-input>
             </el-form-item>
             <el-form-item label="扫宽上限：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫宽"></el-input>
+              <el-input size="small" v-model="orderMainForm.skUpperLimit" placeholder="扫宽上限"></el-input>
             </el-form-item>
             <el-form-item label="扫宽设定值：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫宽"></el-input>
+              <el-input size="small" v-model="orderMainForm.skSet" placeholder="扫宽设定值"></el-input>
             </el-form-item>
             <el-form-item label="扫宽下限：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫宽"></el-input>
+              <el-input size="small" v-model="orderMainForm.skLowerLimit" placeholder="扫宽下限"></el-input>
             </el-form-item>
             <el-form-item label="扫描频率上限：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫描频率"></el-input>
+              <el-input size="small" v-model="orderMainForm.smplUpperLimit" placeholder="扫描频率上限"></el-input>
             </el-form-item>
             <el-form-item label="扫描频率设定：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫描频率"></el-input>
+              <el-input size="small" v-model="orderMainForm.smplSet" placeholder="扫描频率设定"></el-input>
             </el-form-item>
             <el-form-item label="扫描频率下限：">
-              <el-input size="small" v-model="formInline.user" placeholder="扫描频率"></el-input>
+              <el-input size="small" v-model="orderMainForm.smplLowerLimit" placeholder="扫描频率下限"></el-input>
             </el-form-item>
             <el-form-item label="PFN电压上限：">
-              <el-input size="small" v-model="formInline.user" placeholder="PFN电压"></el-input>
+              <el-input size="small" v-model="orderMainForm.pfnUpperLimit" placeholder="PFN电压上限"></el-input>
             </el-form-item>
             <el-form-item label="PFN电压设定：">
-              <el-input size="small" v-model="formInline.user" placeholder="PFN电压"></el-input>
+              <el-input size="small" v-model="orderMainForm.pfnSet" placeholder="PFN电压设定"></el-input>
             </el-form-item>
             <el-form-item label="PFN电压下限：">
-              <el-input size="small" v-model="formInline.user" placeholder="PFN电压"></el-input>
+              <el-input size="small" v-model="orderMainForm.pfnLowerLimit" placeholder="PFN电压下限"></el-input>
             </el-form-item>
             <el-form-item label="能量上限：">
-              <el-input size="small" v-model="formInline.user" placeholder="能量"></el-input>
+              <el-input size="small" v-model="orderMainForm.nlUpperLimit" placeholder="能量上限"></el-input>
             </el-form-item>
             <el-form-item label="能量设定值：">
-              <el-input size="small" v-model="formInline.user" placeholder="能量"></el-input>
+              <el-input size="small" v-model="orderMainForm.nlSet" placeholder="能量设定值"></el-input>
             </el-form-item>
             <el-form-item label="能量下限：">
-              <el-input size="small" v-model="formInline.user" placeholder="能量"></el-input>
+              <el-input size="small" v-model="orderMainForm.nlLowerLimit" placeholder="能量下限"></el-input>
             </el-form-item>
             <el-form-item label="订单箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="订单箱数"></el-input>
+              <el-input size="small" v-model="orderMainForm.orderBoxNum" placeholder="订单箱数"></el-input>
             </el-form-item>
             <el-form-item label="剔除箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="剔除箱数"></el-input>
+              <el-input size="small" v-model="orderMainForm.eliminateBoxNum" placeholder="剔除箱数"></el-input>
             </el-form-item>
             <el-form-item label="上货箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="上货箱数"></el-input>
+              <el-input size="small" v-model="orderMainForm.exhibitBoxNum" placeholder="上货箱数"></el-input>
             </el-form-item>
             <el-form-item label="合格箱数：">
-              <el-input size="small" v-model="formInline.user" placeholder="合格箱数"></el-input>
+              <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数"></el-input>
             </el-form-item>
           </el-form>
           <div class="content-bottom">
-            <el-button type="primary" size="small" icon="el-icon-success">保存</el-button>
+            <el-button type="primary" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading">保存</el-button>
             <el-button size="small" style="margin-left: 15px;" icon="el-icon-error">取消</el-button>
           </div>
         </div>
@@ -139,6 +139,7 @@
               :label="item.label"
               :width="item.width">
             </el-table-column>
+
             <el-table-column
               fixed="right"
               label="操作"
@@ -147,7 +148,7 @@
                 <el-link type="primary" icon="el-icon-edit">编辑</el-link>
                 <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning">启动</el-link>
                 <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else>运行中</el-link>
-                <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" :disabled="!scope.row.isRunning">停止</el-link>
+                <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" :disabled="!scope.row.isRunning" @click="stop">停止</el-link>
                 <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;">完成</el-link>
                 <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph">动态图</el-link>
               </template>
@@ -167,93 +168,101 @@
 </template>
 
 <script>
+import HttpUtil from '@/utils/HttpUtil'
+import { ipcRenderer } from 'electron'
 export default {
   name: "OrderList",
   components: {},
   props: {},
   data() {
     return {
-      orderMain: {
-        user: '',
-        region: ''
-      },
+      orderMainForm: {},
       tableTitle:[
-        {prop:"no",label:"序号",width:"50"},{prop:"taskNo",label:"任务编号",width:"150"},{prop:"revert",label:"翻转",width:"150"},
-        {prop:"batchNo",label:"批次编号",width:"150"},{prop:"orderNo",label:"订单编号",width:"150"},{prop:"orderName",label:"订单名称",width:"150"},
+        {prop:"orderId",label:"任务编号",width:"150"},{prop:"revertFlag",label:"翻转",width:"150"},
+        {prop:"batchId",label:"批次编号",width:"150"},{prop:"orderNo",label:"订单编号",width:"150"},{prop:"orderName",label:"订单名称",width:"150"},
         {prop:"planNum",label:"计划数量",width:"150"},{prop:"productName",label:"产品名称",width:"150"},{prop:"loadMethod",label:"装载方式",width:"150"},
-        {prop:"pathName",label:"路径名称",width:"150"},{prop:"artName",label:"工艺名称",width:"150"},{prop:"eleDown",label:"电流下限值",width:"150"}
+        {prop:"pathName",label:"路径名称",width:"150"},{prop:"artName",label:"工艺名称",width:"150"},{prop:"acceleratorKValue",label:"加速器k值",width:"150"}
       ],
-      tableData: [{
-        no: '1',
-        taskNo: '220508001',
-        revert: '是',
-        batchNo: '',
-        orderNo: '2023060802001',
-        orderName: '静脉穿刺辅助包',
-        planNum: '1000',
-        productName: '静脉穿刺辅助包',
-        loadMethod: '起重机',
-        pathName: '',
-        artName: '静脉穿刺辅助包',
-        eleDown: '10.2',
-        isRunning: true
-      },
-      {
-        no: '2',
-        taskNo: '220508002',
-        revert: '是',
-        batchNo: '',
-        orderNo: '2023060802001',
-        orderName: '静脉穿刺辅助包',
-        planNum: '1000',
-        productName: '静脉穿刺辅助包',
-        loadMethod: '起重机',
-        pathName: '',
-        artName: '静脉穿刺辅助包',
-        eleDown: '10.2',
-        isRunning: false
-      },
-      {
-        no: '3',
-        taskNo: '220508003',
-        revert: '是',
-        batchNo: '',
-        orderNo: '2023060802001',
-        orderName: '静脉穿刺辅助包',
-        planNum: '1000',
-        productName: '静脉穿刺辅助包',
-        loadMethod: '起重机',
-        pathName: '',
-        artName: '静脉穿刺辅助包',
-        eleDown: '10.2',
-        isRunning: false
-      },
-      {
-        no: '4',
-        taskNo: '220508004',
-        revert: '否',
-        batchNo: '',
-        orderNo: '2023060802001',
-        orderName: '静脉穿刺辅助包',
-        planNum: '1000',
-        productName: '静脉穿刺辅助包',
-        loadMethod: '起重机',
-        pathName: '',
-        artName: '静脉穿刺辅助包',
-        eleDown: '10.2',
-        isRunning: false
-      }]
+      tableData: [],
+      saveLoading: false
     };
   },
   watch: {},
   computed: {},
   methods: {
+    async saveOrder() {
+      this.saveLoading = true;
+      this.orderMainForm.revertFlag = this.orderMainForm.revertFlag ? 1 : 0
+      await HttpUtil.post('/order/save', this.orderMainForm).then((res)=> {
+        if(res.data === 1) {
+          this.$message.success('保存成功！');
+          // 查询订单信息
+          this.getOrderList();
+        } else {
+          this.$message.error('保存失败！');
+        }
+        this.saveLoading = false;
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('保存失败！' + err);
+        this.saveLoading = false;
+      });
+    },
+    async getOrderList() {
+      await HttpUtil.get('/order/getOrderList').then((res)=> {
+        this.tableData = res.data
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('查询失败！' + err);
+      });
+    },
     handleClick(){},
     showDynamicGraph() {
       this.$emit('replaceRoute','/homePage/dynamicGraph')
+    },
+    writeValuesToPLC() {
+      // ipcRenderer.send('writeValuesToPLC', 'DBW6', 1);
+      // DB101.DBW2 加速器设定输送速度
+      ipcRenderer.send('writeValuesToPLC', 'DBW2', Number(this.orderMainForm.acceleratorKValue));
+      this.sleep(50)
+      // DB101.DBW8 启动输送线
+      ipcRenderer.send('writeValuesToPLC', 'DBW8', 1);
+      this.sleep(50)
+      // 翻转&回流
+      if(this.orderMainForm.revertFlag === 1) {
+        // DB101.DBW12 翻转
+        ipcRenderer.send('writeValuesToPLC', 'DBW12', 1);
+        this.sleep(50)
+        ipcRenderer.send('writeValuesToPLC', 'DBW14', 0);
+      }  else {
+        // DB101.DBW14 回流模式
+        ipcRenderer.send('writeValuesToPLC', 'DBW14', 1);
+        this.sleep(50)
+        ipcRenderer.send('writeValuesToPLC', 'DBW12', 0);
+      }
+      this.sleep(50)
+      // DB101.DBW22 纸箱宽度
+      ipcRenderer.send('writeValuesToPLC', 'DBW22', Number(this.orderMainForm.boxWidth));
+      this.sleep(50)
+      // DB101.DBW24 纸箱长度
+      ipcRenderer.send('writeValuesToPLC', 'DBW24', Number(this.orderMainForm.boxLength));
+    },
+    sleep(numberMillis) {
+      var now = new Date();
+      var exitTime = now.getTime() + numberMillis;
+      while (true) {
+        now = new Date();
+        if (now.getTime() > exitTime)
+        return;
+      }
+    },
+    stop() {
+      ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
     }
   },
-  created() {},
+  created() {
+    this.getOrderList()
+  },
   mounted() {}
 };
 </script>

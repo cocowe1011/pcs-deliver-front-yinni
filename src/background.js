@@ -62,6 +62,10 @@ app.on('ready', () => {
   ipcMain.on('min-window', (event, arg) => {
     mainWindow.minimize();
   })
+  // writeValuesToPLC
+  ipcMain.on('writeValuesToPLC', (event, arg1, arg2) => {
+    writeValuesToPLC(arg1, arg2);
+  })
   // 定义自定义事件
   ipcMain.on('max-window', (event, arg) => {
     if (arg === 'max-window') {
@@ -123,22 +127,46 @@ app.on('ready', () => {
   //     process.exit();
   //   }
   //   conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
-  //   // conn.addItems('DBW62');
-  //   conn.addItems('DBW70');
-  //   // 给DBW6写0或1
-  //   // console.log('给DBW6写0')
-  //   //conn.writeItems('DBW6', 0, valuesWritten); // This writes a single boolean item (one bit) to true
-  //   // 读DBW6和DBW62
-  //   setInterval(() => {
-  //     conn.readAllItems(valuesReady);
-  //   }, 50);
-  //   // conn.readAllItems(valuesReady);
+
+    // DB101.DBW2 加速器设定输送速度
+    // conn.addItems('DBW2');
+    // // DB101.DBW8 启动输送线
+    // conn.addItems('DBW8');
+    // // DB101.DBW10 停止输送线
+    // conn.addItems('DBW10');
+    // // DB101.DBW12 翻转
+    // conn.addItems('DBW12');
+    // // DB101.DBW14 回流模式
+    // conn.addItems('DBW14');
+    // // DB101.DBW22 纸箱宽度
+    // conn.addItems('DBW22');
+    // // DB101.DBW24 纸箱长度
+    // conn.addItems('DBW24');
+
+    // conn.addItems('DBW70');
+    // 给DBW6写0或1
+    // console.log('给DBW6写0')
+    // conn.writeItems('DBW6', 0, valuesWritten); // This writes a single boolean item (one bit) to true
+    // 读DBW6和DBW62
+    // setInterval(() => {
+    //   conn.readAllItems(valuesReady);
+    // }, 50);
+    // conn.readAllItems(valuesReady);
   // });
+
 });
+
+// 给PLC写值
+function writeValuesToPLC(add, values) {
+  console.log(add)
+  console.log(values)
+  conn.writeItems(add, values, valuesWritten); // This writes a single boolean item (one bit) to true
+  // console.log(add +','+values)
+}
 
 function valuesWritten(anythingBad) {
   if (anythingBad) { console.log("SOMETHING WENT WRONG WRITING VALUES!!!!"); }
-  console.log("DBW6成功写入！");
+  console.log("成功写入！");
   doneWriting = true;
   if (doneReading) { process.exit(); }
 }
@@ -147,8 +175,8 @@ var doneReading = false;
 var doneWriting = false;
 function valuesReady(anythingBad, values) {
   if (anythingBad) { console.log("SOMETHING WENT WRONG READING VALUES!!!!"); }
-  // console.log(values)
-  mainWindow.webContents.send('receivedMsg', values)
+  console.log(values)
+  // mainWindow.webContents.send('receivedMsg', values)
   doneReading = true;
   if (doneWriting) { process.exit(); }
 }
@@ -167,10 +195,13 @@ var variables = {
   TEST8: 'DB1,LREAL4',   // Single 8-byte real value
   TEST9: 'DB1,X14.0',    // Single bit in a data block
   TEST10: 'DB1,X14.0.8',  // Array of 8 bits in a data block
-  DBW6: 'DB101,INT6',
-  DBW60: 'DB101,INT60',
-  DBW62: 'DB101,INT62',
-  DBW70: 'DB101,INT70'
+  DBW2: 'DB101,INT2',
+  DBW8: 'DB101,INT8',
+  DBW10: 'DB101,INT10',
+  DBW12: 'DB101,INT12',
+  DBW14: 'DB101,INT14',
+  DBW22: 'DB101,INT22',
+  DBW24: 'DB101,INT24'
 };
 const setAppTray = () => {  
   // 系统托盘右键菜单
