@@ -86,27 +86,45 @@
             <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
           </transition>
           <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:30px" />
-          <div class="show-data-area" style="position: absolute;right: 150px;top: 475px;" v-show="false">
-            <div class="show-data-area-top">上货扫码信息</div>
+          <div class="show-data-area" style="position: absolute;right: 80px;top: 490px;">
+            <div class="show-data-area-top">ID信息</div>
             <div class="show-data-area-content">
               <el-input v-model="qrCode" readonly size="small"></el-input>
             </div>
           </div>
-          <div class="show-data-area" style="position: absolute;right: 150px;top: 538px;" v-show="false">
+          <div class="show-data-area" style="position: absolute;right: 80px;top: 528px;">
+            <div class="show-data-area-top">上货扫码信息</div>
+            <div class="show-data-area-content">
+              <el-input v-model="nowInNum" readonly size="small"></el-input>
+            </div>
+          </div>
+          <div class="show-data-area" style="position: absolute;right: 80px;top: 569px;">
             <div class="show-data-area-top">当前上货数量</div>
             <div class="show-data-area-content">
               <el-input v-model="nowInNum" readonly size="small"></el-input>
             </div>
           </div>
-          <div class="show-data-area" style="position: absolute;left: 150px;top: 475px;" v-show="false">
-            <div class="show-data-area-top">下货扫码信息</div>
+          <div class="show-data-area" style="position: absolute;left: 178px;top: 475px;">
+            <div class="show-data-area-top">ID信息</div>
             <div class="show-data-area-content">
               <el-input v-model="qrCode" readonly size="small"></el-input>
             </div>
           </div>
-          <div class="show-data-area" style="position: absolute;left: 150px;top: 538px;" v-show="false">
+          <div class="show-data-area" style="position: absolute;left: 178px;top: 513px;">
+            <div class="show-data-area-top">下货扫码信息</div>
+            <div class="show-data-area-content">
+              <el-input v-model="nowInNum" readonly size="small"></el-input>
+            </div>
+          </div>
+          <div class="show-data-area" style="position: absolute;left: 194px;top: 560px;">
             <div class="show-data-area-top">当前下货数量</div>
             <div class="show-data-area-content">
+              <el-input v-model="nowInNum" readonly size="small"></el-input>
+            </div>
+          </div>
+          <div class="show-data-area" style="position: absolute;left: 436px;top: 185px;width: 150px;height: 58px;">
+            <div class="show-data-area-top" style="width: 100%;height: 26px;">束下当前货物ID</div>
+            <div class="show-data-area-content" style="width: 100%;height: 26px;">
               <el-input v-model="nowInNum" readonly size="small"></el-input>
             </div>
           </div>
@@ -143,6 +161,23 @@
             <div class='star'></div>
             <div class="pointText">H</div>
           </div>
+          <!-- 电机状态 -->
+          <div class="dianji dianji-active" style="top: 640px;right: 133px;">100#电机</div>
+          <div class="dianji dianji-active" style="top: 416px;right: 6px;">101#电机</div>
+          <div class="dianji dianji-active" style="top: 386px;right: 190px;">102#电机</div>
+          <div class="dianji dianji-active" style="top: 258px;right: 190px;">103#电机</div>
+          <div class="dianji dianji-active" style="top: 132px;right: 190px;">104#电机</div>
+          <div class="dianji dianji-active" style="top: 88px;right: 450px;">105#电机</div>
+          <div class="dianji dianji-active" style="top: 131px;right: 538px;">106#电机</div>
+          <div class="dianji" style="top: 259px;right: 516px;">107#电机</div>
+          <div class="dianji" style="top: 379px;right: 516px;">108#电机</div>
+          <div class="dianji dianji-active" style="top: 379px;right: 641px;">109#电机</div>
+          <div class="dianji dianji-active" style="top: 420px;right: 727px;">110#电机</div>
+          <div class="dianji dianji-active" style="top: 638px;right: 730px;">111#电机</div>
+          <div class="dianji dianji-active" style="top: 639px;right: 627px;">112#电机</div>
+          <div class="dianji dianji-active" style="top: 596px;right: 450px;">113#电机</div>
+          <div class="dianji" style="top: 596px;right: 264px;">114#电机</div>
+          <div class="dianji dianji-active" style="top: 690px;right: 367px;">115#电机</div>
         </div>
       </div>
     </div>
@@ -253,11 +288,11 @@ export default {
   .chuansongpadding {
     box-sizing: border-box;
     .show-data-area {
-      width:150px;
-      height: 58px;
+      width:250px;
+      height: 32px;
       &-top {
-        height: 25px;
-        width: 100%;
+        height: 32px;
+        width: 100px;
         float: left;
         display:flex;
         align-items:center;
@@ -268,7 +303,7 @@ export default {
       }
       &-content {
         height: 32px;
-        width: 100%;
+        width: 150px;
         float: left;
         ::v-deep .el-input--small .el-input__inner {
           text-align: center;
@@ -431,6 +466,19 @@ export default {
       .guangdian:hover {
         background: rgba(246, 247, 251, 0.56);
         box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
+      }
+      .dianji {
+        height: 23px;
+        width: 75px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f56c6c;
+        color: white;
+        position: absolute;
+      }
+      .dianji-active {
+        background-color: #43CF7C;
       }
     }
   }

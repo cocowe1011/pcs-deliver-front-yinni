@@ -62,7 +62,6 @@
             <el-form-item label="合格箱数：">
               <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数"></el-input>
             </el-form-item>
-            <br/>
             <el-form-item label="束流上限：">
               <el-input size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限"></el-input>
             </el-form-item>
