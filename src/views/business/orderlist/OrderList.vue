@@ -24,10 +24,10 @@
             <el-form-item label="加速器k值：">
               <el-input size="small" v-model="orderMainForm.acceleratorKValue" placeholder="加速器k值"></el-input>
             </el-form-item>
-            <br />
             <el-form-item label="工艺名称：">
               <el-input size="small" v-model="orderMainForm.artName" placeholder="工艺名称"></el-input>
             </el-form-item>
+            <br />
             <el-form-item label="装载方式：">
               <el-input size="small" v-model="orderMainForm.loadMethod" placeholder="装载方式"></el-input>
             </el-form-item>
@@ -37,10 +37,10 @@
             <el-form-item label="圈数：">
               <el-input size="small" v-model="orderMainForm.numberTurns" placeholder="圈数"></el-input>
             </el-form-item>
-            <br />
             <el-form-item label="箱子长度：">
               <el-input size="small" v-model="orderMainForm.boxLength" placeholder="箱子长度"></el-input>
             </el-form-item>
+            <br />
             <el-form-item label="箱子高度：">
               <el-input size="small" v-model="orderMainForm.boxWidth" placeholder="箱子高度"></el-input>
             </el-form-item>
@@ -49,6 +49,18 @@
             </el-form-item>
             <el-form-item label="箱子重量：">
               <el-input size="small" v-model="orderMainForm.boxWeight" placeholder="箱子重量"></el-input>
+            </el-form-item>
+            <el-form-item label="订单箱数：">
+              <el-input size="small" v-model="orderMainForm.orderBoxNum" placeholder="订单箱数"></el-input>
+            </el-form-item>
+            <el-form-item label="剔除箱数：">
+              <el-input size="small" v-model="orderMainForm.eliminateBoxNum" placeholder="剔除箱数"></el-input>
+            </el-form-item>
+            <el-form-item label="上货箱数：">
+              <el-input size="small" v-model="orderMainForm.exhibitBoxNum" placeholder="上货箱数"></el-input>
+            </el-form-item>
+            <el-form-item label="合格箱数：">
+              <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数"></el-input>
             </el-form-item>
             <br/>
             <el-form-item label="束流上限：">
@@ -105,62 +117,57 @@
             <el-form-item label="能量下限：">
               <el-input size="small" v-model="orderMainForm.nlLowerLimit" placeholder="能量下限"></el-input>
             </el-form-item>
-            <el-form-item label="订单箱数：">
-              <el-input size="small" v-model="orderMainForm.orderBoxNum" placeholder="订单箱数"></el-input>
-            </el-form-item>
-            <el-form-item label="剔除箱数：">
-              <el-input size="small" v-model="orderMainForm.eliminateBoxNum" placeholder="剔除箱数"></el-input>
-            </el-form-item>
-            <el-form-item label="上货箱数：">
-              <el-input size="small" v-model="orderMainForm.exhibitBoxNum" placeholder="上货箱数"></el-input>
-            </el-form-item>
-            <el-form-item label="合格箱数：">
-              <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数"></el-input>
-            </el-form-item>
           </el-form>
-          <div class="content-bottom">
-            <el-button type="primary" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading">保存</el-button>
-            <el-button size="small" style="margin-left: 15px;" icon="el-icon-error">取消</el-button>
+          <div class="content-bottom" v-show="isNewSave || isEdit">
+            <el-button type="primary" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading" v-if="isNewSave">保存</el-button>
+            <el-button type="primary" size="small" icon="el-icon-success" v-else>修改</el-button>
+            <el-button size="small" style="margin-left: 15px;" icon="el-icon-error" @click="cancelEditOrSave">取消</el-button>
           </div>
         </div>
       </div>
       <el-divider></el-divider>
       <div class="listDiv">
         <div class="list-top">
-          <el-button type="primary" icon="el-icon-plus" size="small">新建</el-button>
+          <el-button type="primary" icon="el-icon-plus" size="small" @click="newOrderClick">新建</el-button>
         </div>
         <div class="list-middle">
           <el-table
             :data="tableData"
             border
-            style="width: 100%">
-            <el-table-column v-for="item in tableTitle" :key="item.prop"
+            style="width: 100%"
+            highlight-current-row
+            @current-change="handleCurrentChange">
+            <el-table-column type="index" width="80" :index="indexMethod" fixed="left" label="序号">
+            </el-table-column>
+            <el-table-column v-for="item in tableTitle"
+              :key="item.prop"
               :prop="item.prop"
               :label="item.label"
               :width="item.width">
             </el-table-column>
-
+            <el-table-column
+              prop="tag"
+              label="来源"
+              width="100"
+              fixed="right">
+              <template>
+                <el-tag type="success" disable-transitions>手动</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column
               fixed="right"
               label="操作"
               width="320">
               <template slot-scope="scope">
-                <el-link type="primary" icon="el-icon-edit">编辑</el-link>
-                <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning">启动</el-link>
-                <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else>运行中</el-link>
-                <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" :disabled="!scope.row.isRunning" @click="stop">停止</el-link>
-                <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;">完成</el-link>
-                <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph">动态图</el-link>
+                <el-link type="primary" icon="el-icon-edit" @click="editClick(scope.row)">编辑</el-link>
+                <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning" :disabled="scope.row.orderId !== currentSelect.orderId">启动</el-link>
+                <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="scope.row.orderId !== currentSelect.orderId">运行中</el-link>
+                <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="scope.row.orderId !== currentSelect.orderId">停止</el-link>
+                <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="scope.row.orderId !== currentSelect.orderId">完成</el-link>
+                <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph" :disabled="scope.row.orderId !== currentSelect.orderId">动态图</el-link>
               </template>
             </el-table-column>
           </el-table>
-        </div>
-        <div class="list-bottom">
-          <el-pagination
-            background
-            layout="prev, pager, next"
-            :total="1000">
-          </el-pagination>
         </div>
       </div>
     </div>
@@ -178,18 +185,32 @@ export default {
     return {
       orderMainForm: {},
       tableTitle:[
-        {prop:"orderId",label:"任务编号",width:"150"},{prop:"revertFlag",label:"翻转",width:"150"},
+        {prop:"orderId",label:"任务编号",width:"200"},{prop:"revertFlag",label:"翻转",width:"150"},
         {prop:"batchId",label:"批次编号",width:"150"},{prop:"orderNo",label:"订单编号",width:"150"},{prop:"orderName",label:"订单名称",width:"150"},
         {prop:"planNum",label:"计划数量",width:"150"},{prop:"productName",label:"产品名称",width:"150"},{prop:"loadMethod",label:"装载方式",width:"150"},
         {prop:"pathName",label:"路径名称",width:"150"},{prop:"artName",label:"工艺名称",width:"150"},{prop:"acceleratorKValue",label:"加速器k值",width:"150"}
       ],
       tableData: [],
-      saveLoading: false
+      saveLoading: false,
+      isEdit: false,
+      isNewSave: false,
+      currentSelect: {}
     };
   },
   watch: {},
   computed: {},
   methods: {
+    cancelEditOrSave() {
+      this.isNewSave = false;
+    },
+    newOrderClick() {
+      this.isNewSave = true;
+      this.orderMainForm = {};
+    },
+    editClick(orderMain) {
+      this.isEdit = true;
+      alert(JSON.stringify(orderMain))
+    },
     async saveOrder() {
       this.saveLoading = true;
       this.orderMainForm.revertFlag = this.orderMainForm.revertFlag ? 1 : 0
@@ -258,6 +279,12 @@ export default {
     },
     stop() {
       ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
+    },
+    indexMethod(index) {
+      return index + 1;
+    },
+    handleCurrentChange(val) {
+      this.currentSelect = val;
     }
   },
   created() {
@@ -386,17 +413,8 @@ export default {
         justify-content: flex-start;
       }
       .list-middle {
-        height: calc(100% - 100px);
+        height: calc(100% - 50px);
         width: 100%;
-      }
-      .list-bottom {
-        width: 100%;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        box-sizing: border-box;
-        padding-right: 1px;
       }
     }
   }

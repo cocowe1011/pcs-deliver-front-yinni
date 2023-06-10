@@ -110,6 +110,39 @@
               <el-input v-model="nowInNum" readonly size="small"></el-input>
             </div>
           </div>
+          <!-- 光电星星 -->
+          <div class="guangdian" style="top: 447px;right: 86px;">
+            <div class='star'></div>
+            <div class="pointText">A</div>
+          </div>
+          <div class="guangdian" style="top: 185px;right: 140px;">
+            <div class='star'></div>
+            <div class="pointText">B</div>
+          </div>
+          <div class="guangdian" style="top: 185px;right: 612px;">
+            <div class='star'></div>
+            <div class="pointText">C</div>
+          </div>
+          <div class="guangdian" style="top: 331px;right: 654px;">
+            <div class='star'></div>
+            <div class="pointText">D</div>
+          </div>
+          <div class="guangdian" style="top: 434px;right: 674px;">
+            <div class='star'></div>
+            <div class="pointText">E</div>
+          </div>
+          <div class="guangdian" style="right: 827px;top: 551px;">
+            <div class='star'></div>
+            <div class="pointText">F</div>
+          </div>
+          <div class="guangdian" style="right: 792px;top: 600px;">
+            <div class='star'></div>
+            <div class="pointText">G</div>
+          </div>
+          <div class="guangdian" style="right: 446px;top: 683px;">
+            <div class='star'></div>
+            <div class="pointText">H</div>
+          </div>
         </div>
       </div>
     </div>
@@ -327,6 +360,78 @@ export default {
       box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(88px);
       background: linear-gradient(to right, rgba(83, 188, 206, 0.7), rgba(97, 168, 160, 0.8));
+      .guangdian {
+        width: 68px;
+        height: 50px;
+        position: absolute;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        cursor: pointer;
+        * {
+          border-width: 0;
+        }
+        .pointText {
+          margin-left: 46px;
+          font-size: 28px;
+          color: #D43030;
+        }
+        .star{
+          width: 0;
+          height: 0;
+          border-top-color: #AC33C1;
+          border-left-color: transparent;
+          border-right-color: transparent;
+          border-top-width: 20.73px;
+          border-left-width: 28.53px;
+          border-right-width: 28.53px;
+          border-style: solid;
+          position: absolute;
+          transform: scale(0.5);
+        }
+        .star::before {
+          border-width:0; 
+          content: '';
+          display: block;
+          width: 0;
+          height: 0;
+          border-top-color: #AC33C1;
+          border-left-color: transparent;
+          border-right-color: transparent;
+          border-top-width: 20.73px;
+          border-left-width: 28.53px;
+          border-right-width: 28.53px;
+          border-style: solid; 
+          position:absolute;
+          top:-20.73px;
+          left:-28.53px;
+          transform:rotate(72deg);
+          transform-origin:28.53px  9.27px; 
+        }
+        .star::after{
+          border-width:0; 
+          content: '';
+          display: block;
+          width: 0;
+          height: 0;
+          border-top-color:#AC33C1;
+          border-left-color: transparent;
+          border-right-color: transparent;
+          border-top-width: 20.73px;
+          border-left-width: 28.53px;
+          border-right-width: 28.53px;
+          border-style: solid;   
+          position:absolute;
+          top:-20.73px;
+          left:-28.53px;
+          transform:rotate(-72deg);
+          transform-origin:28.53px  9.27px; 
+        }
+      }
+      .guangdian:hover {
+        background: rgba(246, 247, 251, 0.56);
+        box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
+      }
     }
   }
 }
