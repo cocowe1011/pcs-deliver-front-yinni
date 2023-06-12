@@ -309,7 +309,8 @@ export default {
       guangDianStatusArr: '',
       dianJiStatusArr: '',
       orderMainDy: {},
-      nowNumberTurns: 1
+      nowNumberTurns: 1,
+      lightBeamRealTimeSpeed: 0
     };
   },
   watch: {
@@ -535,6 +536,7 @@ export default {
       this.pointG = this.guangDianStatusArr[1];
       this.pointH = this.guangDianStatusArr[0];
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
+      this.lightBeamRealTimeSpeed = eventData.DBW68;
       // console.log(this.guangDianStatusArr)
     })
   }

@@ -130,10 +130,16 @@ app.on('ready', () => {
     }
     conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
 
+    // 束下实时反馈速度
+    conn.addItems('DBW68')
     // 关键点光电信号
     conn.addItems('DBW70');
     // 电机运行信号
     conn.addItems('DBW72');
+    // 上料固定扫码
+    conn.addItems('DBB100');
+    // 迷宫出口固定扫码
+    conn.addItems('DBB130');
     // 读DBW6和DBW62
     intervalReadPLC = setInterval(() => {
       conn.readAllItems(valuesReady);
@@ -157,7 +163,9 @@ var variables = {
   DBW66: 'DB101,INT66',
   DBW68: 'DB101,INT68',
   DBW70: 'DB101,INT70',
-  DBW72: 'DB101,INT72'
+  DBW72: 'DB101,INT72',
+  DBB100: 'DB101,C100.30',
+  DBB130: 'DB101,C130.30'
 };
 
 // 给PLC写值
