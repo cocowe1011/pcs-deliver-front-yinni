@@ -4,6 +4,8 @@ import nodes7 from 'nodes7';
 const { spawn } = require('child_process');
 const path = require('path');
 var appTray = null;
+let closeStatus = false;
+var conn = new nodes7;
 // electron 开启热更新
 try {
   require('electron-reloader')(module,{});
@@ -120,89 +122,63 @@ app.on('ready', () => {
   }
 
   // 与PLC进行通讯
-  // conn.initiateConnection( { port: 102, host: '192.168.0.10', rack: 0, slot: 1, debug: false }, (err) => {
-  //   if (typeof(err) !== "undefined") {
-  //     // We have an error. Maybe the PLC is not reachable.
-  //     console.log(err);
-  //     process.exit();
-  //   }
-  //   conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
+  conn.initiateConnection( { port: 102, host: '192.168.0.10', rack: 0, slot: 1, debug: false }, (err) => {
+    if (typeof(err) !== "undefined") {
+      // We have an error. Maybe the PLC is not reachable.
+      console.log(err);
+      // process.exit();
+    }
+    conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
 
-    // DB101.DBW2 加速器设定输送速度
-    // conn.addItems('DBW2');
-    // // DB101.DBW8 启动输送线
-    // conn.addItems('DBW8');
-    // // DB101.DBW10 停止输送线
-    // conn.addItems('DBW10');
-    // // DB101.DBW12 翻转
-    // conn.addItems('DBW12');
-    // // DB101.DBW14 回流模式
-    // conn.addItems('DBW14');
-    // // DB101.DBW22 纸箱宽度
-    // conn.addItems('DBW22');
-    // // DB101.DBW24 纸箱长度
-    // conn.addItems('DBW24');
-
-    // conn.addItems('DBW70');
-    // 给DBW6写0或1
-    // console.log('给DBW6写0')
-    // conn.writeItems('DBW6', 0, valuesWritten); // This writes a single boolean item (one bit) to true
+    // 关键点光电信号
+    conn.addItems('DBW70');
+    // 电机运行信号
+    conn.addItems('DBW72');
     // 读DBW6和DBW62
-    // setInterval(() => {
-    //   conn.readAllItems(valuesReady);
-    // }, 50);
-    // conn.readAllItems(valuesReady);
-  // });
-
+    intervalReadPLC = setInterval(() => {
+      conn.readAllItems(valuesReady);
+    }, 50);
+  });
 });
 
-// 给PLC写值
-function writeValuesToPLC(add, values) {
-  console.log(add)
-  console.log(values)
-  conn.writeItems(add, values, valuesWritten); // This writes a single boolean item (one bit) to true
-  // console.log(add +','+values)
-}
-
-function valuesWritten(anythingBad) {
-  if (anythingBad) { console.log("SOMETHING WENT WRONG WRITING VALUES!!!!"); }
-  console.log("成功写入！");
-  doneWriting = true;
-  if (doneReading) { process.exit(); }
-}
-
-var doneReading = false;
-var doneWriting = false;
-function valuesReady(anythingBad, values) {
-  if (anythingBad) { console.log("SOMETHING WENT WRONG READING VALUES!!!!"); }
-  console.log(values)
-  // mainWindow.webContents.send('receivedMsg', values)
-  doneReading = true;
-  if (doneWriting) { process.exit(); }
-}
-
-let closeStatus = false;
-var conn = new nodes7;
+let intervalReadPLC = null;
 
 var variables = {
-  TEST1: 'MR4',          // Memory real at MD4
-  TEST2: 'M32.2',        // Bit at M32.2
-  TEST3: 'M20.0',        // Bit at M20.0
-  TEST4: 'DB1,REAL0.20', // Array of 20 values in DB1
-  TEST5: 'DB1,REAL4',    // Single real value
-  DBW6: 'DB1,REAL8',    // Another single real value
-  TEST7: 'DB1,INT12.2',  // Two integer value array
-  TEST8: 'DB1,LREAL4',   // Single 8-byte real value
-  TEST9: 'DB1,X14.0',    // Single bit in a data block
-  TEST10: 'DB1,X14.0.8',  // Array of 8 bits in a data block
   DBW2: 'DB101,INT2',
   DBW8: 'DB101,INT8',
   DBW10: 'DB101,INT10',
   DBW12: 'DB101,INT12',
   DBW14: 'DB101,INT14',
   DBW22: 'DB101,INT22',
-  DBW24: 'DB101,INT24'
+  DBW24: 'DB101,INT24',
+  DBW60: 'DB101,INT60',
+  DBW62: 'DB101,INT62',
+  DBW64: 'DB101,INT64',
+  DBW66: 'DB101,INT66',
+  DBW68: 'DB101,INT68',
+  DBW70: 'DB101,INT70',
+  DBW72: 'DB101,INT72'
 };
+
+// 给PLC写值
+function writeValuesToPLC(add, values) {
+  console.log(add)
+  console.log(values)
+  // nodes7 代码
+  conn.writeItems(add, values, valuesWritten); // This writes a single boolean item (one bit) to true
+  // console.log(add +','+values)
+}
+
+function valuesWritten(anythingBad) {
+  if (anythingBad) { console.log("SOMETHING WENT WRONG WRITING VALUES!!!!"); }
+}
+
+function valuesReady(anythingBad, values) {
+  if (anythingBad) { console.log("SOMETHING WENT WRONG READING VALUES!!!!"); }
+  console.log(values)
+  mainWindow.webContents.send('receivedMsg', values)
+}
+
 const setAppTray = () => {  
   // 系统托盘右键菜单
   var trayMenuTemplate = [

@@ -1,184 +1,193 @@
 <template>
-  <div class="orderlist">
-    <div>
-      <div class="formDiv">
-        <div class="card-title">工艺参数</div>
-        <div class="card-content">
-          <el-form :inline="true" label-position="right" label-width="115px" :model="orderMainForm" class="demo-form-inline">
-            <el-form-item label="订单编号：">
-              <el-input size="small" v-model="orderMainForm.orderNo" placeholder="订单编号"></el-input>
-            </el-form-item>
-            <el-form-item label="订单名称：">
-              <el-input size="small" v-model="orderMainForm.orderName" placeholder="订单名称"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-checkbox v-model="orderMainForm.revertFlag">翻转</el-checkbox>
-            </el-form-item>
-            <br />
-            <el-form-item label="批次编号：">
-              <el-input size="small" v-model="orderMainForm.batchId" placeholder="批次编号"></el-input>
-            </el-form-item>
-            <el-form-item label="产品名称：">
-              <el-input size="small" v-model="orderMainForm.productName" placeholder="产品名称"></el-input>
-            </el-form-item>
-            <el-form-item label="加速器k值：">
-              <el-input size="small" v-model="orderMainForm.acceleratorKValue" placeholder="加速器k值"></el-input>
-            </el-form-item>
-            <el-form-item label="工艺名称：">
-              <el-input size="small" v-model="orderMainForm.artName" placeholder="工艺名称"></el-input>
-            </el-form-item>
-            <br />
-            <el-form-item label="装载方式：">
-              <el-input size="small" v-model="orderMainForm.loadMethod" placeholder="装载方式"></el-input>
-            </el-form-item>
-            <el-form-item label="路径名称：">
-              <el-input size="small" v-model="orderMainForm.pathName" placeholder="路径名称"></el-input>
-            </el-form-item>
-            <el-form-item label="圈数：">
-              <el-input size="small" v-model="orderMainForm.numberTurns" placeholder="圈数"></el-input>
-            </el-form-item>
-            <el-form-item label="箱子长度：">
-              <el-input size="small" v-model="orderMainForm.boxLength" placeholder="箱子长度"></el-input>
-            </el-form-item>
-            <br />
-            <el-form-item label="箱子高度：">
-              <el-input size="small" v-model="orderMainForm.boxWidth" placeholder="箱子高度"></el-input>
-            </el-form-item>
-            <el-form-item label="箱子宽度：">
-              <el-input size="small" v-model="orderMainForm.boxHeight" placeholder="箱子宽度"></el-input>
-            </el-form-item>
-            <el-form-item label="箱子重量：">
-              <el-input size="small" v-model="orderMainForm.boxWeight" placeholder="箱子重量"></el-input>
-            </el-form-item>
-            <el-form-item label="订单箱数：">
-              <el-input size="small" v-model="orderMainForm.orderBoxNum" placeholder="订单箱数"></el-input>
-            </el-form-item>
-            <el-form-item label="剔除箱数：">
-              <el-input size="small" v-model="orderMainForm.eliminateBoxNum" placeholder="剔除箱数"></el-input>
-            </el-form-item>
-            <el-form-item label="上货箱数：">
-              <el-input size="small" v-model="orderMainForm.exhibitBoxNum" placeholder="上货箱数"></el-input>
-            </el-form-item>
-            <el-form-item label="合格箱数：">
-              <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数"></el-input>
-            </el-form-item>
-            <el-form-item label="束流上限：">
-              <el-input size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限"></el-input>
-            </el-form-item>
-            <el-form-item label="束流设定值：">
-              <el-input size="small" v-model="orderMainForm.slSet" placeholder="束流设定值"></el-input>
-            </el-form-item>
-            <el-form-item label="束流下限：">
-              <el-input size="small" v-model="orderMainForm.slLowerLimit" placeholder="束流下限"></el-input>
-            </el-form-item>
-            <el-form-item label="功率上限：">
-              <el-input size="small" v-model="orderMainForm.glUpperLimit" placeholder="功率上限"></el-input>
-            </el-form-item>
-            <el-form-item label="功率设定值：">
-              <el-input size="small" v-model="orderMainForm.glSet" placeholder="功率设定值"></el-input>
-            </el-form-item>
-            <el-form-item label="功率下限：">
-              <el-input size="small" v-model="orderMainForm.glLowerLimit" placeholder="功率下限"></el-input>
-            </el-form-item>
-            <el-form-item label="扫宽上限：">
-              <el-input size="small" v-model="orderMainForm.skUpperLimit" placeholder="扫宽上限"></el-input>
-            </el-form-item>
-            <el-form-item label="扫宽设定值：">
-              <el-input size="small" v-model="orderMainForm.skSet" placeholder="扫宽设定值"></el-input>
-            </el-form-item>
-            <el-form-item label="扫宽下限：">
-              <el-input size="small" v-model="orderMainForm.skLowerLimit" placeholder="扫宽下限"></el-input>
-            </el-form-item>
-            <el-form-item label="扫描频率上限：">
-              <el-input size="small" v-model="orderMainForm.smplUpperLimit" placeholder="扫描频率上限"></el-input>
-            </el-form-item>
-            <el-form-item label="扫描频率设定：">
-              <el-input size="small" v-model="orderMainForm.smplSet" placeholder="扫描频率设定"></el-input>
-            </el-form-item>
-            <el-form-item label="扫描频率下限：">
-              <el-input size="small" v-model="orderMainForm.smplLowerLimit" placeholder="扫描频率下限"></el-input>
-            </el-form-item>
-            <el-form-item label="PFN电压上限：">
-              <el-input size="small" v-model="orderMainForm.pfnUpperLimit" placeholder="PFN电压上限"></el-input>
-            </el-form-item>
-            <el-form-item label="PFN电压设定：">
-              <el-input size="small" v-model="orderMainForm.pfnSet" placeholder="PFN电压设定"></el-input>
-            </el-form-item>
-            <el-form-item label="PFN电压下限：">
-              <el-input size="small" v-model="orderMainForm.pfnLowerLimit" placeholder="PFN电压下限"></el-input>
-            </el-form-item>
-            <el-form-item label="能量上限：">
-              <el-input size="small" v-model="orderMainForm.nlUpperLimit" placeholder="能量上限"></el-input>
-            </el-form-item>
-            <el-form-item label="能量设定值：">
-              <el-input size="small" v-model="orderMainForm.nlSet" placeholder="能量设定值"></el-input>
-            </el-form-item>
-            <el-form-item label="能量下限：">
-              <el-input size="small" v-model="orderMainForm.nlLowerLimit" placeholder="能量下限"></el-input>
-            </el-form-item>
-          </el-form>
-          <div class="content-bottom" v-show="isNewSave || isEdit">
-            <el-button type="primary" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading" v-if="isNewSave">保存</el-button>
-            <el-button type="primary" size="small" icon="el-icon-success" v-else>修改</el-button>
-            <el-button size="small" style="margin-left: 15px;" icon="el-icon-error" @click="cancelEditOrSave">取消</el-button>
+  <div style="width: 100%;height: 100%;">
+    <div class="orderlist" v-show="!isDynamicGraphShow">
+      <div>
+        <div class="formDiv">
+          <div class="card-title">工艺参数</div>
+          <div class="card-content">
+            <el-form :inline="true" label-position="right" label-width="115px" :model="orderMainForm" class="demo-form-inline">
+              <el-form-item label="订单编号：">
+                <el-input size="small" v-model="orderMainForm.orderNo" placeholder="订单编号" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="订单名称：">
+                <el-input size="small" v-model="orderMainForm.orderName" placeholder="订单名称" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-checkbox v-model="orderMainForm.revertFlag" :disabled="!(isNewSave || isEdit)">翻转</el-checkbox>
+              </el-form-item>
+              <br />
+              <el-form-item label="批次编号：">
+                <el-input size="small" v-model="orderMainForm.batchId" placeholder="批次编号" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="产品名称：">
+                <el-input size="small" v-model="orderMainForm.productName" placeholder="产品名称" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="加速器k值：">
+                <el-input size="small" v-model="orderMainForm.acceleratorKValue" placeholder="加速器k值" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="工艺名称：">
+                <el-input size="small" v-model="orderMainForm.artName" placeholder="工艺名称" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <br />
+              <el-form-item label="装载方式：">
+                <el-input size="small" v-model="orderMainForm.loadMethod" placeholder="装载方式" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="路径名称：">
+                <el-input size="small" v-model="orderMainForm.pathName" placeholder="路径名称" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="圈数：">
+                <el-input size="small" v-model="orderMainForm.numberTurns" placeholder="圈数" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="箱子长度：">
+                <el-input size="small" v-model="orderMainForm.boxLength" placeholder="箱子长度" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <br />
+              <el-form-item label="箱子高度：">
+                <el-input size="small" v-model="orderMainForm.boxWidth" placeholder="箱子高度" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="箱子宽度：">
+                <el-input size="small" v-model="orderMainForm.boxHeight" placeholder="箱子宽度" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="箱子重量：">
+                <el-input size="small" v-model="orderMainForm.boxWeight" placeholder="箱子重量" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="订单箱数：">
+                <el-input size="small" v-model="orderMainForm.orderBoxNum" placeholder="订单箱数" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="剔除箱数：">
+                <el-input size="small" v-model="orderMainForm.eliminateBoxNum" placeholder="剔除箱数" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="上货箱数：">
+                <el-input size="small" v-model="orderMainForm.exhibitBoxNum" placeholder="上货箱数" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="合格箱数：">
+                <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="束流上限：">
+                <el-input size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="束流设定值：">
+                <el-input size="small" v-model="orderMainForm.slSet" placeholder="束流设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="束流下限：">
+                <el-input size="small" v-model="orderMainForm.slLowerLimit" placeholder="束流下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="功率上限：">
+                <el-input size="small" v-model="orderMainForm.glUpperLimit" placeholder="功率上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="功率设定值：">
+                <el-input size="small" v-model="orderMainForm.glSet" placeholder="功率设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="功率下限：">
+                <el-input size="small" v-model="orderMainForm.glLowerLimit" placeholder="功率下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="扫宽上限：">
+                <el-input size="small" v-model="orderMainForm.skUpperLimit" placeholder="扫宽上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="扫宽设定值：">
+                <el-input size="small" v-model="orderMainForm.skSet" placeholder="扫宽设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="扫宽下限：">
+                <el-input size="small" v-model="orderMainForm.skLowerLimit" placeholder="扫宽下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="扫描频率上限：">
+                <el-input size="small" v-model="orderMainForm.smplUpperLimit" placeholder="扫描频率上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="扫描频率设定：">
+                <el-input size="small" v-model="orderMainForm.smplSet" placeholder="扫描频率设定" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="扫描频率下限：">
+                <el-input size="small" v-model="orderMainForm.smplLowerLimit" placeholder="扫描频率下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="PFN电压上限：">
+                <el-input size="small" v-model="orderMainForm.pfnUpperLimit" placeholder="PFN电压上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="PFN电压设定：">
+                <el-input size="small" v-model="orderMainForm.pfnSet" placeholder="PFN电压设定" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="PFN电压下限：">
+                <el-input size="small" v-model="orderMainForm.pfnLowerLimit" placeholder="PFN电压下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="能量上限：">
+                <el-input size="small" v-model="orderMainForm.nlUpperLimit" placeholder="能量上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="能量设定值：">
+                <el-input size="small" v-model="orderMainForm.nlSet" placeholder="能量设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="能量下限：">
+                <el-input size="small" v-model="orderMainForm.nlLowerLimit" placeholder="能量下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+            </el-form>
+            <div class="content-bottom" v-show="isNewSave || isEdit">
+              <el-button type="primary" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading" v-if="isNewSave">保存</el-button>
+              <el-button type="primary" size="small" icon="el-icon-success" v-else>修改</el-button>
+              <el-button size="small" style="margin-left: 15px;" icon="el-icon-error" @click="cancelEditOrSave">取消</el-button>
+            </div>
+          </div>
+        </div>
+        <el-divider></el-divider>
+        <div class="listDiv">
+          <div class="list-top">
+            <el-button type="primary" icon="el-icon-plus" size="small" @click="newOrderClick">新建</el-button>
+          </div>
+          <div class="list-middle">
+            <el-table
+              :data="tableData"
+              border
+              style="width: 100%"
+              highlight-current-row
+              @current-change="handleCurrentChange">
+              <el-table-column type="index" width="80" :index="indexMethod" fixed="left" label="序号">
+              </el-table-column>
+              <el-table-column v-for="item in tableTitle"
+                :key="item.prop"
+                :prop="item.prop"
+                :label="item.label"
+                :width="item.width">
+              </el-table-column>
+              <el-table-column
+                prop="tag"
+                label="来源"
+                width="100"
+                fixed="right">
+                <template>
+                  <el-tag type="success" disable-transitions>手动</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
+                fixed="right"
+                label="操作"
+                width="320">
+                <template slot-scope="scope">
+                  <el-link type="primary" icon="el-icon-edit" @click="editClick(scope.row)">编辑</el-link>
+                  <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning" :disabled="scope.row.orderId !== currentSelect.orderId" @click="runPLC(scope.row)">启动</el-link>
+                  <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="scope.row.orderId !== currentSelect.orderId">运行中</el-link>
+                  <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="scope.row.orderId !== currentSelect.orderId">停止</el-link>
+                  <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="scope.row.orderId !== currentSelect.orderId">完成</el-link>
+                  <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph(scope.row)" :disabled="scope.row.orderId !== currentSelect.orderId">动态图</el-link>
+                </template>
+              </el-table-column>
+            </el-table>
           </div>
         </div>
       </div>
-      <el-divider></el-divider>
-      <div class="listDiv">
-        <div class="list-top">
-          <el-button type="primary" icon="el-icon-plus" size="small" @click="newOrderClick">新建</el-button>
-        </div>
-        <div class="list-middle">
-          <el-table
-            :data="tableData"
-            border
-            style="width: 100%"
-            highlight-current-row
-            @current-change="handleCurrentChange">
-            <el-table-column type="index" width="80" :index="indexMethod" fixed="left" label="序号">
-            </el-table-column>
-            <el-table-column v-for="item in tableTitle"
-              :key="item.prop"
-              :prop="item.prop"
-              :label="item.label"
-              :width="item.width">
-            </el-table-column>
-            <el-table-column
-              prop="tag"
-              label="来源"
-              width="100"
-              fixed="right">
-              <template>
-                <el-tag type="success" disable-transitions>手动</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column
-              fixed="right"
-              label="操作"
-              width="320">
-              <template slot-scope="scope">
-                <el-link type="primary" icon="el-icon-edit" @click="editClick(scope.row)">编辑</el-link>
-                <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning" :disabled="scope.row.orderId !== currentSelect.orderId">启动</el-link>
-                <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="scope.row.orderId !== currentSelect.orderId">运行中</el-link>
-                <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="scope.row.orderId !== currentSelect.orderId">停止</el-link>
-                <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="scope.row.orderId !== currentSelect.orderId">完成</el-link>
-                <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph" :disabled="scope.row.orderId !== currentSelect.orderId">动态图</el-link>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-      </div>
+    </div>
+    <div style="width:100%;height: 100%;" v-show="isDynamicGraphShow">
+      <DynamicGraph @closeDynamicGraphShow="closeDynamicGraphShow" ref="dynamicGraph"></DynamicGraph>
     </div>
   </div>
+  
 </template>
 
 <script>
 import HttpUtil from '@/utils/HttpUtil'
-import { ipcRenderer } from 'electron'
+import { Debugger, ipcRenderer } from 'electron'
+import DynamicGraph from '../dynamicgraph/DynamicGraph.vue'
 export default {
   name: "OrderList",
-  components: {},
+  components: {
+    DynamicGraph
+  },
   props: {},
   data() {
     return {
@@ -193,7 +202,8 @@ export default {
       saveLoading: false,
       isEdit: false,
       isNewSave: false,
-      currentSelect: {}
+      currentSelect: {},
+      isDynamicGraphShow: false
     };
   },
   watch: {},
@@ -212,7 +222,7 @@ export default {
     },
     async saveOrder() {
       this.saveLoading = true;
-      this.orderMainForm.revertFlag = this.orderMainForm.revertFlag ? 1 : 0
+      this.orderMainForm.revertFlag = this.orderMainForm.revertFlag ? '1' : '0'
       await HttpUtil.post('/order/save', this.orderMainForm).then((res)=> {
         if(res.data === 1) {
           this.$message.success('保存成功！');
@@ -231,25 +241,42 @@ export default {
     async getOrderList() {
       await HttpUtil.get('/order/getOrderList').then((res)=> {
         this.tableData = res.data
+        this.tableData.forEach(item => {
+          item.revertFlag = item.revertFlag == '1' ? '翻转' : ''
+        })
       }).catch((err)=> {
         // 网络异常 稍后再试
         this.$message.error('查询失败！' + err);
       });
     },
     handleClick(){},
-    showDynamicGraph() {
-      this.$emit('replaceRoute','/homePage/dynamicGraph')
+    showDynamicGraph(orderMain) {
+      this.isDynamicGraphShow = true;
+      // 将订单信息同步到动态图组件
+      this.$nextTick(() => {
+        this.$refs.dynamicGraph.showOrderInfo(orderMain);
+      });
+      
     },
-    writeValuesToPLC() {
+    closeDynamicGraphShow() {
+      this.isDynamicGraphShow = false
+    },
+    runPLC(obj) {
+      // 运行
+      this.$set(obj, 'isRunning', 'true')
+      this.writeValuesToPLC(obj);
+      this.$message.success('已启动！');
+    },
+    async writeValuesToPLC(obj) {
       // ipcRenderer.send('writeValuesToPLC', 'DBW6', 1);
       // DB101.DBW2 加速器设定输送速度
-      ipcRenderer.send('writeValuesToPLC', 'DBW2', Number(this.orderMainForm.acceleratorKValue));
+      ipcRenderer.send('writeValuesToPLC', 'DBW2', Number(obj.acceleratorKValue));
       this.sleep(50)
       // DB101.DBW8 启动输送线
       ipcRenderer.send('writeValuesToPLC', 'DBW8', 1);
       this.sleep(50)
       // 翻转&回流
-      if(this.orderMainForm.revertFlag === 1) {
+      if(obj.revertFlag === '翻转') {
         // DB101.DBW12 翻转
         ipcRenderer.send('writeValuesToPLC', 'DBW12', 1);
         this.sleep(50)
@@ -262,10 +289,10 @@ export default {
       }
       this.sleep(50)
       // DB101.DBW22 纸箱宽度
-      ipcRenderer.send('writeValuesToPLC', 'DBW22', Number(this.orderMainForm.boxWidth));
+      ipcRenderer.send('writeValuesToPLC', 'DBW22', Number(obj.boxWidth));
       this.sleep(50)
       // DB101.DBW24 纸箱长度
-      ipcRenderer.send('writeValuesToPLC', 'DBW24', Number(this.orderMainForm.boxLength));
+      ipcRenderer.send('writeValuesToPLC', 'DBW24', Number(obj.boxLength));
     },
     sleep(numberMillis) {
       var now = new Date();
@@ -283,6 +310,8 @@ export default {
       return index + 1;
     },
     handleCurrentChange(val) {
+      this.orderMainForm = JSON.parse(JSON.stringify(val));
+      this.orderMainForm.revertFlag = this.orderMainForm.revertFlag == '翻转' ? true : false
       this.currentSelect = val;
     }
   },

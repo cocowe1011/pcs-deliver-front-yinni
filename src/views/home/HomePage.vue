@@ -36,7 +36,8 @@
         <div class="maskDiv-top-close" @click="closewindow"><i class="el-icon-close" style="font-size:18px;font-weight:600;"></i></div>
       </div>
       <div class="maskDiv-down">
-        <router-view @replaceRoute="replaceRoute"/>
+        <StatusMonitor></StatusMonitor>
+        <router-view/>
       </div>
     </div>
   </div>
@@ -44,9 +45,12 @@
 
 <script>
 import { ipcRenderer } from 'electron'
+import StatusMonitor from '@/components/StatusMonitoring.vue'
 export default {
   name: "HomePage",
-  components: {},
+  components: {
+    StatusMonitor
+  },
   props: {},
   data() {
     return {
@@ -58,13 +62,6 @@ export default {
   watch: {},
   computed: {},
   methods: {
-    replaceRoute(path) {
-      this.$nextTick(() => {
-          this.$router.replace({
-            path: path
-          });
-        });
-    },
     handleSelect(key, keyPath) {
       // if(true) {
       // // this.$nextTick(() => {
