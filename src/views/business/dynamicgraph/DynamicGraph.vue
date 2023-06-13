@@ -39,7 +39,7 @@
             <div class="data-card" style="padding: 7px 20px 7px 10px;">
               <div class="data-card-border">
                 <div class="data-card-border-borderTop granient-text">束下实时速度</div>
-                <div class="data-card-border-borderDown">0.0米/分钟</div>
+                <div class="data-card-border-borderDown">{{ lightBeamRealTimeSpeed }}米/分钟</div>
               </div>
             </div>
             <div class="data-card" style="padding: 7px 10px 14px 20px;">
@@ -190,6 +190,9 @@
           <el-link type="danger" style="position: absolute;top: 320px;right: 536px;" @click="showChuanSong('CD')">{{ '107-109区域货物缓存队列 (' + arrCD.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 450px;right: 502px;" @click="showChuanSong('DG')">{{ '110-111区域货物缓存队列 (' + arrDG.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 453px;right: 194px;" @click="showChuanSong('GH')">{{ '112-115区域货物缓存队列 (' + arrGH.length + ')' }}</el-link>
+          <!-- 预警 -->
+          <img src="./img/yujing.png" class="warning-img"/>
+          <img src="./img/baojing.png" class="warning-img"/>
         </div>
       </div>
     </div>
@@ -810,6 +813,10 @@ export default {
       }
       .dianji-active {
         background-color: #43CF7C;
+      }
+      .warning-img {
+        width: 80px;
+        height: 80px;
       }
     }
   }
