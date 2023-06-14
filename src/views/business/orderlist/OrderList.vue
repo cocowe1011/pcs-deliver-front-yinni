@@ -28,7 +28,6 @@
               <el-form-item label="工艺名称：">
                 <el-input size="small" v-model="orderMainForm.artName" placeholder="工艺名称" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <br />
               <el-form-item label="装载方式：">
                 <el-input size="small" v-model="orderMainForm.loadMethod" placeholder="装载方式" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
@@ -41,7 +40,6 @@
               <el-form-item label="箱子长度：">
                 <el-input size="small" v-model="orderMainForm.boxLength" placeholder="箱子长度" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <br />
               <el-form-item label="箱子高度：">
                 <el-input size="small" v-model="orderMainForm.boxWidth" placeholder="箱子高度" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
@@ -159,7 +157,7 @@
                 label="操作"
                 width="320">
                 <template slot-scope="scope">
-                  <el-link type="primary" icon="el-icon-edit" @click="editClick(scope.row)">编辑</el-link>
+                  <el-link type="primary" icon="el-icon-edit" @click.stop="editClick(scope.row)">编辑</el-link>
                   <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning" :disabled="scope.row.orderId !== currentSelect.orderId" @click="runPLC(scope.row)">启动</el-link>
                   <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="scope.row.orderId !== currentSelect.orderId">运行中</el-link>
                   <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="scope.row.orderId !== currentSelect.orderId">停止</el-link>
@@ -211,14 +209,18 @@ export default {
   methods: {
     cancelEditOrSave() {
       this.isNewSave = false;
+      this.isEdit = false;
     },
     newOrderClick() {
       this.isNewSave = true;
       this.orderMainForm = {};
     },
-    editClick(orderMain) {
+    editClick(val) {
       this.isEdit = true;
-      alert(JSON.stringify(orderMain))
+      this.orderMainForm = JSON.parse(JSON.stringify(val));
+      this.orderMainForm.revertFlag = this.orderMainForm.revertFlag == '翻转' ? true : false
+      this.currentSelect = val;
+      // alert(JSON.stringify(orderMain))
     },
     async saveOrder() {
       this.saveLoading = true;
@@ -313,6 +315,8 @@ export default {
       this.orderMainForm = JSON.parse(JSON.stringify(val));
       this.orderMainForm.revertFlag = this.orderMainForm.revertFlag == '翻转' ? true : false
       this.currentSelect = val;
+      this.isNewSave = false;
+      this.isEdit = false;
     }
   },
   created() {

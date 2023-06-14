@@ -80,16 +80,16 @@
     <div class="dynamic-right">
       <div>
         <div class="card-title">实时状态监控</div>
-        <div class="card-content chuansongpadding" style="display: flex;justify-content: center;">
+        <div class="card-content chuansongpadding backgroundimg">
           <img src="./img/fushe2x.png" class="fusheIcon"/>
           <transition name="el-fade-in-linear">
             <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
           </transition>
-          <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:30px" />
+          
           <div class="show-data-area" style="position: absolute;right: 80px;top: 490px;">
             <div class="show-data-area-top">ID信息</div>
             <div class="show-data-area-content">
-              <el-input v-model="qrCode" readonly size="small"></el-input>
+              <el-input readonly size="small"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;right: 80px;top: 528px;">
@@ -107,7 +107,7 @@
           <div class="show-data-area" style="position: absolute;left: 178px;top: 475px;">
             <div class="show-data-area-top">ID信息</div>
             <div class="show-data-area-content">
-              <el-input v-model="qrCode" readonly size="small"></el-input>
+              <el-input readonly size="small"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;left: 178px;top: 513px;">
@@ -135,35 +135,35 @@
             </div>
           </div>
           <!-- 光电星星 -->
-          <div class="guangdian" style="top: 447px;right: 86px;" @click="clickGuangDian('A')">
+          <div class="guangdian" style="top: 447px;right: 86px;" @click="analogOptoelectronics('A')">
             <div class='star' v-show="pointA == '1'"></div>
             <div class="pointText">A</div>
           </div>
-          <div class="guangdian" style="top: 185px;right: 140px;" @click="clickGuangDian('B')">
+          <div class="guangdian" style="top: 185px;right: 140px;" @click="analogOptoelectronics('B')">
             <div class='star' v-show="pointB == '1'"></div>
             <div class="pointText">B</div>
           </div>
-          <div class="guangdian" style="top: 185px;right: 612px;" @click="clickGuangDian('C')">
+          <div class="guangdian" style="top: 185px;right: 612px;" @click="analogOptoelectronics('C')">
             <div class='star' v-show="pointC == '1'"></div>
             <div class="pointText">C</div>
           </div>
-          <div class="guangdian" style="top: 331px;right: 654px;" @click="clickGuangDian('D')">
+          <div class="guangdian" style="top: 331px;right: 654px;" @click="analogOptoelectronics('D')">
             <div class='star' v-show="pointD == '1'"></div>
             <div class="pointText">D</div>
           </div>
-          <div class="guangdian" style="top: 434px;right: 674px;" @click="clickGuangDian('E')">
+          <div class="guangdian" style="top: 434px;right: 674px;" @click="analogOptoelectronics('E')">
             <div class='star' v-show="pointE == '1'"></div>
             <div class="pointText">E</div>
           </div>
-          <div class="guangdian" style="right: 827px;top: 551px;" @click="clickGuangDian('F')">
+          <div class="guangdian" style="right: 827px;top: 551px;" @click="analogOptoelectronics('F')">
             <div class='star' v-show="pointF == '1'"></div>
             <div class="pointText">F</div>
           </div>
-          <div class="guangdian" style="right: 792px;top: 600px;" @click="clickGuangDian('G')">
+          <div class="guangdian" style="right: 792px;top: 600px;" @click="analogOptoelectronics('G')">
             <div class='star' v-show="pointG == '1'"></div>
             <div class="pointText">G</div>
           </div>
-          <div class="guangdian" style="right: 446px;top: 683px;" @click="clickGuangDian('H')">
+          <div class="guangdian" style="right: 446px;top: 683px;" @click="analogOptoelectronics('H')">
             <div class='star' v-show="pointH == '1'"></div>
             <div class="pointText">H</div>
           </div>
@@ -191,8 +191,8 @@
           <el-link type="danger" style="position: absolute;top: 450px;right: 502px;" @click="showChuanSong('DG')">{{ '110-111区域货物缓存队列 (' + arrDG.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 453px;right: 194px;" @click="showChuanSong('GH')">{{ '112-115区域货物缓存队列 (' + arrGH.length + ')' }}</el-link>
           <!-- 预警 -->
-          <img src="./img/yujing.png" class="warning-img"/>
-          <img src="./img/baojing.png" class="warning-img"/>
+          <img src="./img/yujing.png" class="warning-img" style="left: 41px;top: 663px;"/>
+          <img src="./img/baojing.png" class="warning-img" style="top: 717px;left: 352px;"/>
         </div>
       </div>
     </div>
@@ -286,13 +286,15 @@ export default {
   data() {
     return {
       dengShow: true,
-      qrCode: '202306140001',
+      // 当前上货数
       nowInNum: '20',
+      // 各个区域下箱子数组
       arrAB: [],
       arrBC: [],
       arrCD: [],
       arrDG: [],
       arrGH: [],
+      // 每个点位的值，根据收到PLC指令为准，值为1或0
       pointA: '0',
       pointB: '0',
       pointC: '0',
@@ -301,65 +303,119 @@ export default {
       pointF: '0',
       pointG: '0',
       pointH: '0',
+      // 控制拖动传送带抽屉弹窗是否显示和隐藏
       drawer: false,
+      // 当前点击的传送带区域内的箱子列表，一个中间变量
       boxArr: [],
+      // 当前打开的是哪块传送带队列
       traAB: false,
       traBC: false,
       traCD: false,
       traDG: false,
       traGH: false,
+      // 当前被拖动元素的索引
       dragIndex: '',
+      // PLC光电状态数组
       guangDianStatusArr: '',
+      // PLC点击状态数组
       dianJiStatusArr: '',
+      // 当前运行订单对象
       orderMainDy: {},
+      // 当前圈数
       nowNumberTurns: 1,
-      lightBeamRealTimeSpeed: 0
+      // 束下实际数据
+      lightBeamRealTimeSpeed: 0,
+      // 是否正在进入A点
+      enteringPonitA: false,
+      // 上料固定扫码
+      loadScanCode: '',
+      // 迷宫出口固定扫码
+      labyrinthScanCode: ''
     };
   },
   watch: {
     pointA: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('A')
+        if(!this.enteringPonitA && newVal === '1' && oldVal === '0') { //货物开始进入A点
+          this.enteringPonitA = true
+        } else if(this.enteringPonitA && newVal === '0' && oldVal === '1') { // 货物走出A点
+          this.enteringPonitA = false
+          this.dealBoxLogic('A')
+        } else {
+          // 先暂定报警吧，因为肯定不会出现这种情况，出现了视为异常，不做任何处理
+          alert('异常！程序走到一个不该走到的地方！')
+        }
       }
     },
     pointB: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('B')
+        this.dealBoxLogic('B')
       }
     },
     pointC: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('C')
+        this.dealBoxLogic('C')
       }
     },
     pointD: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('D')
+        this.dealBoxLogic('D')
       }
     },
     pointE: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('E')
+        this.dealBoxLogic('E')
       }
     },
     pointF: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('F')
+        this.dealBoxLogic('F')
       }
     },
     pointG: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('G')
+        this.dealBoxLogic('G')
       }
     },
     pointH: {
       handler(newVal, oldVal) {
-        this.clickGuangDian('H')
+        this.dealBoxLogic('H')
       }
     }
   },
   computed: {},
   methods: {
+    analogOptoelectronics(point) {
+      console.log(point)
+      switch (point) {
+        case 'A':
+          this.pointA = this.pointA === '1' ? '0' : '1'
+          break;
+        case 'B':
+          this.pointB = this.pointB === '1' ? '0' : '1'
+          break;
+        case 'C':
+          this.pointC = this.pointC === '1' ? '0' : '1'
+          break;
+        case 'D':
+          this.pointD = this.pointD === '1' ? '0' : '1'
+          break;
+        case 'E':
+          this.pointE = this.pointE === '1' ? '0' : '1'
+          break;
+        case 'F':
+          this.pointF = this.pointF === '1' ? '0' : '1'
+          break;
+        case 'G':
+          this.pointG  = this.pointG === '1' ? '0' : '1'
+          break;
+        case 'H':
+          this.pointH = this.pointH === '1' ? '0' : '1'
+          break;
+        default:
+          break;
+      }
+    },
     showOrderInfo(orderMain) {
       this.orderMainDy = JSON.parse(JSON.stringify(orderMain))
     },
@@ -453,23 +509,21 @@ export default {
       return i;
       }
     },
-    clickGuangDian(point) {
+    dealBoxLogic(point) {
       // 这些判断逻辑都不对，得改，因为point*都是在随时变化的，万一变化速度快，从1变0，那么就会丢失这次光电触发状态
       // 正确修改方法：直接在watch方法判断值，一变化接着调用这个方法，并且传固参，不再判断point*变量
       switch (point) {
         case 'A':
-          if(this.pointA === '1') {
-            if(this.nowNumberTurns == 1) {
-              // 第一圈，仍然是新增
-              const boxImitateId = this.getCurrentTimeSort();
-              // 代表货物进入光电A，生成模拟id绑定
-              this.arrAB.push({boxImitateId:boxImitateId, numberTurns: 1});
-            } else {
-              // 把GH队列最开始箱子加入AB对接，并修改圈数
-              this.arrAB.push(this.arrGH[0]);
-              this.arrGH.splice(0,1)
-              this.arrAB[this.arrAB.length - 1].numberTurns = this.arrAB[this.arrAB.length - 1].numberTurns + 1;
-            }
+          if(this.nowNumberTurns == 1) {
+            // 第一圈，仍然是新增，按照要求生成模拟id策略
+            const boxImitateId = this.getCurrentTimeSort();
+            // 代表货物进入光电A，生成模拟id绑定,如果有扫码数据则
+            this.arrAB.push({boxImitateId: boxImitateId, numberTurns: 1, loadScanCode: this.loadScanCode});
+          } else {
+            // 把GH队列最开始箱子加入AB对接，并修改圈数
+            this.arrAB.push(this.arrGH[0]);
+            this.arrGH.splice(0,1)
+            this.arrAB[this.arrAB.length - 1].numberTurns = this.arrAB[this.arrAB.length - 1].numberTurns + 1;
           }
           break;
         case 'B':
@@ -529,18 +583,23 @@ export default {
     }, 1000);
     // 订阅<状态球>eventBus发布的消息
     EventBus.$on('pushPLCMessage', eventData => {
-      this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
-      this.pointA = this.guangDianStatusArr[7];
-      this.pointB = this.guangDianStatusArr[6];
-      this.pointC = this.guangDianStatusArr[5];
-      this.pointD = this.guangDianStatusArr[4];
-      this.pointE = this.guangDianStatusArr[3];
-      this.pointF = this.guangDianStatusArr[2];
-      this.pointG = this.guangDianStatusArr[1];
-      this.pointH = this.guangDianStatusArr[0];
+      // --------无PLC测试时，这里以下代码毙掉--------
+      // this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
+      // this.pointA = this.guangDianStatusArr[7];
+      // this.pointB = this.guangDianStatusArr[6];
+      // this.pointC = this.guangDianStatusArr[5];
+      // this.pointD = this.guangDianStatusArr[4];
+      // this.pointE = this.guangDianStatusArr[3];
+      // this.pointF = this.guangDianStatusArr[2];
+      // this.pointG = this.guangDianStatusArr[1];
+      // this.pointH = this.guangDianStatusArr[0];
+      // --------无PLC测试时，这里以上代码毙掉--------
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
       this.lightBeamRealTimeSpeed = eventData.DBW68;
-      // console.log(this.guangDianStatusArr)
+      // 上料固定扫码
+      this.loadScanCode = eventData.DBB100??'';
+      // 迷宫出口固定扫码
+      this.labyrinthScanCode = eventData.DBB130??'';
     })
   }
 };
@@ -618,6 +677,12 @@ export default {
     position: absolute;
     top: 56px;
     right: 342px;
+  }
+  .backgroundimg {
+    background-image: url('./img/chuansongdai.png');
+    background-size: 889.67px 682.66px;
+    background-position: center center;
+    background-repeat: no-repeat;
   }
   .chuansongpadding {
     box-sizing: border-box;
@@ -815,8 +880,9 @@ export default {
         background-color: #43CF7C;
       }
       .warning-img {
-        width: 80px;
-        height: 80px;
+        width: 161.6px;
+        height: 89.74px;
+        position: absolute;
       }
     }
   }
