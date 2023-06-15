@@ -1,4 +1,3 @@
-<!-- 所有PLC数据计算都在这个文件中 -->
 <template>
   <div class="sm-main" draggable="true">
     PLC连接

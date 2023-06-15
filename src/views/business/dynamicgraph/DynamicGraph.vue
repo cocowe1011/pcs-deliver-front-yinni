@@ -80,12 +80,12 @@
     <div class="dynamic-right">
       <div>
         <div class="card-title">实时状态监控</div>
-        <div class="card-content chuansongpadding backgroundimg">
+        <div class="card-content chuansongpadding" style="display: flex;justify-content: center;">
           <img src="./img/fushe2x.png" class="fusheIcon"/>
           <transition name="el-fade-in-linear">
             <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
           </transition>
-          
+          <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:30px" />
           <div class="show-data-area" style="position: absolute;right: 80px;top: 490px;">
             <div class="show-data-area-top">ID信息</div>
             <div class="show-data-area-content">
@@ -95,7 +95,7 @@
           <div class="show-data-area" style="position: absolute;right: 80px;top: 528px;">
             <div class="show-data-area-top">上货扫码信息</div>
             <div class="show-data-area-content">
-              <el-input v-model="nowInNum" readonly size="small"></el-input>
+              <el-input v-model="loadScanCode" readonly size="small"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;right: 80px;top: 569px;">
@@ -251,7 +251,7 @@
                 <tr v-for="(item, index) in boxArr" class="body-col" :key="index" draggable="true" @dragstart="dragStart(index)">
                   <td style="width: 40px;">{{ index + 1 }}</td>
                   <td style="width: 80px;">{{ item.boxImitateId.substring(0, 10) }}</td>
-                  <th style="width: 150px"></th>
+                  <th style="width: 150px">{{ item.loadScanCode }}</th>
                   <th style="width: 80px"></th>
                   <th style="width: 80px"></th>
                   <th style="width: 80px">{{ item.numberTurns }}</th>
@@ -287,7 +287,7 @@ export default {
     return {
       dengShow: true,
       // 当前上货数
-      nowInNum: '20',
+      nowInNum: 0,
       // 各个区域下箱子数组
       arrAB: [],
       arrBC: [],
@@ -327,10 +327,14 @@ export default {
       lightBeamRealTimeSpeed: 0,
       // 是否正在进入A点
       enteringPonitA: false,
+      // 是否正在进入B点
+      enteringPonitB: false,
       // 上料固定扫码
       loadScanCode: '',
       // 迷宫出口固定扫码
-      labyrinthScanCode: ''
+      labyrinthScanCode: '',
+      l11: 2,
+      l2: 5
     };
   },
   watch: {
@@ -349,7 +353,21 @@ export default {
     },
     pointB: {
       handler(newVal, oldVal) {
-        this.dealBoxLogic('B')
+        // enteringPonitB
+        if(!this.enteringPonitB && newVal === '1' && oldVal === '0') { //货物开始进入B点
+          this.enteringPonitB = true
+          // 进入B的下降沿，获取AB队列第一个，开始计算时间，到时间后，进行工艺对比，判断货物是否合格
+          // 计算时间
+          setTimeout(() => {
+            this.getUndercutProcess();
+          }, this.calculateMilliseconds((this.l11/this.lightBeamRealTimeSpeed).toFixed(2),(this.l2/this.lightBeamRealTimeSpeed).toFixed(2)));
+        } else if(this.enteringPonitB && newVal === '0' && oldVal === '1') { // 货物走出B点
+          this.enteringPonitB = false
+          this.dealBoxLogic('B')
+        } else {
+          // 先暂定报警吧，因为肯定不会出现这种情况，出现了视为异常，不做任何处理
+          alert('异常！程序走到一个不该走到的地方！')
+        }
       }
     },
     pointC: {
@@ -385,6 +403,25 @@ export default {
   },
   computed: {},
   methods: {
+    // 拿到模拟id去判断箱子的工艺是否合格
+    getUndercutProcess(boxImitateIdVal) {
+      this.$confirm('箱子id' + boxImitateIdVal + '判断工艺，请确定是否合格！', '是否合格', {
+        confirmButtonText: '合格',
+        cancelButtonText: '不合格',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '箱子id' + boxImitateIdVal + '工艺合格！更新状态！'
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'warning',
+          message: '箱子id' + boxImitateIdVal + '工艺不合格！更新状态！'
+        });
+      });
+    },
     analogOptoelectronics(point) {
       console.log(point)
       switch (point) {
@@ -519,6 +556,8 @@ export default {
             const boxImitateId = this.getCurrentTimeSort();
             // 代表货物进入光电A，生成模拟id绑定,如果有扫码数据则
             this.arrAB.push({boxImitateId: boxImitateId, numberTurns: 1, loadScanCode: this.loadScanCode});
+            // 上货数量+1
+            this.nowInNum++;
           } else {
             // 把GH队列最开始箱子加入AB对接，并修改圈数
             this.arrAB.push(this.arrGH[0]);
@@ -574,6 +613,12 @@ export default {
     },
     PrefixZero(num, n) {
       return (Array(n).join(0) + num).slice(-n);
+    },
+    calculateMilliseconds(A, B) {
+      return this.minutesToMilliseconds(A + B);
+    },
+    minutesToMilliseconds(minutes) {
+      return minutes * 60 * 1000;
     }
   },
   created() {},
@@ -867,7 +912,8 @@ export default {
         box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
       }
       .dianji {
-        height: 23px;
+        height: 19px;
+        font-size: 15px;
         width: 75px;
         display: flex;
         justify-content: center;
