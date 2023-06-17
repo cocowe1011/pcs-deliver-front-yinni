@@ -125,7 +125,7 @@
           <div class="show-data-area" style="position: absolute;left: 436px;top: 185px;width: 150px;height: 58px;">
             <div class="show-data-area-top" style="width: 100%;height: 26px;">束下当前货物ID</div>
             <div class="show-data-area-content" style="width: 100%;height: 26px;">
-              <el-input v-model="boxImitateIdVal" readonly size="small"></el-input>
+              <el-input v-model="nowShuXiaid" readonly size="small"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;left: 2px;top: 60px;">
@@ -193,6 +193,10 @@
           <!-- 预警 -->
           <img src="./img/yujing.png" class="warning-img" v-show="yujingShow" style="left: 41px;top: 663px;"/>
           <img src="./img/baojing.png" class="warning-img" v-show="baojingShow" style="top: 717px;left: 352px;"/>
+          <!-- 操作按钮 -->
+          <el-button type="primary" class="caozuoButton" style="top: 108px;left: 20px;" @click="sendMsgToPLC('suspend')">暂停</el-button>
+          <el-button type="primary" class="caozuoButton" style="top: 158px;left: 20px;" @click="sendMsgToPLC('run')">启动</el-button>
+          <el-button type="primary" class="caozuoButton" style="top: 208px;left: 20px;" @click="sendMsgToPLC('stop')">停止</el-button>
         </div>
       </div>
     </div>
@@ -689,6 +693,21 @@ export default {
     },
     minutesToMilliseconds(minutes) {
       return minutes * 60 * 1000;
+    },
+    sendMsgToPLC(command) {
+      switch (command) {
+        case 'suspend':
+          ipcRenderer.send('writeValuesToPLC', 'DBW6', 1);
+          break;
+        case 'run':
+          ipcRenderer.send('writeValuesToPLC', 'DBW8', 1);
+          break;
+        case 'stop':
+          ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
+          break;
+        default:
+          break;
+      }
     }
   },
   created() {},
@@ -998,6 +1017,9 @@ export default {
       .warning-img {
         width: 161.6px;
         height: 89.74px;
+        position: absolute;
+      }
+      .caozuoButton {
         position: absolute;
       }
     }
