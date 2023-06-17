@@ -89,7 +89,7 @@
           <div class="show-data-area" style="position: absolute;right: 80px;top: 490px;">
             <div class="show-data-area-top">ID信息</div>
             <div class="show-data-area-content">
-              <el-input readonly size="small"></el-input>
+              <el-input readonly size="small" v-model="nowABoxImitateId"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;right: 80px;top: 528px;">
@@ -107,25 +107,25 @@
           <div class="show-data-area" style="position: absolute;left: 178px;top: 475px;">
             <div class="show-data-area-top">ID信息</div>
             <div class="show-data-area-content">
-              <el-input readonly size="small"></el-input>
+              <el-input readonly size="small" v-model="nowEBoxImitateId"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;left: 178px;top: 513px;">
             <div class="show-data-area-top">下货扫码信息</div>
             <div class="show-data-area-content">
-              <el-input v-model="nowInNum" readonly size="small"></el-input>
+              <el-input v-model="labyrinthScanCode" readonly size="small"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;left: 194px;top: 560px;">
             <div class="show-data-area-top">当前下货数量</div>
             <div class="show-data-area-content">
-              <el-input v-model="nowInNum" readonly size="small"></el-input>
+              <el-input v-model="nowOutNum" readonly size="small"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;left: 436px;top: 185px;width: 150px;height: 58px;">
             <div class="show-data-area-top" style="width: 100%;height: 26px;">束下当前货物ID</div>
             <div class="show-data-area-content" style="width: 100%;height: 26px;">
-              <el-input v-model="nowInNum" readonly size="small"></el-input>
+              <el-input v-model="boxImitateIdVal" readonly size="small"></el-input>
             </div>
           </div>
           <div class="show-data-area" style="position: absolute;left: 2px;top: 60px;">
@@ -191,8 +191,8 @@
           <el-link type="danger" style="position: absolute;top: 450px;right: 502px;" @click="showChuanSong('DG')">{{ '110-111区域货物缓存队列 (' + arrDG.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 453px;right: 194px;" @click="showChuanSong('GH')">{{ '112-115区域货物缓存队列 (' + arrGH.length + ')' }}</el-link>
           <!-- 预警 -->
-          <img src="./img/yujing.png" class="warning-img" style="left: 41px;top: 663px;"/>
-          <img src="./img/baojing.png" class="warning-img" style="top: 717px;left: 352px;"/>
+          <img src="./img/yujing.png" class="warning-img" v-show="yujingShow" style="left: 41px;top: 663px;"/>
+          <img src="./img/baojing.png" class="warning-img" v-show="baojingShow" style="top: 717px;left: 352px;"/>
         </div>
       </div>
     </div>
@@ -257,7 +257,7 @@
                   <th style="width: 80px">{{ item.numberTurns }}</th>
                   <th style="width: 80px"></th>
                   <th style="width: 80px"></th>
-                  <th style="width: 80px"></th>
+                  <th style="width: 80px">{{ item.qualified === true ? '合格' : item.qualified === false ? '不合格' : '' }}</th>
                   <th style="width: 80px"></th>
                   <th></th>
                 </tr>
@@ -279,6 +279,7 @@
 
 <script>
 import { EventBus } from '@/utils/EventBus'
+import { Debugger, ipcRenderer } from 'electron'
 export default {
   name: "DynamicGraph",
   components: {},
@@ -288,6 +289,8 @@ export default {
       dengShow: true,
       // 当前上货数
       nowInNum: 0,
+      // 当前下货数
+      nowOutNum: 0,
       // 各个区域下箱子数组
       arrAB: [],
       arrBC: [],
@@ -334,7 +337,13 @@ export default {
       // 迷宫出口固定扫码
       labyrinthScanCode: '',
       l11: 2,
-      l2: 5
+      l2: 5,
+      lastRouteEPoint: '',
+      yujingShow: false,
+      baojingShow: false,
+      nowABoxImitateId: '',
+      nowEBoxImitateId: '',
+      nowShuXiaid: ''
     };
   },
   watch: {
@@ -355,13 +364,16 @@ export default {
       handler(newVal, oldVal) {
         // enteringPonitB
         if(!this.enteringPonitB && newVal === '1' && oldVal === '0') { //货物开始进入B点
+          console.log('开始进入B点')
           this.enteringPonitB = true
           // 进入B的下降沿，获取AB队列第一个，开始计算时间，到时间后，进行工艺对比，判断货物是否合格
+          const boxImitateId = this.arrAB[0].boxImitateId;
           // 计算时间
           setTimeout(() => {
-            this.getUndercutProcess();
-          }, this.calculateMilliseconds((this.l11/this.lightBeamRealTimeSpeed).toFixed(2),(this.l2/this.lightBeamRealTimeSpeed).toFixed(2)));
+            this.getUndercutProcess(boxImitateId);
+          }, this.calculateMilliseconds((Number(this.l11)/Number(this.lightBeamRealTimeSpeed)).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
         } else if(this.enteringPonitB && newVal === '0' && oldVal === '1') { // 货物走出B点
+          console.log('货物走出B点')
           this.enteringPonitB = false
           this.dealBoxLogic('B')
         } else {
@@ -382,6 +394,7 @@ export default {
     },
     pointE: {
       handler(newVal, oldVal) {
+        // 进入E点的，剔除不合格的箱子，给PLC发送剔除指令
         this.dealBoxLogic('E')
       }
     },
@@ -403,8 +416,22 @@ export default {
   },
   computed: {},
   methods: {
+    qualified4Box(boxImitateIdVal, status) {
+      console.log(boxImitateIdVal)
+      console.log(status)
+      console.log(this.arrBC)
+      //判断箱子在哪个队列 AB BC CD DG GH,status为true为合格，false为不合格
+      for (let index = 0; index < this.arrBC.length; index++) {
+        if(this.arrBC[index].boxImitateId == boxImitateIdVal) {
+          this.arrBC[index].qualified = status;
+          break;
+        }
+      }
+      console.log(this.arrBC)
+    },
     // 拿到模拟id去判断箱子的工艺是否合格
     getUndercutProcess(boxImitateIdVal) {
+      this.nowShuXiaid = boxImitateIdVal;
       this.$confirm('箱子id' + boxImitateIdVal + '判断工艺，请确定是否合格！', '是否合格', {
         confirmButtonText: '合格',
         cancelButtonText: '不合格',
@@ -415,11 +442,13 @@ export default {
           type: 'success',
           message: '箱子id' + boxImitateIdVal + '工艺合格！更新状态！'
         });
+        this.qualified4Box(boxImitateIdVal, true)
       }).catch(() => {
         this.$message({
           type: 'warning',
           message: '箱子id' + boxImitateIdVal + '工艺不合格！更新状态！'
         });
+        this.qualified4Box(boxImitateIdVal, false)
       });
     },
     analogOptoelectronics(point) {
@@ -554,6 +583,7 @@ export default {
           if(this.nowNumberTurns == 1) {
             // 第一圈，仍然是新增，按照要求生成模拟id策略
             const boxImitateId = this.getCurrentTimeSort();
+            this.nowABoxImitateId = boxImitateId;
             // 代表货物进入光电A，生成模拟id绑定,如果有扫码数据则
             this.arrAB.push({boxImitateId: boxImitateId, numberTurns: 1, loadScanCode: this.loadScanCode});
             // 上货数量+1
@@ -566,12 +596,10 @@ export default {
           }
           break;
         case 'B':
-          if(this.pointB === '1') {
-            // 把AB队列第一个货物出列，进入BC
-            this.arrBC.push(this.arrAB[0]);
-            // 删除AB队列第一个
-            this.arrAB.splice(0,1)
-          }
+          // 把AB队列第一个货物出列，进入BC
+          this.arrBC.push(this.arrAB[0]);
+          // 删除AB队列第一个
+          this.arrAB.splice(0,1)
           break;
         case 'C':
           if(this.pointC === '1') {
@@ -588,8 +616,33 @@ export default {
             this.arrCD.splice(0,1);
           }
           break;
+        case 'E':
+          if(this.pointE === '1') {
+            // 判断进入E点的箱子工艺是否合格，合格不做处理，不合格剔除
+            if(this.lastRouteEPoint === '') { // 说明物品第一次经过E点，直接取DG数组的第一个元素
+              this.judgeIfDGqualified(0);
+            } else {
+              // 查找DG数组，lastRouteEPoint的元素，那么下一个必定是此时经过E点的元素
+              const indexLast = this.arrDG.findIndex(item => {
+                return item.boxImitateId === this.lastRouteEPoint
+              })
+              if(indexLast != -1) {
+                // 找到了，lastRouteEPoint的下一个元素必定是经过E点的元素
+                this.judgeIfDGqualified(indexLast + 1);
+              } else {
+                // 找不到，队列第一个肯定就是经过E点的元素
+                this.judgeIfDGqualified(0);
+              }
+            }
+          }
+          break;
         case 'G':
           if(this.pointG === '1') {
+            // 判断是否符合下货条件
+            if (this.arrDG[0].numberTurns >= this.orderMainDy.numberTurns) {
+              // 符合下货条件，展示预警，货物需要下线标识。
+              this.yujingShow = true;
+            }
             // 把DG队列第一个货物出列，进入GH
             this.arrGH.push(this.arrDG[0]);
             // 删除BC队列第一个
@@ -597,15 +650,32 @@ export default {
           }
           break;
         case 'H':
-        if(this.pointH === '1') {
-          if(this.nowNumberTurns == 1) {
-            // 第一圈货物到达H点，A点光电再新入货物为第二圈
-            this.nowNumberTurns++;
+          if(this.pointH === '1') {
+            console.log(this.nowNumberTurns)
+            console.log(this.orderMainDy.numberTurns)
+            if (this.nowNumberTurns < this.orderMainDy.numberTurns) {
+              // 第一圈货物到达H点，A点光电再新入货物为第二圈
+              this.nowNumberTurns++;
+            } else {
+              this.baojingShow = true;
+            }
           }
-        }
           break;
         default:
           break;
+      }
+    },
+    judgeIfDGqualified(index) {
+      this.nowEBoxImitateId = this.arrDG[index].boxImitateId;
+      if(this.arrDG[index].qualified === false) {
+        // 执行剔除命令
+        ipcRenderer.send('writeValuesToPLC', 'DBW18', 1);
+        console.log('剔除')
+        // 在DG数组移除元素
+        this.arrDG.splice(index, 1);
+      } else {
+        // 合格无需处理，写0即可
+        ipcRenderer.send('writeValuesToPLC', 'DBW18', 0);
       }
     },
     closeDynamicGraphShow() {
@@ -615,7 +685,7 @@ export default {
       return (Array(n).join(0) + num).slice(-n);
     },
     calculateMilliseconds(A, B) {
-      return this.minutesToMilliseconds(A + B);
+      return this.minutesToMilliseconds(Number(A) + Number(B));
     },
     minutesToMilliseconds(minutes) {
       return minutes * 60 * 1000;

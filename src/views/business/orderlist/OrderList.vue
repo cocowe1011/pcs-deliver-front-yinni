@@ -250,6 +250,7 @@ export default {
         // 网络异常 稍后再试
         this.$message.error('查询失败！' + err);
       });
+      // this.tableData = [{revertFlag: '翻转', orderId: '202306160001', orderName: '威高一次性管路'}];
     },
     handleClick(){},
     showDynamicGraph(orderMain) {

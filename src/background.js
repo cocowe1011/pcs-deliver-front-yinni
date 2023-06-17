@@ -151,13 +151,18 @@ app.on('ready', () => {
 });
 
 var variables = {
-  DBW2: 'DB101,INT2',
-  DBW8: 'DB101,INT8',
-  DBW10: 'DB101,INT10',
-  DBW12: 'DB101,INT12',
-  DBW14: 'DB101,INT14',
-  DBW22: 'DB101,INT22',
-  DBW24: 'DB101,INT24',
+  DBW2: 'DB101,INT2', // 加速器设定输送线速度
+  DBW4: 'DB101,INT4', // 加速器允许货物进入辐照区
+  DBW6: 'DB101,INT6', // 暂停按钮
+  DBW8: 'DB101,INT8', // 启动输送线
+  DBW10: 'DB101,INT10', // 停止输送线
+  DBW12: 'DB101,INT12', // 翻转模式
+  DBW14: 'DB101,INT14', // 回流模式
+  DBW16: 'DB101,INT16', // 下货
+  DBW18: 'DB101,INT18', // 剔除指令
+  DBW20: 'DB101,INT20', // 单独启动105
+  DBW22: 'DB101,INT22', // 纸箱宽度
+  DBW24: 'DB101,INT24', // 纸箱长度
   DBW60: 'DB101,INT60',
   DBW62: 'DB101,INT62',
   DBW64: 'DB101,INT64',
