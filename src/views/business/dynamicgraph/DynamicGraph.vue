@@ -134,6 +134,12 @@
               <el-input v-model="orderMainDy.orderNo" readonly size="small"></el-input>
             </div>
           </div>
+          <div class="show-data-area" style="position: absolute;left: -35px;top: 428px;width: 150px;height: 58px;">
+            <div class="show-data-area-top" style="width: 100%;height: 26px;">当前剔除数量</div>
+            <div class="show-data-area-content" style="width: 100%;height: 26px;">
+              <el-input v-model="nowTiChuNum" readonly size="small"></el-input>
+            </div>
+          </div>
           <!-- 光电星星 -->
           <div class="guangdian" style="top: 447px;right: 86px;" @click="analogOptoelectronics('A')">
             <div class='star' v-show="pointA == '1'"></div>
@@ -188,8 +194,8 @@
           <el-link type="danger" style="position: absolute;top: 326px;right: 109px;" @click="showChuanSong('AB')">{{ '101-103区域货物缓存队列 (' + arrAB.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 86px;right: 118px;" @click="showChuanSong('BC')">{{ '104-106区域货物缓存队列 (' + arrBC.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 320px;right: 536px;" @click="showChuanSong('CD')">{{ '107-109区域货物缓存队列 (' + arrCD.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 450px;right: 502px;" @click="showChuanSong('DG')">{{ '110-111区域货物缓存队列 (' + arrDG.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 453px;right: 194px;" @click="showChuanSong('GH')">{{ '112-115区域货物缓存队列 (' + arrGH.length + ')' }}</el-link>
+          <el-link type="danger" style="position: absolute;top: 445px;left: 240px;" @click="showChuanSong('DG')">{{ '剔除货物缓存队列 (' + arrDG.length + ')' }}</el-link>
+          <el-link type="danger" style="position: absolute;top: 689px;right: 542px;" @click="showChuanSong('GH')">{{ '下货区缓存队列 (' + arrGH.length + ')' }}</el-link>
           <!-- 预警 -->
           <img src="./img/yujing.png" class="warning-img" v-show="yujingShow" style="left: 41px;top: 663px;"/>
           <img src="./img/baojing.png" class="warning-img" v-show="baojingShow" style="top: 717px;left: 352px;"/>
@@ -347,7 +353,8 @@ export default {
       baojingShow: false,
       nowABoxImitateId: '',
       nowEBoxImitateId: '',
-      nowShuXiaid: ''
+      nowShuXiaid: '',
+      nowTiChuNum: 0
     };
   },
   watch: {
@@ -671,10 +678,13 @@ export default {
     },
     judgeIfDGqualified(index) {
       this.nowEBoxImitateId = this.arrDG[index].boxImitateId;
+      this.lastRouteEPoint = this.arrDG[index].boxImitateId;
+      console.log(this.nowEBoxImitateId)
       if(this.arrDG[index].qualified === false) {
         // 执行剔除命令
         ipcRenderer.send('writeValuesToPLC', 'DBW18', 1);
         console.log('剔除')
+        this.nowTiChuNum++;
         // 在DG数组移除元素
         this.arrDG.splice(index, 1);
       } else {
