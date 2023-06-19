@@ -61,6 +61,17 @@
               <el-form-item label="合格箱数：">
                 <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
+
+              <el-form-item label="束下速度上限：">
+                <el-input size="small" v-model="orderMainForm.sxSpeedUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="束下速度设定值：">
+                <el-input size="small" v-model="orderMainForm.sxSpeedSet" placeholder="束流设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="束下速度下限：">
+                <el-input size="small" v-model="orderMainForm.sxSpeedLowerLimit" placeholder="束流下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+
               <el-form-item label="束流上限：">
                 <el-input size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
@@ -277,7 +288,8 @@ export default {
       await this.delay(50)
       // DB101.DBW8 启动输送线
       ipcRenderer.send('writeValuesToPLC', 'DBW8', 1);
-      this.delay(50)
+      await this.delay(50)
+      console.log(obj.revertFlag)
       // 翻转&回流
       if(obj.revertFlag === '翻转') {
         // DB101.DBW12 翻转
@@ -290,11 +302,12 @@ export default {
         await this.delay(50)
         ipcRenderer.send('writeValuesToPLC', 'DBW12', 0);
       }
-      this.delay(50)
+      await this.delay(50)
       // DB101.DBW22 纸箱宽度
-      await ipcRenderer.send('writeValuesToPLC', 'DBW22', Number(obj.boxWidth));
-      this.delay(50)
+      ipcRenderer.send('writeValuesToPLC', 'DBW22', Number(obj.boxWidth));
+      await this.delay(50)
       // DB101.DBW24 纸箱长度
+      console.log(Number(obj.boxLength))
       ipcRenderer.send('writeValuesToPLC', 'DBW24', Number(obj.boxLength));
     },
     delay(ms) {
