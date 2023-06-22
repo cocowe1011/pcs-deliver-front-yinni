@@ -29,6 +29,11 @@ const routes = [
         path: 'dynamicGraph',
         component: () => import('../views/business/dynamicgraph/DynamicGraph.vue'),
         name: 'DynamicGraph'
+      },
+      {
+        path: 'report',
+        component: () => import('../views/business/report/Report.vue'),
+        name: 'Report'
       }
     ]
   }

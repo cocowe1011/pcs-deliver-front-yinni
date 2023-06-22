@@ -63,13 +63,24 @@ export default {
   computed: {},
   methods: {
     handleSelect(key, keyPath) {
-      // if(true) {
-      // // this.$nextTick(() => {
-      // //   this.$router.replace({
-      // //     path: '/homePage/dynamicGraph'
-      // //   });
-      // // });
-      // }
+      switch (key) {
+        case '1':
+          this.$nextTick(() => {
+            this.$router.replace({
+              path: '/homePage/orderList'
+            });
+          });
+          break;
+        case '2':
+          this.$nextTick(() => {
+            this.$router.replace({
+              path: '/homePage/report'
+            });
+          });
+          break;
+        default:
+          break;
+      }
     },
     closewindow() {
       ipcRenderer.send('close-window')

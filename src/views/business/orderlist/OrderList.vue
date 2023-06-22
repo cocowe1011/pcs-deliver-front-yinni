@@ -15,16 +15,16 @@
               <el-form-item>
                 <el-checkbox v-model="orderMainForm.revertFlag" :disabled="!(isNewSave || isEdit)">翻转</el-checkbox>
               </el-form-item>
-              <br />
+              <br/>
               <el-form-item label="批次编号：">
                 <el-input size="small" v-model="orderMainForm.batchId" placeholder="批次编号" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="产品名称：">
                 <el-input size="small" v-model="orderMainForm.productName" placeholder="产品名称" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="加速器k值：">
+              <!-- <el-form-item label="加速器k值：">
                 <el-input size="small" v-model="orderMainForm.acceleratorKValue" placeholder="加速器k值" :readonly="!(isNewSave || isEdit)"></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="工艺名称：">
                 <el-input size="small" v-model="orderMainForm.artName" placeholder="工艺名称" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
@@ -61,17 +61,15 @@
               <el-form-item label="合格箱数：">
                 <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-
               <el-form-item label="束下速度上限：">
                 <el-input size="small" v-model="orderMainForm.sxSpeedUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="束下速度设定值：">
+              <el-form-item label="束下速度值：">
                 <el-input size="small" v-model="orderMainForm.sxSpeedSet" placeholder="束流设定值" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="束下速度下限：">
                 <el-input size="small" v-model="orderMainForm.sxSpeedLowerLimit" placeholder="束流下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-
               <el-form-item label="束流上限：">
                 <el-input size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
@@ -172,7 +170,7 @@
                   <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning" :disabled="scope.row.orderId !== currentSelect.orderId" @click="runPLC(scope.row)">启动</el-link>
                   <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="scope.row.orderId !== currentSelect.orderId">运行中</el-link>
                   <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="scope.row.orderId !== currentSelect.orderId">停止</el-link>
-                  <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="scope.row.orderId !== currentSelect.orderId">完成</el-link>
+                  <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="scope.row.orderId !== currentSelect.orderId" @click="generateBatchReport">完成</el-link>
                   <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph(scope.row)" :disabled="scope.row.orderId !== currentSelect.orderId">动态图</el-link>
                 </template>
               </el-table-column>
@@ -182,7 +180,7 @@
       </div>
     </div>
     <div style="width:100%;height: 100%;" v-show="isDynamicGraphShow">
-      <DynamicGraph @closeDynamicGraphShow="closeDynamicGraphShow" ref="dynamicGraph"></DynamicGraph>
+      <DynamicGraph @closeDynamicGraphShow="closeDynamicGraphShow" @returnGenerateBatchReport="returnGenerateBatchReport" ref="dynamicGraph"></DynamicGraph>
     </div>
   </div>
   
@@ -275,11 +273,30 @@ export default {
     closeDynamicGraphShow() {
       this.isDynamicGraphShow = false
     },
-    runPLC(obj) {
+    async runPLC(obj) {
+      // 启动前的准备工作，不符合则不让启动
+      // 1、首先判断本次模拟id0~9999数字起始的数字
+      try {
+        await this.getId();
+      } catch (error) {
+        this.$message.error('获取模拟id方法错误！请重新尝试！');
+        throw new Error("A 方法异常");
+      }
       // 运行
       this.$set(obj, 'isRunning', 'true')
       this.writeValuesToPLC(obj);
       this.$message.success('已启动！');
+    },
+    async getId() {
+      await HttpUtil.post('/box/getId').then((res)=> {
+        if(res.data >= 0) {
+          this.$refs.dynamicGraph.setBeginCountNum(res.data)
+        } else {
+          throw new Error();
+        }
+      }).catch((err)=> {
+        throw new Error();
+      });
     },
     async writeValuesToPLC(obj) {
       // ipcRenderer.send('writeValuesToPLC', 'DBW6', 1);
@@ -325,6 +342,17 @@ export default {
       this.currentSelect = val;
       this.isNewSave = false;
       this.isEdit = false;
+    },
+    generateBatchReport() {
+      this.$refs.dynamicGraph.generateBatchReport()
+    },
+    returnGenerateBatchReport(res) {
+      if (res) {
+        this.$message.success('生成成功！');
+        this.getOrderList();
+      } else {
+        this.$message.error('生成失败！请重试！');
+      }
     }
   },
   created() {

@@ -19,6 +19,7 @@
     "electron-icon-builder": "^2.0.1",
     "electron-reloader": "^1.2.3",
     "element-ui": "^2.15.13",
+    "moment": "^2.29.4",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "nodes7": "^0.3.18",
     "path-browserify": "^1.0.1",
