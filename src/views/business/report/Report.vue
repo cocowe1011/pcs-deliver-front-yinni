@@ -5,8 +5,8 @@
         <div class="formDiv">
           <div class="card-title"><el-divider content-position="left">报表设计</el-divider></div>
           <div class="card-content">
-            箱报告模板
-            批报告模板
+            <div @click="getData">打印预览箱报告</div>
+            <div @click="getDataPi">打印预览批报告</div>
           </div>
         </div>
         <el-divider></el-divider>
@@ -22,20 +22,52 @@
 <script>
 import HttpUtil from '@/utils/HttpUtil'
 import { Debugger, ipcRenderer } from 'electron'
+import grwebapp from '@/utils/grwebapp'
 export default {
   name: "Report",
   components: {},
   props: {},
   data() {
     return {
+      printObj: {recordset:[]}
     };
   },
   watch: {},
   computed: {},
   methods: {
-    
+    async getDataPi() {
+      await HttpUtil.post('/order/getOrderMainReport').then((res)=> {
+        this.printObj.recordset = res.data
+        this.printView(this.printObj, "D://batchReport.grf")
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('查询失败！' + err);
+      });
+    },
+    async getData() {
+      await HttpUtil.post('/box/getBoxReport').then((res)=> {
+        this.printObj.recordset = res.data
+        this.printView(this.printObj, "D://boxreport.grf")
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('查询失败！' + err);
+      });
+    },
+    printView(printObj, reportPath) {
+      console.log(printObj)
+      var args = {
+        type: "preview", //设置不同的属性可以执行不同的任务，如：preview print pdf xls csv txt rtf img grd
+        report: grwebapp.urlAddRandomNo(reportPath),
+        PrinterName: "XP-58", //指定要输出的打印机名称
+        showOptionDlg: false,
+        //实际应用中，data应该为程序中通过各种途径获取到的数据，最后要将数据转换为报表需要的XML或JSON格式的字符串数据
+        data: printObj
+      };
+      grwebapp.webapp_ws_ajax_run(args);
+    }
   },
   created() {
+    grwebapp.webapp_urlprotocol_startup();
   },
   mounted() {}
 };

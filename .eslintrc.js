@@ -21,5 +21,6 @@ module.exports = {
     'prettier/prettier': 'off',
     "vue/multi-word-component-names":"off",
     "no-constant-condition": ["error", { "checkLoops": false }]
-  }
+  },
+  ignorePatterns: ['src/utils/grwebapp.js'],
 };

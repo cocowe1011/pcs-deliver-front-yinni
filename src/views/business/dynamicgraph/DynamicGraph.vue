@@ -781,15 +781,15 @@ export default {
     // 订阅<状态球>eventBus发布的消息
     EventBus.$on('pushPLCMessage', eventData => {
       // --------无PLC测试时，这里以下代码毙掉--------
-      // this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
-      // this.pointA = this.guangDianStatusArr[7];
-      // this.pointB = this.guangDianStatusArr[6];
-      // this.pointC = this.guangDianStatusArr[5];
-      // this.pointD = this.guangDianStatusArr[4];
-      // this.pointE = this.guangDianStatusArr[3];
-      // this.pointF = this.guangDianStatusArr[2];
-      // this.pointG = this.guangDianStatusArr[1];
-      // this.pointH = this.guangDianStatusArr[0];
+      this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
+      this.pointA = this.guangDianStatusArr[7];
+      this.pointB = this.guangDianStatusArr[6];
+      this.pointC = this.guangDianStatusArr[5];
+      this.pointD = this.guangDianStatusArr[4];
+      this.pointE = this.guangDianStatusArr[3];
+      this.pointF = this.guangDianStatusArr[2];
+      this.pointG = this.guangDianStatusArr[1];
+      this.pointH = this.guangDianStatusArr[0];
       // --------无PLC测试时，这里以上代码毙掉--------
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
       this.lightBeamRealTimeSpeed = Number(eventData.DBW68);
