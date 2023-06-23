@@ -127,7 +127,7 @@
             </el-form>
             <div class="content-bottom" v-show="isNewSave || isEdit">
               <el-button type="primary" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading" v-if="isNewSave">保存</el-button>
-              <el-button type="primary" size="small" icon="el-icon-success" v-else>修改</el-button>
+              <el-button type="primary" size="small" icon="el-icon-success" @click="updateOrder" :loading="editLoading" v-else>修改</el-button>
               <el-button size="small" style="margin-left: 15px;" icon="el-icon-error" @click="cancelEditOrSave">取消</el-button>
             </div>
           </div>
@@ -207,6 +207,7 @@ export default {
       ],
       tableData: [],
       saveLoading: false,
+      editLoading: false,
       isEdit: false,
       isNewSave: false,
       currentSelect: {},
@@ -247,6 +248,24 @@ export default {
         // 网络异常 稍后再试
         this.$message.error('保存失败！' + err);
         this.saveLoading = false;
+      });
+    },
+    async updateOrder() {
+      this.editLoading = true;
+      this.orderMainForm.revertFlag = this.orderMainForm.revertFlag ? '1' : '0'
+      await HttpUtil.post('/order/update', this.orderMainForm).then((res)=> {
+        if(res.data === 1) {
+          this.$message.success('修改成功！');
+          // 查询订单信息
+          this.getOrderList();
+        } else {
+          this.$message.error('修改失败！');
+        }
+        this.editLoading = false;
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('修改失败！' + err);
+        this.editLoading = false;
       });
     },
     async getOrderList() {
