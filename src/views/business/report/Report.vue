@@ -3,15 +3,75 @@
     <div class="orderlist">
       <div>
         <div class="formDiv">
-          <div class="card-title"><el-divider content-position="left">报表设计</el-divider></div>
+          <div class="card-title">报表设计</div>
           <div class="card-content">
-            <div @click="getData">打印预览箱报告</div>
-            <div @click="getDataPi">打印预览批报告</div>
+            <div>箱报告模板<el-input placeholder="文件路径" v-model="boxReportPath" style="width: 300px;margin-left: 10px;" size="small" readonly></el-input><el-button style="margin-left: 10px;" size="small">箱设计</el-button></div>
+            <div>批报告模板<el-input placeholder="文件路径" v-model="orderReportPath" style="width: 300px;margin-left: 10px;" size="small" readonly></el-input><el-button style="margin-left: 10px;" size="small">批设计</el-button></div>
           </div>
         </div>
         <el-divider></el-divider>
         <div class="listDiv">
-          <el-divider content-position="left">报表查询</el-divider>
+          <div class="search">
+            <span>订单编号</span>
+            <el-input placeholder="请输入订单编号" style="width: 200px;margin-left: 10px;" size="small"></el-input>
+            <span style="margin-left: 10px;">箱编号</span>
+            <el-input placeholder="请输入箱编号" style="width: 200px;margin-left: 10px;" size="small"></el-input>
+            <el-button style="margin-left: 10px;" size="small" type="primary">查询</el-button>
+          </div>
+          <div class="tableDiv">
+            <el-table
+              :data="tableData1"
+              border
+              style="width: 100%">
+              <el-table-column type="index" width="80" :index="indexMethod" fixed="left" label="序号">
+              </el-table-column>
+              <el-table-column
+                prop="date"
+                label="任务编号"
+                width="180">
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="订单日期"
+                width="180">
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="订单编号">
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="订单名称">
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="批次编号">
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="箱编号">
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="上货时间">
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="合格">
+              </el-table-column>
+              <el-table-column
+                fixed="right"
+                label="操作"
+                width="180">
+                <template>
+                  <el-link type="primary" icon="el-icon-tickets">批报告</el-link>
+                  <el-link type="primary" icon="el-icon-receiving" style="margin-left: 15px;">箱报告</el-link>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <!-- <div @click="getData">打印预览箱报告</div>
+          <div @click="getDataPi">打印预览批报告</div> -->
         </div>
       </div>
     </div>
@@ -29,7 +89,31 @@ export default {
   props: {},
   data() {
     return {
-      printObj: {recordset:[]}
+      printObj: {recordset:[]},
+      boxReportPath: 'D://CSS/箱报告报表.grf',
+      orderReportPath: 'D://CSS/批报告报表.grf',
+      tableData1: [{
+        id: 1,
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: 2,
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1517 弄'
+      }, {
+        id: 3,
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1519 弄',
+        hasChildren: true
+      }, {
+        id: 4,
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      }]
     };
   },
   watch: {},
@@ -64,6 +148,9 @@ export default {
         data: printObj
       };
       grwebapp.webapp_ws_ajax_run(args);
+    },
+    indexMethod(index) {
+      return index + 1;
     }
   },
   created() {
@@ -102,8 +189,15 @@ export default {
       .card-content {
         height: calc(100% - 37px);
         width: 100%;
-        padding: 10px 0px 0px 16px;
+        padding: 0px 32px;
         box-sizing: border-box;
+        > div {
+          height: 43px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+        }
       }
     }
     ::v-deep .el-divider--horizontal{
@@ -112,6 +206,20 @@ export default {
     .listDiv {
       box-sizing: border-box;
       padding: 0px 16px;
+      .search {
+        height: 43px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        box-sizing: border-box;
+        padding: 0px 16px;
+        margin-bottom: 5px;
+      }
+      .tableDiv {
+        height: calc(100% - 43px);
+        width: 100%;
+      }
     }
   }
 }
