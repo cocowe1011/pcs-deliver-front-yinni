@@ -145,9 +145,9 @@ app.on('ready', () => {
     // 迷宫出口固定扫码
     conn.addItems('DBB130');
     // 读DBW6和DBW62
-    setInterval(() => {
-      conn.readAllItems(valuesReady);
-    }, 50);
+    // setInterval(() => {
+    //   conn.readAllItems(valuesReady);
+    // }, 50);
   });
 });
 

@@ -13,42 +13,42 @@
         <div class="listDiv">
           <div class="search">
             <span>订单编号</span>
-            <el-input placeholder="请输入订单编号" style="width: 200px;margin-left: 10px;" size="small"></el-input>
+            <el-input placeholder="请输入订单编号" v-model="orderNoInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
             <span style="margin-left: 10px;">箱编号</span>
-            <el-input placeholder="请输入箱编号" style="width: 200px;margin-left: 10px;" size="small"></el-input>
-            <el-button style="margin-left: 10px;" size="small" type="primary">查询</el-button>
+            <el-input placeholder="请输入箱编号" v-model="boxImitateIdInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
+            <el-button style="margin-left: 10px;" size="small" type="primary" @click="getReportList">查询</el-button>
           </div>
           <div class="tableDiv">
             <el-table
-              :data="tableData1"
+              :data="tableData"
               border
               style="width: 100%">
               <el-table-column type="index" width="80" :index="indexMethod" fixed="left" label="序号">
               </el-table-column>
               <el-table-column
-                prop="date"
+                prop="orderId"
                 label="任务编号"
                 width="180">
               </el-table-column>
               <el-table-column
-                prop="name"
+                prop="createTime"
                 label="订单日期"
                 width="180">
               </el-table-column>
               <el-table-column
-                prop="address"
+                prop="orderNo"
                 label="订单编号">
               </el-table-column>
               <el-table-column
-                prop="address"
+                prop="orderName"
                 label="订单名称">
               </el-table-column>
               <el-table-column
-                prop="address"
+                prop="batchId"
                 label="批次编号">
               </el-table-column>
               <el-table-column
-                prop="address"
+                prop="boxImitateId"
                 label="箱编号">
               </el-table-column>
               <el-table-column
@@ -63,9 +63,9 @@
                 fixed="right"
                 label="操作"
                 width="180">
-                <template>
-                  <el-link type="primary" icon="el-icon-tickets">批报告</el-link>
-                  <el-link type="primary" icon="el-icon-receiving" style="margin-left: 15px;">箱报告</el-link>
+                <template slot-scope="scope">
+                  <el-link type="primary" icon="el-icon-tickets" @click="getOrderReportData(scope.row)">批报告</el-link>
+                  <el-link type="primary" icon="el-icon-receiving" @click="getBoxReportData(scope.row)" style="margin-left: 15px;">箱报告</el-link>
                 </template>
               </el-table-column>
             </el-table>
@@ -92,35 +92,29 @@ export default {
       printObj: {recordset:[]},
       boxReportPath: 'D://CSS/箱报告报表.grf',
       orderReportPath: 'D://CSS/批报告报表.grf',
-      tableData1: [{
-        id: 1,
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        id: 2,
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        id: 3,
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄',
-        hasChildren: true
-      }, {
-        id: 4,
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }]
+      tableData: [],
+      orderNoInput: '',
+      boxImitateIdInput: ''
     };
   },
   watch: {},
   computed: {},
   methods: {
-    async getDataPi() {
-      await HttpUtil.post('/order/getOrderMainReport').then((res)=> {
+    async getReportList() {
+      const param = {
+        boxImitateId: this.boxImitateIdInput,
+        orderNo: this.orderNoInput
+      }
+      await HttpUtil.post('/order/getReportList', param).then((res)=> {
+        this.tableData = res.data
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('查询失败！' + err);
+      });
+    },
+    async getOrderReportData(row) {
+      const param = {orderNo: row.orderNo}
+      await HttpUtil.post('/order/getOrderMainReport', param).then((res)=> {
         this.printObj.recordset = res.data
         this.printView(this.printObj, "D://batchReport.grf")
       }).catch((err)=> {
@@ -128,8 +122,9 @@ export default {
         this.$message.error('查询失败！' + err);
       });
     },
-    async getData() {
-      await HttpUtil.post('/box/getBoxReport').then((res)=> {
+    async getBoxReportData(row) {
+      const param = {boxImitateId: row.boxImitateId}
+      await HttpUtil.post('/box/getBoxReport', param).then((res)=> {
         this.printObj.recordset = res.data
         this.printView(this.printObj, "D://boxreport.grf")
       }).catch((err)=> {
@@ -155,6 +150,7 @@ export default {
   },
   created() {
     grwebapp.webapp_urlprotocol_startup();
+    this.getReportList();
   },
   mounted() {}
 };
