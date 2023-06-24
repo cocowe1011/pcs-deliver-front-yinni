@@ -61,18 +61,9 @@
         <div>
           <div class="card-title">操作日志</div>
           <div class="card-content">
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
-            <div class="log-text">2023-05-20 13:30:30 与PLC连接成功!</div>
+            <div class="log-text" v-for="(message, index) in logArr" :key="index">
+              {{ message.text }}
+            </div>
           </div>
         </div>
       </div>
@@ -188,7 +179,8 @@
           <el-link type="danger" style="position: absolute;top: 326px;right: 109px;" @click="showChuanSong('AB')">{{ '101-103区域货物缓存队列 (' + arrAB.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 86px;right: 118px;" @click="showChuanSong('BC')">{{ '104-106区域货物缓存队列 (' + arrBC.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 320px;right: 536px;" @click="showChuanSong('CD')">{{ '107-109区域货物缓存队列 (' + arrCD.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 445px;left: 240px;" @click="showChuanSong('DG')">{{ '剔除货物缓存队列 (' + arrDG.length + ')' }}</el-link>
+          <el-link type="danger" style="position: absolute;top: 445px;left: 240px;" @click="showChuanSong('DG')">{{ '110-111区域货物缓存队列 (' + arrDG.length + ')' }}</el-link>
+          <el-link type="danger" style="position: absolute;top: 395px;left: -9px;" @click="showChuanSong('F')">{{ '剔除货物缓存队列 (' + arrF.length + ')' }}</el-link>
           <el-link type="danger" style="position: absolute;top: 689px;right: 542px;" @click="showChuanSong('GH')">{{ '下货区缓存队列 (' + arrGH.length + ')' }}</el-link>
           <!-- 预警 -->
           <img src="./img/yujing.png" class="warning-img" v-show="yujingShow" style="left: 41px;top: 663px;"/>
@@ -276,6 +268,7 @@
         <div :class="['transform-card',traBC?'transform-card-active':'']" @dragover.prevent @drop="dropItem('BC', $event)" @click="showCache('BC')">104-106区域货物缓存队列</div>
         <div :class="['transform-card',traCD?'transform-card-active':'']" @dragover.prevent @drop="dropItem('CD', $event)" @click="showCache('CD')">107-109区域货物缓存队列</div>
         <div :class="['transform-card',traDG?'transform-card-active':'']" @dragover.prevent @drop="dropItem('DG', $event)" @click="showCache('DG')">110-111区域货物缓存队列</div>
+        <div :class="['transform-card',traF?'transform-card-active':'']" @dragover.prevent @drop="dropItem('F', $event)" @click="showCache('F')">剔除货物缓存队列</div>
         <div :class="['transform-card',traGH?'transform-card-active':'']" @dragover.prevent @drop="dropItem('GH', $event)" @click="showCache('GH')">112-115区域货物缓存队列</div>
       </div>
     </el-drawer>
@@ -304,6 +297,8 @@ export default {
       arrCD: [],
       arrDG: [],
       arrGH: [],
+      arrF: [], // 被剔除的箱子缓存
+      tempArrF: [], // 经过E点，不合格的箱子，暂时缓存在临时队列，只有经过F点的时候，才去实际的处理箱子
       // 每个点位的值，根据收到PLC指令为准，值为1或0
       pointA: '0',
       pointB: '0',
@@ -323,6 +318,7 @@ export default {
       traCD: false,
       traDG: false,
       traGH: false,
+      traF: false,
       // 当前被拖动元素的索引
       dragIndex: '',
       // PLC光电状态数组
@@ -341,26 +337,56 @@ export default {
       enteringPonitB: false,
       // 上料固定扫码
       loadScanCode: '',
+      // 上料固定扫码(实时读PLC的码)
+      loadScanCodeTemp: '',
       // 迷宫出口固定扫码
       labyrinthScanCode: '',
       l11: 2,
       l2: 5,
       lastRouteEPoint: '',
       lastRouteHPoint: '',
+      lastRouteFPoint: '',
       yujingShow: false,
       baojingShow: false,
       nowABoxImitateId: '',
       nowEBoxImitateId: '',
       nowShuXiaid: '', // 当前束下ID 清空
       nowTiChuNum: 0, // 当前剔除的数量，清空
-      beginCountNum: 0 // 模拟id开始数，清空
+      beginCountNum: 0, // 模拟id开始数，清空
+      logArr: []
     };
   },
   watch: {
     pointA: {
-      handler(newVal, oldVal) {
+      async handler(newVal, oldVal) {
         if(!this.enteringPonitA && newVal === '1' && oldVal === '0') { //货物开始进入A点
+          // 碰到A，清零读码信息
+          this.loadScanCode = ''
           this.enteringPonitA = true
+          if(this.nowNumberTurns == 1) {
+            // 第一圈，仍然是新增，按照要求生成模拟id策略
+            const boxImitateId = await this.getCurrentTimeSort();
+            this.nowABoxImitateId = boxImitateId;
+            // 代表货物进入光电A，生成模拟id绑定,如果有扫码数据则
+            this.arrAB.push({orderId: this.orderMainDy.orderId, orderNo: this.orderMainDy.orderNo, boxImitateId: boxImitateId, numberTurns: 1, loadScanCode: this.loadScanCode, turnsInfoList:[{numberTurns: 1, passATime: moment().format('YYYY-MM-DD HH:mm:ss')}]});
+            // 上货数量+1
+            this.nowInNum++;
+            // 模拟id数+1
+            this.beginCountNum++;
+            // 生成日志
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + boxImitateId + '进入A点');
+          } else {
+            // 把GH队列最开始箱子加入AB对接，并修改圈数
+            this.arrAB.push(this.arrGH[0]);
+            this.arrGH.splice(0,1)
+            this.arrAB[this.arrAB.length - 1].numberTurns = this.arrAB[this.arrAB.length - 1].numberTurns + 1;
+            const nowTurns = this.arrAB[this.arrAB.length - 1].numberTurns;
+            this.arrAB[this.arrAB.length - 1].turnsInfoList.push({numberTurns: nowTurns, passATime: moment().format('YYYY-MM-DD HH:mm:ss')});
+            // 显示箱子模拟id
+            this.nowABoxImitateId = this.arrAB[this.arrAB.length - 1].boxImitateId;
+            // 生成日志
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.nowABoxImitateId + '进入A点');
+          }
         } else if(this.enteringPonitA && newVal === '0' && oldVal === '1') { // 货物走出A点
           this.enteringPonitA = false
           this.dealBoxLogic('A')
@@ -374,7 +400,7 @@ export default {
       handler(newVal, oldVal) {
         // enteringPonitB
         if(!this.enteringPonitB && newVal === '1' && oldVal === '0') { //货物开始进入B点
-          console.log('开始进入B点')
+          this.$message.success('开始进入B点')
           this.enteringPonitB = true
           // 进入B的下降沿，获取AB队列第一个，开始计算时间，到时间后，进行工艺对比，判断货物是否合格
           const boxImitateId = this.arrAB[0].boxImitateId;
@@ -383,7 +409,7 @@ export default {
             this.getUndercutProcess(boxImitateId);
           }, this.calculateMilliseconds((Number(this.l11)/Number(this.lightBeamRealTimeSpeed)).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
         } else if(this.enteringPonitB && newVal === '0' && oldVal === '1') { // 货物走出B点
-          console.log('货物走出B点')
+          this.$message.warning('货物走出B点')
           this.enteringPonitB = false
           this.dealBoxLogic('B')
         } else {
@@ -426,6 +452,10 @@ export default {
   },
   computed: {},
   methods: {
+    createLog(msg) {
+      // 生成日志
+      this.logArr.push({text: msg})
+    },
     qualified4Box(boxImitateIdVal, status) {
       console.log(boxImitateIdVal)
       console.log(status)
@@ -519,6 +549,9 @@ export default {
         case 'DG':
           this.arrDG.push(this.boxArr[this.dragIndex]);
           break;
+        case 'F':
+          this.arrF.push(this.boxArr[this.dragIndex]);
+          break;
         case 'GH':
           this.arrGH.push(this.boxArr[this.dragIndex]);
           break;
@@ -538,6 +571,7 @@ export default {
       this.traCD = false
       this.traDG = false
       this.traGH = false
+      this.traF = false
       switch (transform) {
         case 'AB':
           this.boxArr = this.arrAB;
@@ -554,6 +588,10 @@ export default {
         case 'DG':
           this.boxArr = this.arrDG;
           this.traDG = true
+          break;
+        case 'F':
+          this.boxArr = this.arrF;
+          this.traF = true
           break;
         case 'GH':
           this.boxArr = this.arrGH;
@@ -585,25 +623,15 @@ export default {
       // 正确修改方法：直接在watch方法判断值，一变化接着调用这个方法，并且传固参，不再判断point*变量
       switch (point) {
         case 'A':
-          if(this.nowNumberTurns == 1) {
-            // 第一圈，仍然是新增，按照要求生成模拟id策略
-            const boxImitateId = await this.getCurrentTimeSort();
-            this.nowABoxImitateId = boxImitateId;
-            // 代表货物进入光电A，生成模拟id绑定,如果有扫码数据则
-            this.arrAB.push({orderId: this.orderMainDy.orderId, orderNo: this.orderMainDy.orderNo, boxImitateId: boxImitateId, numberTurns: 1, loadScanCode: this.loadScanCode, turnsInfoList:[{numberTurns: 1, passATime: moment().format('YYYY-MM-DD HH:mm:ss')}]});
-            // 上货数量+1
-            this.nowInNum++;
-            // 模拟id数+1
-            this.beginCountNum++;
+        if(this.nowNumberTurns == 1) {
+            // 走出A 读码
+            this.loadScanCode = this.loadScanCodeTemp;
+            this.arrAB[this.arrAB.length - 1].loadScanCode = this.loadScanCode;
           } else {
-            // 把GH队列最开始箱子加入AB对接，并修改圈数
-            this.arrAB.push(this.arrGH[0]);
-            this.arrGH.splice(0,1)
-            this.arrAB[this.arrAB.length - 1].numberTurns = this.arrAB[this.arrAB.length - 1].numberTurns + 1;
-            const nowTurns = this.arrAB[this.arrAB.length - 1].numberTurns;
-            this.arrAB[this.arrAB.length - 1].turnsInfoList.push({numberTurns: nowTurns, passATime: moment().format('YYYY-MM-DD HH:mm:ss')});
+            // 走出A 读码
+            this.loadScanCode = this.arrAB[this.arrAB.length - 1].loadScanCode;
           }
-          console.log(this.arrAB)
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrAB[this.arrAB.length - 1].boxImitateId + '离开A点，扫码信息：' + this.loadScanCode);
           break;
         case 'B':
           // 把AB队列第一个货物出列，进入BC
@@ -612,7 +640,8 @@ export default {
           this.arrBC[this.arrBC.length - 1].turnsInfoList[this.arrBC[this.arrBC.length - 1].numberTurns - 1].passBTime = moment().format('YYYY-MM-DD HH:mm:ss');
           // 删除AB队列第一个
           this.arrAB.splice(0,1)
-          console.log(this.arrBC)
+          // 生成日志
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrBC[this.arrBC.length - 1].boxImitateId + '经过B点，扫码信息：' + this.arrBC[this.arrBC.length - 1].loadScanCode);
           break;
         case 'C':
           if(this.pointC === '1') {
@@ -620,7 +649,7 @@ export default {
             this.arrCD[this.arrCD.length - 1].turnsInfoList[this.arrCD[this.arrCD.length - 1].numberTurns - 1].passCTime = moment().format('YYYY-MM-DD HH:mm:ss');
             // 删除BC队列第一个
             this.arrBC.splice(0,1);
-            console.log(this.arrCD)
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrCD[this.arrCD.length - 1].boxImitateId + '经过C点，扫码信息：' + this.arrCD[this.arrCD.length - 1].loadScanCode);
           }
           break;
         case 'D':
@@ -630,7 +659,7 @@ export default {
             this.arrDG[this.arrDG.length - 1].turnsInfoList[this.arrDG[this.arrDG.length - 1].numberTurns - 1].passDTime = moment().format('YYYY-MM-DD HH:mm:ss');
             // 删除BC队列第一个
             this.arrCD.splice(0,1);
-            console.log(this.arrDG)
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrDG[this.arrDG.length - 1].boxImitateId + '经过D点，扫码信息：' + this.arrDG[this.arrDG.length - 1].loadScanCode);
           }
           break;
         case 'E':
@@ -659,6 +688,20 @@ export default {
           }
           break;
         case 'F':
+          if(this.pointF === '1') {
+            this.nowTiChuNum++;
+            // tempArrF 缓存队列第一个一定是经过F点的箱子
+            this.arrF.push(this.tempArrF[0]);
+            // 删除tempArrF 第一个箱子
+            this.tempArrF.splice(0, 1);
+            // 在DG数组移除元素
+            for (let index = 0; index < this.arrDG.length; index++) {
+              if(this.arrF[this.arrF.length - 1].boxImitateId == this.arrDG[index].boxImitateId) {
+                this.arrDG.splice(index, 1);
+                break;
+              }
+            }
+          }
           break;
         case 'G':
           if(this.pointG === '1') {
@@ -712,8 +755,6 @@ export default {
       }
     },
     judgeIfDGqualified(index) {
-      console.log(this.arrDG)
-      console.log(index)
       this.nowEBoxImitateId = this.arrDG[index].boxImitateId;
       this.lastRouteEPoint = this.arrDG[index].boxImitateId;
       // 更新进入E点时间
@@ -722,12 +763,13 @@ export default {
         // 执行剔除命令
         ipcRenderer.send('writeValuesToPLC', 'DBW18', 1);
         console.log('剔除')
-        this.nowTiChuNum++;
-        // 在DG数组移除元素
-        this.arrDG.splice(index, 1);
+        this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + '货物' + this.arrDG[index].boxImitateId + '经过E点，扫码信息：' + this.arrDG[index].loadScanCode + ',货物不合格！执行剔除命令！');
+        // 将不合格货物加入 tempArrF 缓存队列
+        this.tempArrF.push(this.arrDG[index])
       } else {
         // 合格无需处理，写0即可
         ipcRenderer.send('writeValuesToPLC', 'DBW18', 0);
+        this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + '货物' + this.arrDG[index].boxImitateId + '经过E点，扫码信息：' + this.arrDG[index].loadScanCode + ',货物合格！');
       }
     },
     closeDynamicGraphShow() {
@@ -781,20 +823,20 @@ export default {
     // 订阅<状态球>eventBus发布的消息
     EventBus.$on('pushPLCMessage', eventData => {
       // --------无PLC测试时，这里以下代码毙掉--------
-      // this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
-      // this.pointA = this.guangDianStatusArr[7];
-      // this.pointB = this.guangDianStatusArr[6];
-      // this.pointC = this.guangDianStatusArr[5];
-      // this.pointD = this.guangDianStatusArr[4];
-      // this.pointE = this.guangDianStatusArr[3];
-      // this.pointF = this.guangDianStatusArr[2];
-      // this.pointG = this.guangDianStatusArr[1];
-      // this.pointH = this.guangDianStatusArr[0];
+      this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
+      this.pointA = this.guangDianStatusArr[7];
+      this.pointB = this.guangDianStatusArr[6];
+      this.pointC = this.guangDianStatusArr[5];
+      this.pointD = this.guangDianStatusArr[4];
+      this.pointE = this.guangDianStatusArr[3];
+      this.pointF = this.guangDianStatusArr[2];
+      this.pointG = this.guangDianStatusArr[1];
+      this.pointH = this.guangDianStatusArr[0];
       // --------无PLC测试时，这里以上代码毙掉--------
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
       this.lightBeamRealTimeSpeed = Number(eventData.DBW68);
       // 上料固定扫码
-      this.loadScanCode = eventData.DBB100??''.replace(/\s/g,'');
+      this.loadScanCodeTemp = eventData.DBB100??''.replace(/\s/g,'');
       // 迷宫出口固定扫码
       this.labyrinthScanCode = eventData.DBB130??''.replace(/\s/g,'');
     })

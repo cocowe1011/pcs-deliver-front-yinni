@@ -62,13 +62,13 @@
                 <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="束下速度上限：">
-                <el-input size="small" v-model="orderMainForm.sxSpeedUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
+                <el-input size="small" v-model="orderMainForm.sxSpeedUpperLimit" placeholder="束下速度上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="束下速度值：">
-                <el-input size="small" v-model="orderMainForm.sxSpeedSet" placeholder="束流设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+                <el-input size="small" v-model="orderMainForm.sxSpeedSet" placeholder="束下速度值" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="束下速度下限：">
-                <el-input size="small" v-model="orderMainForm.sxSpeedLowerLimit" placeholder="束流下限" :readonly="!(isNewSave || isEdit)"></el-input>
+                <el-input size="small" v-model="orderMainForm.sxSpeedLowerLimit" placeholder="束下速度下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="束流上限：">
                 <el-input size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
@@ -136,6 +136,7 @@
         <div class="listDiv">
           <div class="list-top">
             <el-button type="primary" icon="el-icon-plus" size="small" @click="newOrderClick">新建</el-button>
+            <el-button icon="el-icon-refresh-right" size="small" @click="getOrderList" style="margin-left: 15px;">刷新</el-button>
           </div>
           <div class="list-middle">
             <el-table
@@ -143,7 +144,8 @@
               border
               style="width: 100%"
               highlight-current-row
-              @current-change="handleCurrentChange">
+              @current-change="handleCurrentChange"
+              v-loading="getOrderListLoading">
               <el-table-column type="index" width="80" :index="indexMethod" fixed="left" label="序号">
               </el-table-column>
               <el-table-column v-for="item in tableTitle"
@@ -211,7 +213,8 @@ export default {
       isEdit: false,
       isNewSave: false,
       currentSelect: {},
-      isDynamicGraphShow: false
+      isDynamicGraphShow: false,
+      getOrderListLoading: false
     };
   },
   watch: {},
@@ -269,12 +272,19 @@ export default {
       });
     },
     async getOrderList() {
+      this.getOrderListLoading = true
       await HttpUtil.get('/order/getOrderList').then((res)=> {
         this.tableData = res.data
         this.tableData.forEach(item => {
           item.revertFlag = item.revertFlag == '1' ? '翻转' : ''
         })
+        setTimeout(() => {
+          this.getOrderListLoading = false
+        }, 500);
       }).catch((err)=> {
+        setTimeout(() => {
+          this.getOrderListLoading = false
+        }, 500);
         // 网络异常 稍后再试
         this.$message.error('查询失败！' + err);
       });
@@ -320,7 +330,7 @@ export default {
     async writeValuesToPLC(obj) {
       // ipcRenderer.send('writeValuesToPLC', 'DBW6', 1);
       // DB101.DBW2 加速器设定输送速度
-      ipcRenderer.send('writeValuesToPLC', 'DBW2', Number(obj.acceleratorKValue));
+      ipcRenderer.send('writeValuesToPLC', 'DBW2', Number(obj.sxSpeedSet));
       await this.delay(50)
       // DB101.DBW8 启动输送线
       ipcRenderer.send('writeValuesToPLC', 'DBW8', 1);

@@ -5,8 +5,8 @@
         <div class="formDiv">
           <div class="card-title">报表设计</div>
           <div class="card-content">
-            <div>箱报告模板<el-input placeholder="文件路径" v-model="boxReportPath" style="width: 300px;margin-left: 10px;" size="small" readonly></el-input><el-button style="margin-left: 10px;" size="small">箱设计</el-button></div>
-            <div>批报告模板<el-input placeholder="文件路径" v-model="orderReportPath" style="width: 300px;margin-left: 10px;" size="small" readonly></el-input><el-button style="margin-left: 10px;" size="small">批设计</el-button></div>
+            <div>箱报告模板<el-input placeholder="文件路径" v-model="boxReportPath" style="width: 300px;margin-left: 10px;" size="small" readonly></el-input><el-button style="margin-left: 10px;" size="small" @click="openReport(boxReportPath)" :loading="openBoxLoading">箱设计</el-button></div>
+            <div>批报告模板<el-input placeholder="文件路径" v-model="orderReportPath" style="width: 300px;margin-left: 10px;" size="small" readonly></el-input><el-button style="margin-left: 10px;" size="small" @click="openReport(orderReportPath)" :loading="openOrderLoading">批设计</el-button></div>
           </div>
         </div>
         <el-divider></el-divider>
@@ -83,6 +83,8 @@
 import HttpUtil from '@/utils/HttpUtil'
 import { Debugger, ipcRenderer } from 'electron'
 import grwebapp from '@/utils/grwebapp'
+const { exec } = require('child_process');
+const os = require('os');
 export default {
   name: "Report",
   components: {},
@@ -90,16 +92,54 @@ export default {
   data() {
     return {
       printObj: {recordset:[]},
-      boxReportPath: 'D://CSS/箱报告报表.grf',
-      orderReportPath: 'D://CSS/批报告报表.grf',
+      boxReportPath: 'D://boxreport.grf',
+      orderReportPath: 'D://batchReport.grf',
       tableData: [],
       orderNoInput: '',
-      boxImitateIdInput: ''
+      boxImitateIdInput: '',
+      openBoxLoading: false,
+      openOrderLoading: false
     };
   },
   watch: {},
   computed: {},
   methods: {
+    openReport(filePath) {
+      if (filePath == 'D://batchReport.grf') {
+        this.openOrderLoading = true
+      } else {
+        this.openBoxLoading = true
+      }
+      let command;
+      switch (os.platform()) {
+        case 'win32': // Windows
+          command = `start "" "${filePath}"`;
+          break;
+        case 'darwin': // macOS
+          command = `open "${filePath}"`;
+          break;
+        case 'linux': // Linux
+          command = `xdg-open "${filePath}"`;
+          break;
+        default:
+          this.$message.error('不支持的操作系统！');
+          return;
+      }
+
+      // 执行打开文件的命令
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          this.$message.error(`无法打开文件：${filePath}`);
+          console.error(error);
+          this.openBoxLoading = false
+          this.openOrderLoading = false
+          return;
+        }
+        this.openBoxLoading = false
+        this.openOrderLoading = false
+        this.$message.success('文件已成功打开！');
+      });
+    },
     async getReportList() {
       const param = {
         boxImitateId: this.boxImitateIdInput,

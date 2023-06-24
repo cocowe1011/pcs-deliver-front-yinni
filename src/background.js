@@ -103,9 +103,9 @@ app.on('ready', () => {
       }
     })
   });
-  setInterval(() => {
-    mainWindow.webContents.send('receivedMsg', {DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-  }, 100);
+  // setInterval(() => {
+  //   mainWindow.webContents.send('receivedMsg', {DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  // }, 100);
   setAppTray();
   if (process.env.NODE_ENV === 'production') {
     // 启动Java进程
@@ -145,9 +145,9 @@ app.on('ready', () => {
     // 迷宫出口固定扫码
     conn.addItems('DBB130');
     // 读DBW6和DBW62
-    // setInterval(() => {
-    //   conn.readAllItems(valuesReady);
-    // }, 50);
+    setInterval(() => {
+      conn.readAllItems(valuesReady);
+    }, 50);
   });
 });
 

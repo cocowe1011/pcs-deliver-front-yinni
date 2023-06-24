@@ -37,7 +37,9 @@
       </div>
       <div class="maskDiv-down">
         <StatusMonitor></StatusMonitor>
-        <router-view/>
+        <keep-alive>
+          <router-view/>
+        </keep-alive>
       </div>
     </div>
   </div>
