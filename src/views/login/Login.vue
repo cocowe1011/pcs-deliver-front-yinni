@@ -9,15 +9,30 @@
         <div class="login-right-top-min" @click="minWindow"><i class="el-icon-minus" style="font-size:18px;font-weight:600;"></i></div>
         <div class="login-right-top-close" @click="closewindow"><i class="el-icon-close" style="font-size:18px;font-weight:600;"></i></div>
       </div>
-      <div class="login-right-down">
+      <div class="login-right-down" v-if="pageMark == 'login'">
         <p class="title">全自动束下输送系统</p>
         <p class="intro">欢迎使用全自动束下输送系统。简洁、易用的操作页面，全自动化管理全力帮助您提高效率。</p>
         <div class="login-form">
           <el-input placeholder="请输入用户名" class="user-code" v-model="userCode"></el-input>
           <el-input placeholder="请输入密码" class="user-password" type="password" v-model="userPassword" autocomplete="off"></el-input>
-          <p class="tips">没有帐户？<span id="look-help">立即注册</span><span style="margin-left:185px;">忘记密码?</span> </p>
+          <p class="tips">没有帐户？<span id="look-help" @click="registerPage">立即注册</span><span style="margin-left:185px;">忘记密码?</span> </p>
           <el-button class="user-login-button" type="primary" @click="login" :loading="loadingStatus">立即登录</el-button>
         </div>
+      </div>
+      <div class="login-right-down" v-else-if="pageMark == 'register'">
+        <p class="title" style="text-align: center;">创建账户</p>
+        <p class="intro" style="width: 100%;text-align: center;">已有帐户？<span id="look-help" @click="loginPage">登录</span></p>
+        <div class="login-form">
+          <el-input placeholder="请输入姓名" class="user-code-register" v-model="userNameReg" @blur="showUserNameTips = false" @focus="showUserNameTips = true"></el-input>
+          <p class="tips" style="margin-bottom: 0;line-height: 3px;" v-show="showUserNameTips">登录人姓名，用于记录订单操作人。</p>
+          <el-input placeholder="请输入注册账号" class="user-code-register" v-model="userCodeReg" style="margin-top: 15px;" @blur="showUserCodeTips = false" @focus="showUserCodeTips = true" @input="restrictInput"></el-input>
+          <p class="tips" style="margin-bottom: 0;line-height: 3px;" v-show="showUserCodeTips">注册账号为数字字母下划线，用于登录系统</p>
+          <el-input placeholder="请输入密码" class="user-password-register" type="password" v-model="userPasswordReg" autocomplete="off" style="margin-top: 15px;"></el-input>
+          <el-input placeholder="确认密码" class="user-password-register" type="password" v-model="userPasswordAgain" autocomplete="off" style="margin-top: 15px;"></el-input>
+          <el-button class="user-login-button" type="primary" @click="registerUser" :loading="registerStatus" style="margin-top: 15px;">立即注册</el-button>
+        </div>
+      </div>
+      <div class="login-right-down" v-else>
       </div>
     </div>
   </div>
@@ -25,37 +40,113 @@
 
 <script>
 import { ipcRenderer } from 'electron'
+import HttpUtil from '@/utils/HttpUtil'
 export default {
   name: "Login",
   components: {},
   props: {},
   data() {
     return {
-      userCode: '',
-      userPassword: '',
-      loadingStatus: false
+      userCode: 'admin',
+      userPassword: '1',
+      loadingStatus: false,
+      pageMark: 'login',
+      showUserNameTips: false,
+      showUserCodeTips: false,
+      userNameReg: '',
+      userCodeReg: '',
+      userPasswordReg: '',
+      userPasswordAgain: '',
+      registerStatus: false,
+      regex: /^[a-zA-Z0-9_]*$/
     };
   },
   watch: {},
   computed: {},
   methods: {
+    registerUser() {
+      this.registerStatus = true;
+      if(this.userPasswordReg !== this.userPasswordAgain) {
+        this.$message.error('密码输入不一致，请重新输入！')
+        this.registerStatus = false;
+        return false;
+      }
+      const param = {
+        userName: this.userNameReg,
+        userCode: this.userCodeReg,
+        userPassword: this.userPasswordReg
+      }
+      HttpUtil.post('/userInfo/save', param).then((res)=> {
+        if(res.data == 1) {
+          // 注册成功，跳转登录页面进行登录
+          this.$notify({
+            title: '注册成功！',
+            message: '请输入账号密码进行登录！',
+            type: 'success',
+            duration: 2000
+          });
+          this.pageMark = 'login';
+        } else {
+          // 注册失败，请重试
+          this.$message.error('注册失败，请重试！')
+        }
+        this.registerStatus = false;
+      }).catch((err)=> {
+        // 注册失败，请重试
+        this.$message.error('注册失败，请重试！')
+        this.registerStatus = false;
+      });
+    },
+    loginPage() {
+      this.pageMark = 'login';
+    },
+    registerPage() {
+      this.userNameReg = '';
+      this.userCodeReg = '';
+      this.userPasswordReg = '';
+      this.userPasswordAgain = '';
+      this.pageMark = 'register';
+    },
     login() {
       this.loadingStatus = true;
-      setTimeout(() => {
+      // 将账号密码传递后台，判断密码是否正确
+      const param = {
+        userCode: this.userCode,
+        userPassword: this.userPassword
+      }
+      HttpUtil.post('/login/login', param).then((res)=> {
+        if(res.data) {
+          setTimeout(() => {
+            this.loadingStatus = false;
+            // 跳转主页
+            this.$nextTick(() => {
+              this.$router.replace({
+                path: '/homePage/orderList'
+              });
+            });
+          }, 2000);
+        } else {
+          this.$message.error(res.message)
+          this.loadingStatus = false;
+        }
+      }).catch((err)=> {
+        this.$message.error(err)
         this.loadingStatus = false;
-        // 跳转主页
-        this.$nextTick(() => {
-          this.$router.replace({
-            path: '/homePage/orderList'
-          });
-        });
-      }, 2000);
+      });
     },
     closewindow() {
       ipcRenderer.send('close-window')
     },
     minWindow() {
       ipcRenderer.send('min-window')
+    },
+    restrictInput() {
+      // 匹配只包含数字、字母和下划线的正则表达式
+      if (!this.regex.test(this.userCodeReg)) {
+        // 如果输入的值不符合要求，移除非法字符
+        this.userCodeReg = this.userCodeReg.replace(/[^a-zA-Z0-9_]/g, '');
+        this.$message.error('登录账户只能设置为数字，字母及下划线！')
+      }
     }
   },
   created() {
@@ -132,6 +223,10 @@ export default {
         line-height: 18px;
         color: #8c8c8c;
         margin-top: -15px;
+        span {
+          color: #4385ff;
+          cursor: pointer;
+        }
       }
       .login-form {
         padding: 20px 30px 20px 0px;

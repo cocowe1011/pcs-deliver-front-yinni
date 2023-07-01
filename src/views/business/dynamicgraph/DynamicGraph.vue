@@ -57,9 +57,29 @@
           </div>
         </div>
       </div>
+      <div class="dynamic-left-middle">
+        <div>
+          <div class="card-title">操作区</div>
+          <div class="card-content" style="display: flex;align-items: center;">
+            <!-- 操作按钮 -->
+            <div class="img" @click="sendMsgToPLC('suspend')">
+              全线<br/>暂停
+            </div>
+            <div class="img" @click="sendMsgToPLC('run')">
+              全线<br/>启动
+            </div>
+            <div class="img" @click="sendMsgToPLC('stop')">
+              全线<br/>停止
+            </div>
+            <div class="img" @click="sendMsgToPLC('clear')">
+              全线<br/>清空
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="dynamic-left-down">
         <div>
-          <div class="card-title">操作日志</div>
+          <div class="card-title">操作日志(报警日志)</div>
           <div class="card-content">
             <div class="log-text" v-for="(message, index) in logArr" :key="index">
               {{ message.text }}
@@ -71,125 +91,122 @@
     <div class="dynamic-right">
       <div>
         <div class="card-title">实时状态监控</div>
-        <div class="card-content chuansongpadding" style="display: flex;justify-content: center;">
-          <img src="./img/fushe2x.png" class="fusheIcon"/>
-          <transition name="el-fade-in-linear">
-            <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
-          </transition>
-          <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:30px" />
-          <div class="show-data-area" style="position: absolute;right: 80px;top: 490px;">
-            <div class="show-data-area-top">ID信息</div>
-            <div class="show-data-area-content">
-              <el-input readonly size="small" v-model="nowABoxImitateId"></el-input>
+        <div class="card-content" style="display: flex;justify-content: center;" ref="parent">
+          <div class="dyscare chuansongpadding" style="width: 900px;height: 100%;position: relative;" ref="child">
+            <img src="./img/fushe2x.png" class="fusheIcon"/>
+            <transition name="el-fade-in-linear">
+              <img src="./img/deng.png" class="fusheguang" v-show="dengShow"/>
+            </transition>
+            <img src="./img/chuansongdai.png" style="width: 889.67px;height: 682.66px;margin-top:60px" />
+            <div class="show-data-area" style="position: absolute;right: 80px;top: 490px;">
+              <div class="show-data-area-top">ID信息</div>
+              <div class="show-data-area-content">
+                <el-input readonly size="small" v-model="nowABoxImitateId"></el-input>
+              </div>
             </div>
-          </div>
-          <div class="show-data-area" style="position: absolute;right: 80px;top: 528px;">
-            <div class="show-data-area-top">上货扫码信息</div>
-            <div class="show-data-area-content">
-              <el-input v-model="loadScanCode" readonly size="small"></el-input>
+            <div class="show-data-area" style="position: absolute;right: 80px;top: 528px;">
+              <div class="show-data-area-top">上货扫码信息</div>
+              <div class="show-data-area-content">
+                <el-input v-model="loadScanCode" readonly size="small"></el-input>
+              </div>
             </div>
-          </div>
-          <div class="show-data-area" style="position: absolute;right: 80px;top: 569px;">
-            <div class="show-data-area-top">当前上货数量</div>
-            <div class="show-data-area-content">
-              <el-input v-model="nowInNum" readonly size="small"></el-input>
+            <div class="show-data-area" style="position: absolute;right: 80px;top: 569px;">
+              <div class="show-data-area-top">当前上货数量</div>
+              <div class="show-data-area-content">
+                <el-input v-model="nowInNum" readonly size="small"></el-input>
+              </div>
             </div>
-          </div>
-          <div class="show-data-area" style="position: absolute;left: 178px;top: 475px;">
-            <div class="show-data-area-top">ID信息</div>
-            <div class="show-data-area-content">
-              <el-input readonly size="small" v-model="nowEBoxImitateId"></el-input>
+            <div class="show-data-area" style="position: absolute;left: 178px;top: 475px;">
+              <div class="show-data-area-top">ID信息</div>
+              <div class="show-data-area-content">
+                <el-input readonly size="small" v-model="nowEBoxImitateId"></el-input>
+              </div>
             </div>
-          </div>
-          <div class="show-data-area" style="position: absolute;left: 178px;top: 513px;">
-            <div class="show-data-area-top">下货扫码信息</div>
-            <div class="show-data-area-content">
-              <el-input v-model="labyrinthScanCode" readonly size="small"></el-input>
+            <div class="show-data-area" style="position: absolute;left: 178px;top: 513px;">
+              <div class="show-data-area-top">下货扫码信息</div>
+              <div class="show-data-area-content">
+                <el-input v-model="labyrinthScanCode" readonly size="small"></el-input>
+              </div>
             </div>
-          </div>
-          <div class="show-data-area" style="position: absolute;left: 194px;top: 560px;">
-            <div class="show-data-area-top">当前下货数量</div>
-            <div class="show-data-area-content">
-              <el-input v-model="nowOutNum" readonly size="small"></el-input>
+            <div class="show-data-area" style="position: absolute;left: 194px;top: 560px;">
+              <div class="show-data-area-top">当前下货数量</div>
+              <div class="show-data-area-content">
+                <el-input v-model="nowOutNum" readonly size="small"></el-input>
+              </div>
             </div>
-          </div>
-          <div class="show-data-area" style="position: absolute;left: 436px;top: 185px;width: 150px;height: 58px;">
-            <div class="show-data-area-top" style="width: 100%;height: 26px;">束下当前货物ID</div>
-            <div class="show-data-area-content" style="width: 100%;height: 26px;">
-              <el-input v-model="nowShuXiaid" readonly size="small"></el-input>
+            <div class="show-data-area" style="position: absolute;left: 436px;top: 185px;width: 150px;height: 58px;">
+              <div class="show-data-area-top" style="width: 100%;height: 26px;">束下当前货物ID</div>
+              <div class="show-data-area-content" style="width: 100%;height: 26px;">
+                <el-input v-model="nowShuXiaid" readonly size="small"></el-input>
+              </div>
             </div>
-          </div>
-          <div class="show-data-area" style="position: absolute;left: -35px;top: 428px;width: 150px;height: 58px;">
-            <div class="show-data-area-top" style="width: 100%;height: 26px;">当前剔除数量</div>
-            <div class="show-data-area-content" style="width: 100%;height: 26px;">
-              <el-input v-model="nowTiChuNum" readonly size="small"></el-input>
+            <div class="show-data-area" style="position: absolute;left: -35px;top: 428px;width: 150px;height: 58px;">
+              <div class="show-data-area-top" style="width: 100%;height: 26px;">当前剔除数量</div>
+              <div class="show-data-area-content" style="width: 100%;height: 26px;">
+                <el-input v-model="nowTiChuNum" readonly size="small"></el-input>
+              </div>
             </div>
+            <!-- 光电星星 -->
+            <div class="guangdian" style="top: 447px;right: 86px;" @click="analogOptoelectronics('A')">
+              <div class='star' v-show="pointA == '1'"></div>
+              <div class="pointText">A</div>
+            </div>
+            <div class="guangdian" style="top: 185px;right: 140px;" @click="analogOptoelectronics('B')">
+              <div class='star' v-show="pointB == '1'"></div>
+              <div class="pointText">B</div>
+            </div>
+            <div class="guangdian" style="top: 185px;right: 612px;" @click="analogOptoelectronics('C')">
+              <div class='star' v-show="pointC == '1'"></div>
+              <div class="pointText">C</div>
+            </div>
+            <div class="guangdian" style="top: 331px;right: 654px;" @click="analogOptoelectronics('D')">
+              <div class='star' v-show="pointD == '1'"></div>
+              <div class="pointText">D</div>
+            </div>
+            <div class="guangdian" style="top: 434px;right: 674px;" @click="analogOptoelectronics('E')">
+              <div class='star' v-show="pointE == '1'"></div>
+              <div class="pointText">E</div>
+            </div>
+            <div class="guangdian" style="right: 827px;top: 551px;" @click="analogOptoelectronics('F')">
+              <div class='star' v-show="pointF == '1'"></div>
+              <div class="pointText">F</div>
+            </div>
+            <div class="guangdian" style="right: 792px;top: 600px;" @click="analogOptoelectronics('G')">
+              <div class='star' v-show="pointG == '1'"></div>
+              <div class="pointText">G</div>
+            </div>
+            <div class="guangdian" style="right: 446px;top: 683px;" @click="analogOptoelectronics('H')">
+              <div class='star' v-show="pointH == '1'"></div>
+              <div class="pointText">H</div>
+            </div>
+            <!-- 电机状态 -->
+            <div :class="['dianji', dianJiStatusArr[7] == '1' ? 'dianji-active' : '']" style="top: 640px;right: 133px;">100#电机</div>
+            <div :class="['dianji', dianJiStatusArr[6] == '1' ? 'dianji-active' : '']" style="top: 416px;right: 6px;">101#电机</div>
+            <div :class="['dianji', dianJiStatusArr[5] == '1' ? 'dianji-active' : '']" style="top: 386px;right: 190px;">102#电机</div>
+            <div :class="['dianji', dianJiStatusArr[4] == '1' ? 'dianji-active' : '']" style="top: 258px;right: 190px;">103#电机</div>
+            <div :class="['dianji', dianJiStatusArr[3] == '1' ? 'dianji-active' : '']" style="top: 132px;right: 190px;">104#电机</div>
+            <div :class="['dianji', dianJiStatusArr[2] == '1' ? 'dianji-active' : '']" style="top: 88px;right: 450px;">105#电机</div>
+            <div :class="['dianji', dianJiStatusArr[1] == '1' ? 'dianji-active' : '']" style="top: 131px;right: 538px;">106#电机</div>
+            <div :class="['dianji', dianJiStatusArr[0] == '1' ? 'dianji-active' : '']" style="top: 259px;right: 516px;">107#电机</div>
+            <div :class="['dianji', dianJiStatusArr[15] == '1' ? 'dianji-active' : '']" style="top: 379px;right: 516px;">108#电机</div>
+            <div :class="['dianji', dianJiStatusArr[14] == '1' ? 'dianji-active' : '']" style="top: 379px;right: 641px;">109#电机</div>
+            <div :class="['dianji', dianJiStatusArr[13] == '1' ? 'dianji-active' : '']" style="top: 420px;right: 727px;">110#电机</div>
+            <div :class="['dianji', dianJiStatusArr[12] == '1' ? 'dianji-active' : '']" style="top: 638px;right: 730px;">111#电机</div>
+            <div :class="['dianji', dianJiStatusArr[11] == '1' ? 'dianji-active' : '']" style="top: 639px;right: 627px;">112#电机</div>
+            <div :class="['dianji', dianJiStatusArr[10] == '1' ? 'dianji-active' : '']" style="top: 596px;right: 450px;">113#电机</div>
+            <div :class="['dianji', dianJiStatusArr[9] == '1' ? 'dianji-active' : '']" style="top: 596px;right: 264px;">114#电机</div>
+            <div :class="['dianji', dianJiStatusArr[8] == '1' ? 'dianji-active' : '']" style="top: 690px;right: 367px;">115#电机</div>
+            <!-- 队列信息 -->
+            <el-link type="danger" style="position: absolute;top: 326px;right: 109px;" @click="showChuanSong('AB')">{{ '101-103区域货物缓存队列 (' + arrAB.length + ')' }}</el-link>
+            <el-link type="danger" style="position: absolute;top: 86px;right: 118px;" @click="showChuanSong('BC')">{{ '104-106区域货物缓存队列 (' + arrBC.length + ')' }}</el-link>
+            <el-link type="danger" style="position: absolute;top: 320px;right: 536px;" @click="showChuanSong('CD')">{{ '107-109区域货物缓存队列 (' + arrCD.length + ')' }}</el-link>
+            <el-link type="danger" style="position: absolute;top: 445px;left: 240px;" @click="showChuanSong('DG')">{{ '110-111区域货物缓存队列 (' + arrDG.length + ')' }}</el-link>
+            <el-link type="danger" style="position: absolute;top: 395px;left: -9px;" @click="showChuanSong('F')">{{ '剔除货物缓存队列 (' + arrF.length + ')' }}</el-link>
+            <el-link type="danger" style="position: absolute;top: 689px;right: 542px;" @click="showChuanSong('GH')">{{ '下货区缓存队列 (' + arrGH.length + ')' }}</el-link>
+            <!-- 预警 -->
+            <img src="./img/yujing.png" class="warning-img" v-show="yujingShow" style="left: 41px;top: 663px;"/>
+            <img src="./img/baojing.png" class="warning-img" v-show="baojingShow" style="top: 717px;left: 352px;"/>
           </div>
-          <!-- 光电星星 -->
-          <div class="guangdian" style="top: 447px;right: 86px;" @click="analogOptoelectronics('A')">
-            <div class='star' v-show="pointA == '1'"></div>
-            <div class="pointText">A</div>
-          </div>
-          <div class="guangdian" style="top: 185px;right: 140px;" @click="analogOptoelectronics('B')">
-            <div class='star' v-show="pointB == '1'"></div>
-            <div class="pointText">B</div>
-          </div>
-          <div class="guangdian" style="top: 185px;right: 612px;" @click="analogOptoelectronics('C')">
-            <div class='star' v-show="pointC == '1'"></div>
-            <div class="pointText">C</div>
-          </div>
-          <div class="guangdian" style="top: 331px;right: 654px;" @click="analogOptoelectronics('D')">
-            <div class='star' v-show="pointD == '1'"></div>
-            <div class="pointText">D</div>
-          </div>
-          <div class="guangdian" style="top: 434px;right: 674px;" @click="analogOptoelectronics('E')">
-            <div class='star' v-show="pointE == '1'"></div>
-            <div class="pointText">E</div>
-          </div>
-          <div class="guangdian" style="right: 827px;top: 551px;" @click="analogOptoelectronics('F')">
-            <div class='star' v-show="pointF == '1'"></div>
-            <div class="pointText">F</div>
-          </div>
-          <div class="guangdian" style="right: 792px;top: 600px;" @click="analogOptoelectronics('G')">
-            <div class='star' v-show="pointG == '1'"></div>
-            <div class="pointText">G</div>
-          </div>
-          <div class="guangdian" style="right: 446px;top: 683px;" @click="analogOptoelectronics('H')">
-            <div class='star' v-show="pointH == '1'"></div>
-            <div class="pointText">H</div>
-          </div>
-          <!-- 电机状态 -->
-          <div :class="['dianji', dianJiStatusArr[7] == '1' ? 'dianji-active' : '']" style="top: 640px;right: 133px;">100#电机</div>
-          <div :class="['dianji', dianJiStatusArr[6] == '1' ? 'dianji-active' : '']" style="top: 416px;right: 6px;">101#电机</div>
-          <div :class="['dianji', dianJiStatusArr[5] == '1' ? 'dianji-active' : '']" style="top: 386px;right: 190px;">102#电机</div>
-          <div :class="['dianji', dianJiStatusArr[4] == '1' ? 'dianji-active' : '']" style="top: 258px;right: 190px;">103#电机</div>
-          <div :class="['dianji', dianJiStatusArr[3] == '1' ? 'dianji-active' : '']" style="top: 132px;right: 190px;">104#电机</div>
-          <div :class="['dianji', dianJiStatusArr[2] == '1' ? 'dianji-active' : '']" style="top: 88px;right: 450px;">105#电机</div>
-          <div :class="['dianji', dianJiStatusArr[1] == '1' ? 'dianji-active' : '']" style="top: 131px;right: 538px;">106#电机</div>
-          <div :class="['dianji', dianJiStatusArr[0] == '1' ? 'dianji-active' : '']" style="top: 259px;right: 516px;">107#电机</div>
-          <div :class="['dianji', dianJiStatusArr[15] == '1' ? 'dianji-active' : '']" style="top: 379px;right: 516px;">108#电机</div>
-          <div :class="['dianji', dianJiStatusArr[14] == '1' ? 'dianji-active' : '']" style="top: 379px;right: 641px;">109#电机</div>
-          <div :class="['dianji', dianJiStatusArr[13] == '1' ? 'dianji-active' : '']" style="top: 420px;right: 727px;">110#电机</div>
-          <div :class="['dianji', dianJiStatusArr[12] == '1' ? 'dianji-active' : '']" style="top: 638px;right: 730px;">111#电机</div>
-          <div :class="['dianji', dianJiStatusArr[11] == '1' ? 'dianji-active' : '']" style="top: 639px;right: 627px;">112#电机</div>
-          <div :class="['dianji', dianJiStatusArr[10] == '1' ? 'dianji-active' : '']" style="top: 596px;right: 450px;">113#电机</div>
-          <div :class="['dianji', dianJiStatusArr[9] == '1' ? 'dianji-active' : '']" style="top: 596px;right: 264px;">114#电机</div>
-          <div :class="['dianji', dianJiStatusArr[8] == '1' ? 'dianji-active' : '']" style="top: 690px;right: 367px;">115#电机</div>
-          <!-- 队列信息 -->
-          <el-link type="danger" style="position: absolute;top: 326px;right: 109px;" @click="showChuanSong('AB')">{{ '101-103区域货物缓存队列 (' + arrAB.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 86px;right: 118px;" @click="showChuanSong('BC')">{{ '104-106区域货物缓存队列 (' + arrBC.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 320px;right: 536px;" @click="showChuanSong('CD')">{{ '107-109区域货物缓存队列 (' + arrCD.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 445px;left: 240px;" @click="showChuanSong('DG')">{{ '110-111区域货物缓存队列 (' + arrDG.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 395px;left: -9px;" @click="showChuanSong('F')">{{ '剔除货物缓存队列 (' + arrF.length + ')' }}</el-link>
-          <el-link type="danger" style="position: absolute;top: 689px;right: 542px;" @click="showChuanSong('GH')">{{ '下货区缓存队列 (' + arrGH.length + ')' }}</el-link>
-          <!-- 预警 -->
-          <img src="./img/yujing.png" class="warning-img" v-show="yujingShow" style="left: 41px;top: 663px;"/>
-          <img src="./img/baojing.png" class="warning-img" v-show="baojingShow" style="top: 717px;left: 352px;"/>
-          <!-- 操作按钮 -->
-          <el-button type="primary" class="caozuoButton" style="top: 108px;left: 20px;" @click="sendMsgToPLC('suspend')">全线暂停</el-button>
-          <el-button type="primary" class="caozuoButton" style="top: 158px;left: 20px;" @click="sendMsgToPLC('run')">全线启动</el-button>
-          <el-button type="primary" class="caozuoButton" style="top: 208px;left: 20px;" @click="sendMsgToPLC('stop')">全线停止</el-button>
-          <el-button type="primary" class="caozuoButton" style="top: 208px;left: 20px;" @click="sendMsgToPLC('clear')">全线清空</el-button>
         </div>
       </div>
     </div>
@@ -709,6 +726,7 @@ export default {
             if (this.arrDG[0].numberTurns >= this.orderMainDy.numberTurns) {
               // 符合下货条件，展示预警，货物需要下线标识。
               this.yujingShow = true;
+              this.nowOutNum++;
             }
             // 把DG队列第一个货物出列，进入GH
             this.arrGH.push(this.arrDG[0]);
@@ -788,12 +806,30 @@ export default {
       switch (command) {
         case 'suspend':
           ipcRenderer.send('writeValuesToPLC', 'DBW6', 1);
+          this.$notify({
+            title: '指令发送成功！',
+            message: '全线暂停指令已成功发送！',
+            type: 'success',
+            duration: 2000
+          });
           break;
         case 'run':
           ipcRenderer.send('writeValuesToPLC', 'DBW8', 1);
+          this.$notify({
+            title: '指令发送成功！',
+            message: '全线暂停指令已成功发送！',
+            type: 'success',
+            duration: 2000
+          });
           break;
         case 'stop':
           ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
+          this.$notify({
+            title: '指令发送成功！',
+            message: '全线暂停指令已成功发送！',
+            type: 'success',
+            duration: 2000
+          });
           break;
         default:
           break;
@@ -813,6 +849,19 @@ export default {
       }).catch((err)=> {
         this.$emit('returnGenerateBatchReport',false)
       });
+    },
+    adjustChildWidth() {
+      const parentElement = this.$refs.parent;
+      const childElement = this.$refs.child;
+      const parentWidth = parentElement.offsetWidth;
+      
+      if (childElement.offsetWidth > parentWidth) {
+        const maxScale = parentWidth / childElement.offsetWidth;
+        const scale = Math.min(maxScale, 1); // 缩放倍数不超过1，即不放大
+        childElement.style.transform = `scale(${scale})`;
+      } else {
+        childElement.style.transform = '';
+      }
     }
   },
   created() {},
@@ -823,15 +872,15 @@ export default {
     // 订阅<状态球>eventBus发布的消息
     EventBus.$on('pushPLCMessage', eventData => {
       // --------无PLC测试时，这里以下代码毙掉--------
-      this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
-      this.pointA = this.guangDianStatusArr[7];
-      this.pointB = this.guangDianStatusArr[6];
-      this.pointC = this.guangDianStatusArr[5];
-      this.pointD = this.guangDianStatusArr[4];
-      this.pointE = this.guangDianStatusArr[3];
-      this.pointF = this.guangDianStatusArr[2];
-      this.pointG = this.guangDianStatusArr[1];
-      this.pointH = this.guangDianStatusArr[0];
+      // this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
+      // this.pointA = this.guangDianStatusArr[7];
+      // this.pointB = this.guangDianStatusArr[6];
+      // this.pointC = this.guangDianStatusArr[5];
+      // this.pointD = this.guangDianStatusArr[4];
+      // this.pointE = this.guangDianStatusArr[3];
+      // this.pointF = this.guangDianStatusArr[2];
+      // this.pointG = this.guangDianStatusArr[1];
+      // this.pointH = this.guangDianStatusArr[0];
       // --------无PLC测试时，这里以上代码毙掉--------
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
       this.lightBeamRealTimeSpeed = Number(eventData.DBW68);
@@ -840,6 +889,11 @@ export default {
       // 迷宫出口固定扫码
       this.labyrinthScanCode = eventData.DBB130??''.replace(/\s/g,'');
     })
+    this.adjustChildWidth();
+    window.addEventListener('resize', this.adjustChildWidth);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.adjustChildWidth);
   }
 };
 </script>
@@ -961,7 +1015,7 @@ export default {
     }
   }
   &-left{
-    width: calc(100% - 930px);
+    width: 820px;
     height: 100%;
     float: left;
     &-top {
@@ -980,8 +1034,45 @@ export default {
         backdrop-filter: blur(88px);
       }
     }
+    &-middle {
+      height: 150px;
+      width: 100%;
+      float: left;
+      box-sizing: border-box;
+      padding: 7.5px 15px 7.5px 15px;
+      > div {
+        width: 100%;
+        height: 100%;
+        opacity: 1;
+        border-radius: 20px;
+        background: rgba(246, 247, 251, 0.56);
+        box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(88px);
+        .img {
+          width: 70px;
+          height: 70px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 20px;
+          box-shadow: 18px 18px 30px rgba(0, 0, 0, 0.2),
+          -15px -7px 30px rgba(255, 255, 255, 1);
+          transition: all .2s ease-out;
+          cursor: pointer;
+          margin-left: 25px;
+          font-weight: 900;
+        }
+        .img:active{
+          cursor: pointer;
+          box-shadow: 0 0 0 rgba(0, 0, 0, 0.2),
+          0 0 0 rgba(255, 255, 255, 0.8),
+          inset 18px 18px 30px rgba(0, 0, 0, 0.1),
+          inset -18px -18px 30px rgba(255, 255, 255, 1);
+        }
+      }
+    }
     &-down {
-      height: calc(100% - 384px);
+      height: calc(100% - 534px);
       width: 100%;
       float: left;
       box-sizing: border-box;
@@ -1027,7 +1118,7 @@ export default {
     }
   }
   &-right{
-    width: 930px;
+    width: calc(100% - 820px);
     height: 100%;
     float: left;
     padding: 15px 15px 15px 0px;

@@ -13,7 +13,7 @@
           <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
             <el-menu-item index="1">业务处理</el-menu-item>
             <el-menu-item index="2">报表管理</el-menu-item>
-            <el-menu-item index="3">系统管理</el-menu-item>
+            <el-menu-item index="3">配置管理</el-menu-item>
             <el-menu-item index="4">关于</el-menu-item>
           </el-menu>
         </div>
@@ -77,6 +77,13 @@ export default {
           this.$nextTick(() => {
             this.$router.replace({
               path: '/homePage/report'
+            });
+          });
+          break;
+        case '3':
+          this.$nextTick(() => {
+            this.$router.replace({
+              path: '/homePage/config'
             });
           });
           break;
@@ -238,6 +245,16 @@ export default {
     &-down {
       width: 100%;
       height: calc(100% - 55px);
+    }
+  }
+  ::v-deep {
+    .el-drawer__wrapper {
+      height: 100%;
+      top: auto;
+      bottom: auto;
+    }
+    .v-modal {
+      top: auto;
     }
   }
 }
