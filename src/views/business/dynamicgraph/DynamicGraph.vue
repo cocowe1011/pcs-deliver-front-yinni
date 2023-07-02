@@ -206,6 +206,9 @@
             <!-- 预警 -->
             <img src="./img/yujing.png" class="warning-img" v-show="yujingShow" style="left: 41px;top: 663px;"/>
             <img src="./img/baojing.png" class="warning-img" v-show="baojingShow" style="top: 717px;left: 352px;"/>
+            <div style="width: 70px;height: 70px;left: 695px; position: absolute;background-color: lightcoral;color: white;display: flex;justify-content: center;align-items: center;" v-show="banLoadStatus">
+              禁止上货
+            </div>
           </div>
         </div>
       </div>
@@ -286,7 +289,7 @@
         <div :class="['transform-card',traCD?'transform-card-active':'']" @dragover.prevent @drop="dropItem('CD', $event)" @click="showCache('CD')">107-109区域货物缓存队列</div>
         <div :class="['transform-card',traDG?'transform-card-active':'']" @dragover.prevent @drop="dropItem('DG', $event)" @click="showCache('DG')">110-111区域货物缓存队列</div>
         <div :class="['transform-card',traF?'transform-card-active':'']" @dragover.prevent @drop="dropItem('F', $event)" @click="showCache('F')">剔除货物缓存队列</div>
-        <div :class="['transform-card',traGH?'transform-card-active':'']" @dragover.prevent @drop="dropItem('GH', $event)" @click="showCache('GH')">112-115区域货物缓存队列</div>
+        <div :class="['transform-card',traGH?'transform-card-active':'']" @dragover.prevent @drop="dropItem('GH', $event)" @click="showCache('GH')">下货区缓存队列</div>
       </div>
     </el-drawer>
   </div>
@@ -370,7 +373,12 @@ export default {
       nowShuXiaid: '', // 当前束下ID 清空
       nowTiChuNum: 0, // 当前剔除的数量，清空
       beginCountNum: 0, // 模拟id开始数，清空
-      logArr: []
+      logArr: [],
+      banLoadStatus: false, // 是否禁止上货
+      judgeLoadPoint: 'D', // 判断禁止上货的点位
+      judgeBanLoadBoxImitateId: '', // 到达判断禁止上货点位后，需要判断的箱子id
+      ifNextPassABoxIsFirst: true, // 刚开始时，第一个经过A点的箱子一定是第一个
+      lastNewBoxPassABoxImitateId: '' // 新增的箱子，最后一个经过A点的模拟Id
     };
   },
   watch: {
@@ -386,6 +394,12 @@ export default {
             this.nowABoxImitateId = boxImitateId;
             // 代表货物进入光电A，生成模拟id绑定,如果有扫码数据则
             this.arrAB.push({orderId: this.orderMainDy.orderId, orderNo: this.orderMainDy.orderNo, boxImitateId: boxImitateId, numberTurns: 1, loadScanCode: this.loadScanCode, turnsInfoList:[{numberTurns: 1, passATime: moment().format('YYYY-MM-DD HH:mm:ss')}]});
+            // 判断当前箱子是不是当前批次消毒的第一个
+            if(this.ifNextPassABoxIsFirst) {
+              this.judgeBanLoadBoxImitateId = boxImitateId;
+              this.ifNextPassABoxIsFirst = false; // 设置为false,下一个经过A点的箱子绝不是此批次第一个箱子了
+            }
+            this.lastNewBoxPassABoxImitateId = boxImitateId;
             // 上货数量+1
             this.nowInNum++;
             // 模拟id数+1
@@ -394,8 +408,8 @@ export default {
             this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + boxImitateId + '进入A点');
           } else {
             // 把GH队列最开始箱子加入AB对接，并修改圈数
-            this.arrAB.push(this.arrGH[0]);
-            this.arrGH.splice(0,1)
+            this.arrAB.push(this.arrGH[this.nowOutNum]);
+            this.arrGH.splice(this.nowOutNum,1)
             this.arrAB[this.arrAB.length - 1].numberTurns = this.arrAB[this.arrAB.length - 1].numberTurns + 1;
             const nowTurns = this.arrAB[this.arrAB.length - 1].numberTurns;
             this.arrAB[this.arrAB.length - 1].turnsInfoList.push({numberTurns: nowTurns, passATime: moment().format('YYYY-MM-DD HH:mm:ss')});
@@ -648,6 +662,17 @@ export default {
             // 走出A 读码
             this.loadScanCode = this.arrAB[this.arrAB.length - 1].loadScanCode;
           }
+          // 判断是否满足可上货条件，就是当前这批消毒的箱子，最后一个满足圈数并且离开A，即可上货
+          if(this.arrAB[this.arrAB.length - 1].boxImitateId == this.lastNewBoxPassABoxImitateId) {
+            if(this.arrAB[this.arrAB.length - 1].numberTurns == this.orderMainDy.numberTurns) {
+              // 开始上新货，当前箱子圈数变成1
+              this.nowNumberTurns = 1;
+              this.ifNextPassABoxIsFirst = true;
+              this.banLoadStatus = false; // 隐藏禁止上货图标
+              // 给PLC发送允许上货命令
+              ipcRenderer.send('writeValuesToPLC', 'DBW36', 1);
+            }
+          }
           this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrAB[this.arrAB.length - 1].boxImitateId + '离开A点，扫码信息：' + this.loadScanCode);
           break;
         case 'B':
@@ -671,6 +696,15 @@ export default {
           break;
         case 'D':
           if(this.pointD === '1') {
+            // 判断是否在D点判断禁止上货
+            if(this.judgeLoadPoint === 'D') {
+              // 判断是不是符合禁止上货条件
+              if(this.arrCD[0].boxImitateId == this.judgeBanLoadBoxImitateId) {
+                this.banLoadStatus = true; // 显示禁止上货图标
+                // 给PLC发送禁止上货指令
+                ipcRenderer.send('writeValuesToPLC', 'DBW26', 1);
+              }
+            }
             // 把CD队列第一个货物出列，进入DG
             this.arrDG.push(this.arrCD[0]);
             this.arrDG[this.arrDG.length - 1].turnsInfoList[this.arrDG[this.arrDG.length - 1].numberTurns - 1].passDTime = moment().format('YYYY-MM-DD HH:mm:ss');

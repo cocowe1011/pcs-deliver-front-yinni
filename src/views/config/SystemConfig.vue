@@ -1,6 +1,6 @@
 <template>
   <div class="config">
-    欢迎登录配置管理页面
+    欢迎进入配置管理页面
   </div>
 </template>
 <script>

@@ -103,9 +103,9 @@ app.on('ready', () => {
       }
     })
   });
-  setInterval(() => {
-    mainWindow.webContents.send('receivedMsg', {DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-  }, 100);
+  // setInterval(() => {
+  //   mainWindow.webContents.send('receivedMsg', {DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  // }, 100);
   setAppTray();
   if (process.env.NODE_ENV === 'production') {
     // 启动Java进程
@@ -145,9 +145,9 @@ app.on('ready', () => {
     // 迷宫出口固定扫码
     conn.addItems('DBB130');
     // 读DBW6和DBW62
-    setInterval(() => {
-      conn.readAllItems(valuesReady);
-    }, 50);
+    // setInterval(() => {
+    //   conn.readAllItems(valuesReady);
+    // }, 50);
   });
 });
 
@@ -164,6 +164,8 @@ var variables = {
   DBW20: 'DB101,INT20', // 单独启动105
   DBW22: 'DB101,INT22', // 纸箱宽度
   DBW24: 'DB101,INT24', // 纸箱长度
+  DBW26: 'DB101,INT26', // 不允许上货
+  DBW36: 'DB101,INT36', // 允许上货
   DBW60: 'DB101,INT60',
   DBW62: 'DB101,INT62',
   DBW64: 'DB101,INT64',
