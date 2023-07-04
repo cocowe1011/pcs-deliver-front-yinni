@@ -52,7 +52,7 @@
               <el-form-item label="订单箱数：">
                 <el-input size="small" v-model="orderMainForm.orderBoxNum" placeholder="订单箱数" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="剔除箱数：">
+              <!-- <el-form-item label="剔除箱数：">
                 <el-input size="small" v-model="orderMainForm.eliminateBoxNum" placeholder="剔除箱数" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="上货箱数：">
@@ -60,7 +60,7 @@
               </el-form-item>
               <el-form-item label="合格箱数：">
                 <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数" :readonly="!(isNewSave || isEdit)"></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="束下速度上限：">
                 <el-input size="small" v-model="orderMainForm.sxSpeedUpperLimit" placeholder="束下速度上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>

@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu, dialog, Tray } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import nodes7 from 'nodes7';
+import HttpUtil from '@/utils/HttpUtil'
 const { spawn } = require('child_process');
 const path = require('path');
 var appTray = null;
@@ -103,9 +104,50 @@ app.on('ready', () => {
       }
     })
   });
-  // setInterval(() => {
-  //   mainWindow.webContents.send('receivedMsg', {DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-  // }, 100);
+  let revert = false;
+  setInterval(() => {
+    if(revert) {
+      mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+    } else {
+      mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+    }
+    revert = !revert;
+  }, 100);
+
+  // 查询配置
+  HttpUtil.get('/cssConfig/getConfig').then((res)=> {
+    conn.initiateConnection( { port: Number(res.data.plcPort), host: res.data.plcIp, rack: 0, slot: 1, debug: false }, (err) => {
+      if (typeof(err) !== "undefined") {
+        // We have an error. Maybe the PLC is not reachable.
+        console.log(err);
+        // process.exit();
+      }
+      conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
+
+      // PLC看门狗心跳
+      conn.addItems('DBW60')
+      // 故障信息
+      conn.addItems('DBW66')
+      // 束下实时反馈速度
+      conn.addItems('DBW68')
+      // 关键点光电信号
+      conn.addItems('DBW70');
+      // 电机运行信号
+      conn.addItems('DBW72');
+      // 上料固定扫码
+      conn.addItems('DBB100');
+      // 迷宫出口固定扫码
+      conn.addItems('DBB130');
+      
+      // 读DBW6和DBW62
+      // setInterval(() => {
+      //   conn.readAllItems(valuesReady);
+      // }, 50);
+    });
+  }).catch((err)=> {
+    console.log('config error!')
+  });
+
   setAppTray();
   if (process.env.NODE_ENV === 'production') {
     // 启动Java进程
@@ -124,31 +166,7 @@ app.on('ready', () => {
       app.quit();
     });
   }
-
-  // 与PLC进行通讯
-  conn.initiateConnection( { port: 102, host: '192.168.0.10', rack: 0, slot: 1, debug: false }, (err) => {
-    if (typeof(err) !== "undefined") {
-      // We have an error. Maybe the PLC is not reachable.
-      console.log(err);
-      // process.exit();
-    }
-    conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
-
-    // 束下实时反馈速度
-    conn.addItems('DBW68')
-    // 关键点光电信号
-    conn.addItems('DBW70');
-    // 电机运行信号
-    conn.addItems('DBW72');
-    // 上料固定扫码
-    conn.addItems('DBB100');
-    // 迷宫出口固定扫码
-    conn.addItems('DBB130');
-    // 读DBW6和DBW62
-    // setInterval(() => {
-    //   conn.readAllItems(valuesReady);
-    // }, 50);
-  });
+  
 });
 
 var variables = {
@@ -166,10 +184,10 @@ var variables = {
   DBW24: 'DB101,INT24', // 纸箱长度
   DBW26: 'DB101,INT26', // 不允许上货
   DBW36: 'DB101,INT36', // 允许上货
-  DBW60: 'DB101,INT60',
+  DBW60: 'DB101,INT60', // 看门狗心跳
   DBW62: 'DB101,INT62',
   DBW64: 'DB101,INT64',
-  DBW66: 'DB101,INT66',
+  DBW66: 'DB101,INT66', // 故障信息
   DBW68: 'DB101,INT68',
   DBW70: 'DB101,INT70',
   DBW72: 'DB101,INT72',

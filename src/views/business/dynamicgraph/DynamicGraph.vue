@@ -71,7 +71,7 @@
             <div class="img" @click="sendMsgToPLC('stop')">
               全线<br/>停止
             </div>
-            <div class="img" @click="sendMsgToPLC('clear')">
+            <div class="img" @click="clearAllData()">
               全线<br/>清空
             </div>
           </div>
@@ -79,16 +79,31 @@
       </div>
       <div class="dynamic-left-down">
         <div>
-          <div class="card-title">操作日志(报警日志)</div>
+          <div class="card-title">
+            <el-badge :value="1" class="item" :hidden="true">
+              <div :class="['log-class', logPageFlag == 'log'?'log-class-active':'']" @click="showRunlog">操作日志</div>
+            </el-badge>
+            &nbsp;/&nbsp;
+            <el-badge :value="3" class="item">
+              <div :class="['log-class', logPageFlag == 'error-log'?'log-class-active':'']" @click="showErrorlog">报警日志</div>
+            </el-badge>
+          </div>
           <div class="card-content">
-            <div class="log-text" v-for="(message, index) in logArr" :key="index">
-              {{ message.text }}
-            </div>
+            <template v-if="logPageFlag == 'log'">
+              <div class="log-text" v-for="(message, index) in logArr" :key="index">
+                {{ message.text }}
+              </div>
+            </template>
+            <template v-else>
+              <div class="log-text" v-for="(message, index) in errorLogArr" :key="index">
+                {{ message.text }}
+              </div>
+            </template>
           </div>
         </div>
       </div>
     </div>
-    <div class="dynamic-right">
+    <div class="dynamic-right" v-show="false">
       <div>
         <div class="card-title">实时状态监控</div>
         <div class="card-content" style="display: flex;justify-content: center;" ref="parent">
@@ -306,6 +321,7 @@ export default {
   props: {},
   data() {
     return {
+      // 镭射灯样式闪烁显示
       dengShow: true,
       // 当前上货数
       nowInNum: 0,
@@ -361,24 +377,45 @@ export default {
       loadScanCodeTemp: '',
       // 迷宫出口固定扫码
       labyrinthScanCode: '',
-      l11: 2,
-      l2: 5,
+      // l11长度，取配置
+      l11: 0,
+      // l2长度，取配置
+      l2: 0,
+      // 最后一个经过E点箱子的id，用于获取当前经过E点箱子的模拟id
       lastRouteEPoint: '',
+      // 最后一个经过H点箱子的id，用于获取当前经过E点箱子的模拟id
       lastRouteHPoint: '',
+      // 最后一个经过F点箱子的id，用于获取当前经过E点箱子的模拟id
       lastRouteFPoint: '',
+      // 下货预警标识
       yujingShow: false,
+      // 下货报警标识
       baojingShow: false,
+      // 上货id信息（显示在页面上）
       nowABoxImitateId: '',
+      // 下货id信息（显示在页面上）
       nowEBoxImitateId: '',
       nowShuXiaid: '', // 当前束下ID 清空
       nowTiChuNum: 0, // 当前剔除的数量，清空
       beginCountNum: 0, // 模拟id开始数，清空
-      logArr: [],
+      logArr: [], // 输送线运行日志
+      errorLogArr: [], // PLC报警日志
       banLoadStatus: false, // 是否禁止上货
       judgeLoadPoint: 'D', // 判断禁止上货的点位
       judgeBanLoadBoxImitateId: '', // 到达判断禁止上货点位后，需要判断的箱子id
       ifNextPassABoxIsFirst: true, // 刚开始时，第一个经过A点的箱子一定是第一个
-      lastNewBoxPassABoxImitateId: '' // 新增的箱子，最后一个经过A点的模拟Id
+      lastNewBoxPassABoxImitateId: '', // 新增的箱子，最后一个经过A点的模拟Id
+      err1: '', // PLC报警1
+      err2: '', // PLC报警2
+      err3: '', // PLC报警3
+      err4: '', // PLC报警4
+      err5: '', // PLC报警5
+      err6: '', // PLC报警6
+      err7: '', // PLC报警7
+      err8: '', // PLC报警8
+      err9: '', // PLC报警9
+      err10: '', // PLC报警10
+      logPageFlag: 'log' // 日志是显示传送带运行日常日志还是报警日志
     };
   },
   watch: {
@@ -388,6 +425,7 @@ export default {
           // 碰到A，清零读码信息
           this.loadScanCode = ''
           this.enteringPonitA = true
+          console.log(1)
           if(this.nowNumberTurns == 1) {
             // 第一圈，仍然是新增，按照要求生成模拟id策略
             const boxImitateId = await this.getCurrentTimeSort();
@@ -400,12 +438,15 @@ export default {
               this.ifNextPassABoxIsFirst = false; // 设置为false,下一个经过A点的箱子绝不是此批次第一个箱子了
             }
             this.lastNewBoxPassABoxImitateId = boxImitateId;
+            // 新上货物时，报警和预警先关闭
+            this.yujingShow = false;
+            this.baojingShow = false;
             // 上货数量+1
             this.nowInNum++;
             // 模拟id数+1
             this.beginCountNum++;
             // 生成日志
-            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + boxImitateId + '进入A点');
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + boxImitateId + '进入A点', 'log');
           } else {
             // 把GH队列最开始箱子加入AB对接，并修改圈数
             this.arrAB.push(this.arrGH[this.nowOutNum]);
@@ -416,7 +457,7 @@ export default {
             // 显示箱子模拟id
             this.nowABoxImitateId = this.arrAB[this.arrAB.length - 1].boxImitateId;
             // 生成日志
-            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.nowABoxImitateId + '进入A点');
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.nowABoxImitateId + '进入A点', 'log');
           }
         } else if(this.enteringPonitA && newVal === '0' && oldVal === '1') { // 货物走出A点
           this.enteringPonitA = false
@@ -479,13 +520,97 @@ export default {
       handler(newVal, oldVal) {
         this.dealBoxLogic('H')
       }
+    },
+    err1: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 输送线上线急停被按下
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 输送线上线急停被按下!', 'error')
+        }
+      }
+    },
+    err2: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 输送线下线急停被按下
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 输送线下线急停被按下!', 'error')
+        }
+      }
+    },
+    err3: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 输送线电箱急停被按下
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 输送线电箱急停被按下!', 'error')
+        }
+      }
+    },
+    err4: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 输送线进线变频过载
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 输送线进线变频过载!', 'error')
+        }
+      }
+    },
+    err5: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 束下输送线进线变频过载
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 束下输送线进线变频过载!', 'error')
+        }
+      }
+    },
+    err6: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 输送线出线变频过载
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 输送线出线变频过载!', 'error')
+        }
+      }
+    },
+    err7: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 翻转机故障报警
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 翻转机故障报警!', 'error')
+        }
+      }
+    },
+    err8: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 剔除机构故障报警
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 剔除机构故障报警!', 'error')
+        }
+      }
+    },
+    err9: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 束下进货堵料
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 束下进货堵料!', 'error')
+        }
+      }
+    },
+    err10: {
+      handler(newVal, oldVal){
+        if(newVal == '1') {
+          // 束下出货堵料
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 束下出货堵料!', 'error')
+        }
+      }
     }
   },
   computed: {},
   methods: {
-    createLog(msg) {
-      // 生成日志
-      this.logArr.push({text: msg})
+    createLog(msg, type) {
+      if(type == 'log') {
+        // 生成日志
+        this.logArr.push({text: msg})
+      } else {
+        this.errorLogArr.push({text: msg})
+      }
     },
     qualified4Box(boxImitateIdVal, status) {
       console.log(boxImitateIdVal)
@@ -656,7 +781,7 @@ export default {
         case 'A':
         if(this.nowNumberTurns == 1) {
             // 走出A 读码
-            this.loadScanCode = this.loadScanCodeTemp;
+            this.loadScanCode = this.loadScanCodeTemp.replace(/\s/g,'');
             this.arrAB[this.arrAB.length - 1].loadScanCode = this.loadScanCode;
           } else {
             // 走出A 读码
@@ -669,11 +794,12 @@ export default {
               this.nowNumberTurns = 1;
               this.ifNextPassABoxIsFirst = true;
               this.banLoadStatus = false; // 隐藏禁止上货图标
+              this.judgeBanLoadBoxImitateId = ''
               // 给PLC发送允许上货命令
               ipcRenderer.send('writeValuesToPLC', 'DBW36', 1);
             }
           }
-          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrAB[this.arrAB.length - 1].boxImitateId + '离开A点，扫码信息：' + this.loadScanCode);
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrAB[this.arrAB.length - 1].boxImitateId + '离开A点，扫码信息：' + this.loadScanCode, 'log');
           break;
         case 'B':
           // 把AB队列第一个货物出列，进入BC
@@ -683,7 +809,7 @@ export default {
           // 删除AB队列第一个
           this.arrAB.splice(0,1)
           // 生成日志
-          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrBC[this.arrBC.length - 1].boxImitateId + '经过B点，扫码信息：' + this.arrBC[this.arrBC.length - 1].loadScanCode);
+          this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrBC[this.arrBC.length - 1].boxImitateId + '经过B点，扫码信息：' + this.arrBC[this.arrBC.length - 1].loadScanCode, 'log');
           break;
         case 'C':
           if(this.pointC === '1') {
@@ -691,7 +817,7 @@ export default {
             this.arrCD[this.arrCD.length - 1].turnsInfoList[this.arrCD[this.arrCD.length - 1].numberTurns - 1].passCTime = moment().format('YYYY-MM-DD HH:mm:ss');
             // 删除BC队列第一个
             this.arrBC.splice(0,1);
-            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrCD[this.arrCD.length - 1].boxImitateId + '经过C点，扫码信息：' + this.arrCD[this.arrCD.length - 1].loadScanCode);
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrCD[this.arrCD.length - 1].boxImitateId + '经过C点，扫码信息：' + this.arrCD[this.arrCD.length - 1].loadScanCode, 'log');
           }
           break;
         case 'D':
@@ -710,7 +836,7 @@ export default {
             this.arrDG[this.arrDG.length - 1].turnsInfoList[this.arrDG[this.arrDG.length - 1].numberTurns - 1].passDTime = moment().format('YYYY-MM-DD HH:mm:ss');
             // 删除BC队列第一个
             this.arrCD.splice(0,1);
-            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrDG[this.arrDG.length - 1].boxImitateId + '经过D点，扫码信息：' + this.arrDG[this.arrDG.length - 1].loadScanCode);
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrDG[this.arrDG.length - 1].boxImitateId + '经过D点，扫码信息：' + this.arrDG[this.arrDG.length - 1].loadScanCode, 'log');
           }
           break;
         case 'E':
@@ -793,11 +919,13 @@ export default {
             // 判断当前箱子的圈数，和全局圈数
             if(this.arrGH[indexHBox].numberTurns >= this.nowNumberTurns) {
               // 更新全局圈数 和 报警信号
-              if (this.nowNumberTurns >= this.orderMainDy.numberTurns) {
+              if (this.arrGH[indexHBox].numberTurns >= this.orderMainDy.numberTurns) {
                 this.baojingShow = true;
               } else {
                 // 有货物的圈数和全局圈数一致时，则全局圈数加1
-                this.nowNumberTurns++;
+                if(this.arrGH[indexHBox].boxImitateId == this.judgeBanLoadBoxImitateId) {
+                  this.nowNumberTurns++;
+                }
               }
             }
           }
@@ -815,13 +943,13 @@ export default {
         // 执行剔除命令
         ipcRenderer.send('writeValuesToPLC', 'DBW18', 1);
         console.log('剔除')
-        this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + '货物' + this.arrDG[index].boxImitateId + '经过E点，扫码信息：' + this.arrDG[index].loadScanCode + ',货物不合格！执行剔除命令！');
+        this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + '货物' + this.arrDG[index].boxImitateId + '经过E点，扫码信息：' + this.arrDG[index].loadScanCode + ',货物不合格！执行剔除命令！', 'log');
         // 将不合格货物加入 tempArrF 缓存队列
         this.tempArrF.push(this.arrDG[index])
       } else {
         // 合格无需处理，写0即可
         ipcRenderer.send('writeValuesToPLC', 'DBW18', 0);
-        this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + '货物' + this.arrDG[index].boxImitateId + '经过E点，扫码信息：' + this.arrDG[index].loadScanCode + ',货物合格！');
+        this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + '货物' + this.arrDG[index].boxImitateId + '经过E点，扫码信息：' + this.arrDG[index].loadScanCode + ',货物合格！', 'log');
       }
     },
     closeDynamicGraphShow() {
@@ -896,9 +1024,82 @@ export default {
       } else {
         childElement.style.transform = '';
       }
+    },
+    clearAllData() {
+      // 当前上货数
+      this.nowInNum = 0;
+      // 当前下货数
+      this.nowOutNum = 0;
+      // 各个区域下箱子数组
+      this.arrAB = [];
+      this.arrBC = [];
+      this.arrCD = [];
+      this.arrDG = [];
+      this.arrGH = [];
+      this.arrF = []; // 被剔除的箱子缓存
+      this.tempArrF = []; // 经过E点，不合格的箱子，暂时缓存在临时队列，只有经过F点的时候，才去实际的处理箱子
+      // 当前点击的传送带区域内的箱子列表，一个中间变量
+      this.boxArr = [];
+      // 当前打开的是哪块传送带队列
+      this.traAB = false;
+      this.traBC = false;
+      this.traCD = false;
+      this.traDG = false;
+      this.traGH = false;
+      this.traF = false;
+      // 当前被拖动元素的索引
+      this.dragIndex = '';
+      // PLC光电状态数组
+      this.guangDianStatusArr = '';
+      // PLC点击状态数组
+      this.dianJiStatusArr = '';
+      // 当前圈数
+      this.nowNumberTurns = 1;
+      // 是否正在进入A点
+      this.enteringPonitA = false;
+      // 是否正在进入B点
+      this.enteringPonitB = false;
+      this.lastRouteEPoint = '';
+      this.lastRouteHPoint = '';
+      this.lastRouteFPoint = '';
+      this.yujingShow = false,
+      this.baojingShow = false,
+      this.nowABoxImitateId = '',
+      this.nowEBoxImitateId = '',
+      this.nowShuXiaid = '', // 当前束下ID 清空
+      this.nowTiChuNum = 0, // 当前剔除的数量，清空
+      this.beginCountNum = 0, // 模拟id开始数，清空
+      this.logArr = [],
+      this.banLoadStatus = false, // 是否禁止上货
+      this.judgeBanLoadBoxImitateId = '', // 到达判断禁止上货点位后，需要判断的箱子id
+      this.ifNextPassABoxIsFirst = true, // 刚开始时，第一个经过A点的箱子一定是第一个
+      this.lastNewBoxPassABoxImitateId = '' // 新增的箱子，最后一个经过A点的模拟Id
+      this.$message.success('全线清空成功!')
+    },
+    getConfig() {
+      // 查询配置
+      HttpUtil.get('/cssConfig/getConfig').then((res)=> {
+        if(res.data) {
+          this.l11 = res.data.oneOneLength;
+          this.l2 = res.data.twoLength;
+          this.judgeLoadPoint = res.data.judgeLoadPoint;
+        } else {
+          this.$message.error('config error! 更新配置错误！')
+        }
+      }).catch((err)=> {
+        this.$message.error('config error! 更新配置错误！')
+      });
+    },
+    showRunlog() {
+      this.logPageFlag = 'log';
+    },
+    showErrorlog() {
+      this.logPageFlag = 'error-log';
     }
   },
-  created() {},
+  created() {
+    this.getConfig()
+  },
   mounted() {
     setInterval(() => {
       this.dengShow = !this.dengShow;
@@ -919,12 +1120,31 @@ export default {
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
       this.lightBeamRealTimeSpeed = Number(eventData.DBW68);
       // 上料固定扫码
-      this.loadScanCodeTemp = eventData.DBB100??''.replace(/\s/g,'');
+      this.loadScanCodeTemp = eventData.DBB100??'';
       // 迷宫出口固定扫码
-      this.labyrinthScanCode = eventData.DBB130??''.replace(/\s/g,'');
+      this.labyrinthScanCode = eventData.DBB130??'';
+      // 监控报警日志
+      if(eventData.DBW66 != null && eventData.DBW66 != undefined) {
+        this.errorModArr = this.PrefixZero(eventData.DBW66.toString(2), 16);
+        this.err1 = this.errorModArr[7];
+        this.err2 = this.errorModArr[6];
+        this.err3 = this.errorModArr[5];
+        this.err4 = this.errorModArr[4];
+        this.err5 = this.errorModArr[3];
+        this.err6 = this.errorModArr[2];
+        this.err7 = this.errorModArr[1];
+        this.err8 = this.errorModArr[0];
+        this.err9 = this.errorModArr[15];
+        this.err10 = this.errorModArr[14];
+      }
+      
     })
     this.adjustChildWidth();
     window.addEventListener('resize', this.adjustChildWidth);
+    // eventBus监听配置更新 reFlushConfig
+    EventBus.$on('reFlushConfig', () => {
+      this.getConfig();
+    })
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.adjustChildWidth);
@@ -1119,6 +1339,28 @@ export default {
         background: rgba(246, 247, 251, 0.56);
         box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(88px);
+        .log-class {
+          cursor: pointer;
+          height: 25px;
+          width: 67px;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+        }
+        .log-class:hover {
+          color: #409eff;
+        }
+        .log-class-active {
+          color: #409eff;
+        }
+        .log-class-active::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          width: 100%;
+          height: 1px; /* 调整下划线的高度 */
+          background-color: #409eff; /* 调整下划线的颜色 */
+        }
       }
       // 滚动槽样式定义
       ::-webkit-scrollbar {
@@ -1152,7 +1394,8 @@ export default {
     }
   }
   &-right{
-    width: calc(100% - 820px);
+    // width: calc(100% - 820px);
+    width: 100%;
     height: 100%;
     float: left;
     padding: 15px 15px 15px 0px;
@@ -1165,7 +1408,7 @@ export default {
       background: rgba(246, 247, 251, 0.56);
       box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(88px);
-      background: linear-gradient(to right, rgba(83, 188, 206, 0.7), rgba(97, 168, 160, 0.8));
+      // background: linear-gradient(to right, rgba(83, 188, 206, 0.7), rgba(97, 168, 160, 0.8));
       .guangdian {
         width: 68px;
         height: 50px;

@@ -25,9 +25,15 @@
                     V1.1.0
                 </div>
             </div>
-            <el-tooltip class="item" effect="dark" content="设置" placement="bottom">
-              <i class="el-icon-setting" style="font-size: 18px;margin-right: 14px;"></i>
-            </el-tooltip>
+            <el-dropdown trigger="click">
+              <span class="el-dropdown-link">
+                <i class="el-icon-setting" style="font-size: 18px;margin-right: 14px;"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item icon="el-icon-key">修改密码</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-upload2" @click="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
             <el-avatar :src="require('./img/header.png')" size="small" style="margin-right:10px;"></el-avatar>
             <div class="el-divider el-divider--vertical"></div>
         </div>
@@ -101,21 +107,19 @@ export default {
       this.windowSize = this.windowSize === 'unmax-window' ? 'max-window' : 'unmax-window';
       ipcRenderer.send('max-window', this.windowSize)
     },
-    logout(command) {
-      if(command == 'logout') {
-        // 改变窗口大小
-        this.$nextTick(() => {
-          this.$router.replace({
-            path: '/'
-          });
+    logout() {
+      // 改变窗口大小
+      this.$nextTick(() => {
+        this.$router.replace({
+          path: '/'
         });
-        this.$notify({
-          title: '已退出登录！',
-          message: '退出登录！',
-          type: 'success',
-          duration: 2000
-        });
-      }
+      });
+      this.$notify({
+        title: '已退出登录！',
+        message: '退出登录！',
+        type: 'success',
+        duration: 2000
+      });
     },
     changeIcon() {
       ipcRenderer.on('mainWin-max', (e, status) => {

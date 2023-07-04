@@ -1,8 +1,8 @@
 <template>
-  <div class="sm-main" v-drag>
-    <i class="el-icon-check icon" style="font-size: 28px; color: #fff"></i>
-    <!-- <i class="el-icon-close icon" style="font-size: 28px; color: #fff"></i> -->
-      PLC已连接
+  <div :class="['sm-main', plcStatus?'':'offline'] " v-drag>
+    <i class="el-icon-check icon" style="font-size: 28px; color: #fff" v-if="plcStatus"></i>
+    <i class="el-icon-close icon" style="font-size: 28px; color: #fff" v-else></i>
+      {{ plcStatus ? 'PLC已连接' : 'PLC未连接' }}
   </div>
 </template>
 
@@ -67,9 +67,26 @@ export default {
   props: [],
   data() {
     return {
+      watchDog: '0',
+      warningTimeOut: null,
+      plcStatus: false
     };
   },
-  watch: {},
+  watch: {
+    watchDog: {
+      handler(newVal, oldVal) {
+        this.plcStatus = true
+        if(this.warningTimeOut) {
+          clearTimeout(this.warningTimeOut);
+        }
+        this.warningTimeOut = setTimeout(() => {
+          // 说明已经2s没有更新数据，PLC断连了，报警
+          this.plcStatus = false
+          this.$message.error('PLC断开连接！');
+        }, 2000);
+      }
+    }
+  },
   computed: {},
   methods: {},
   created() {},
@@ -78,6 +95,9 @@ export default {
     ipcRenderer.on('receivedMsg', (event, values) => {
       // this.data = this.PrefixZero(values.DBW70.toString(2), 16)
       EventBus.$emit('pushPLCMessage', values)
+      // 处理看门狗心跳
+      this.watchDog = values.DBW60;
+      // console.log(this.watchDog)
     })}
 };
 </script>
