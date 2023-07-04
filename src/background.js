@@ -104,15 +104,15 @@ app.on('ready', () => {
       }
     })
   });
-  let revert = false;
-  setInterval(() => {
-    if(revert) {
-      mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-    } else {
-      mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-    }
-    revert = !revert;
-  }, 100);
+  // let revert = false;
+  // setInterval(() => {
+  //   if(revert) {
+  //     mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  //   } else {
+  //     mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  //   }
+  //   revert = !revert;
+  // }, 100);
 
   // 查询配置
   HttpUtil.get('/cssConfig/getConfig').then((res)=> {
@@ -140,9 +140,9 @@ app.on('ready', () => {
       conn.addItems('DBB130');
       
       // 读DBW6和DBW62
-      // setInterval(() => {
-      //   conn.readAllItems(valuesReady);
-      // }, 50);
+      setInterval(() => {
+        conn.readAllItems(valuesReady);
+      }, 50);
     });
   }).catch((err)=> {
     console.log('config error!')

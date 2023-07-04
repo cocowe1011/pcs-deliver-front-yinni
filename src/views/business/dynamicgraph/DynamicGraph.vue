@@ -103,7 +103,7 @@
         </div>
       </div>
     </div>
-    <div class="dynamic-right" v-show="false">
+    <div class="dynamic-right">
       <div>
         <div class="card-title">实时状态监控</div>
         <div class="card-content" style="display: flex;justify-content: center;" ref="parent">
@@ -1107,15 +1107,15 @@ export default {
     // 订阅<状态球>eventBus发布的消息
     EventBus.$on('pushPLCMessage', eventData => {
       // --------无PLC测试时，这里以下代码毙掉--------
-      // this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
-      // this.pointA = this.guangDianStatusArr[7];
-      // this.pointB = this.guangDianStatusArr[6];
-      // this.pointC = this.guangDianStatusArr[5];
-      // this.pointD = this.guangDianStatusArr[4];
-      // this.pointE = this.guangDianStatusArr[3];
-      // this.pointF = this.guangDianStatusArr[2];
-      // this.pointG = this.guangDianStatusArr[1];
-      // this.pointH = this.guangDianStatusArr[0];
+      this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
+      this.pointA = this.guangDianStatusArr[7];
+      this.pointB = this.guangDianStatusArr[6];
+      this.pointC = this.guangDianStatusArr[5];
+      this.pointD = this.guangDianStatusArr[4];
+      this.pointE = this.guangDianStatusArr[3];
+      this.pointF = this.guangDianStatusArr[2];
+      this.pointG = this.guangDianStatusArr[1];
+      this.pointH = this.guangDianStatusArr[0];
       // --------无PLC测试时，这里以上代码毙掉--------
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
       this.lightBeamRealTimeSpeed = Number(eventData.DBW68);
@@ -1394,8 +1394,8 @@ export default {
     }
   }
   &-right{
-    // width: calc(100% - 820px);
-    width: 100%;
+    width: calc(100% - 820px);
+    // width: 100%;
     height: 100%;
     float: left;
     padding: 15px 15px 15px 0px;
@@ -1408,7 +1408,7 @@ export default {
       background: rgba(246, 247, 251, 0.56);
       box-shadow: 0px 60px 90px 0px rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(88px);
-      // background: linear-gradient(to right, rgba(83, 188, 206, 0.7), rgba(97, 168, 160, 0.8));
+      background: linear-gradient(to right, rgba(83, 188, 206, 0.7), rgba(97, 168, 160, 0.8));
       .guangdian {
         width: 68px;
         height: 50px;
