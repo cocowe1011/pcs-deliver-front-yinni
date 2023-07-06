@@ -104,15 +104,34 @@ app.on('ready', () => {
       }
     })
   });
-  // let revert = false;
-  // setInterval(() => {
-  //   if(revert) {
-  //     mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-  //   } else {
-  //     mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-  //   }
-  //   revert = !revert;
-  // }, 100);
+  let revert = false;
+  setInterval(() => {
+    if(revert) {
+      mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+    } else {
+      mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+    }
+    revert = !revert;
+  }, 100);
+
+  setAppTray();
+  if (process.env.NODE_ENV === 'production') {
+    // 启动Java进程
+    const java = spawn(path.join(__static, './jre', 'jre1.8.0_251', 'bin', 'java'), ['-jar', path.join(__static, './jarlib', 'pcs-deliver-middle.jar')]);
+    // 监听Java进程的输出
+    java.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+  
+    java.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+  
+    // 当Java进程退出时关闭Electron应用程序
+    java.on('exit', (code) => {
+      app.quit();
+    });
+  }
 
   // 查询配置
   HttpUtil.get('/cssConfig/getConfig').then((res)=> {
@@ -147,25 +166,6 @@ app.on('ready', () => {
   }).catch((err)=> {
     console.log('config error!')
   });
-
-  setAppTray();
-  if (process.env.NODE_ENV === 'production') {
-    // 启动Java进程
-    const java = spawn(path.join(__static, './jre', 'jre1.8.0_251', 'bin', 'java'), ['-jar', path.join(__static, './jarlib', 'pcs-deliver-middle.jar')]);
-    // 监听Java进程的输出
-    java.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-    });
-  
-    java.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-    });
-  
-    // 当Java进程退出时关闭Electron应用程序
-    java.on('exit', (code) => {
-      app.quit();
-    });
-  }
   
 });
 

@@ -20,6 +20,12 @@ const routes = [
     name: 'HomePage',
     component: HomePage,
     children: [
+      // WelcomPage
+      {
+        path: 'welcomPage',
+        component: () => import('../views/home/WelcomPage.vue'),
+        name: 'WelcomPage'
+      },
       {
         path: 'orderList',
         component: () => import('../views/business/orderlist/OrderList.vue'),

@@ -278,6 +278,9 @@ export default {
         this.tableData.forEach(item => {
           item.revertFlag = item.revertFlag == '1' ? '翻转' : ''
         })
+        this.orderMainForm = {};
+        this.isNewSave = false;
+        this.isEdit = false;
         setTimeout(() => {
           this.getOrderListLoading = false
         }, 500);
@@ -366,11 +369,13 @@ export default {
       return index + 1;
     },
     handleCurrentChange(val) {
-      this.orderMainForm = JSON.parse(JSON.stringify(val));
-      this.orderMainForm.revertFlag = this.orderMainForm.revertFlag == '翻转' ? true : false
-      this.currentSelect = val;
-      this.isNewSave = false;
-      this.isEdit = false;
+      if(val != null) {
+        this.orderMainForm = JSON.parse(JSON.stringify(val));
+        this.orderMainForm.revertFlag = this.orderMainForm.revertFlag == '翻转' ? true : false
+        this.currentSelect = val;
+        this.isNewSave = false;
+        this.isEdit = false;
+      }
     },
     generateBatchReport() {
       this.$refs.dynamicGraph.generateBatchReport()

@@ -11,9 +11,10 @@
         </div>
         <div class="maskDiv-top-mid">
           <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-            <el-menu-item index="1">业务处理</el-menu-item>
-            <el-menu-item index="2">报表管理</el-menu-item>
-            <el-menu-item index="3">配置管理</el-menu-item>
+            <el-menu-item index="1">首页</el-menu-item>
+            <el-menu-item index="2">业务处理</el-menu-item>
+            <el-menu-item index="3">报表管理</el-menu-item>
+            <el-menu-item index="4">配置管理</el-menu-item>
             <el-menu-item index="4">关于</el-menu-item>
           </el-menu>
         </div>
@@ -72,21 +73,29 @@ export default {
   methods: {
     handleSelect(key, keyPath) {
       switch (key) {
+        // welcomPage
         case '1':
           this.$nextTick(() => {
             this.$router.replace({
-              path: '/homePage/orderList'
+              path: '/homePage/welcomPage'
             });
           });
           break;
         case '2':
           this.$nextTick(() => {
             this.$router.replace({
-              path: '/homePage/report'
+              path: '/homePage/orderList'
             });
           });
           break;
         case '3':
+          this.$nextTick(() => {
+            this.$router.replace({
+              path: '/homePage/report'
+            });
+          });
+          break;
+        case '4':
           this.$nextTick(() => {
             this.$router.replace({
               path: '/homePage/config'
