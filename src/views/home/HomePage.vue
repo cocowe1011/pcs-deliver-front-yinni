@@ -15,7 +15,7 @@
             <el-menu-item index="2">业务处理</el-menu-item>
             <el-menu-item index="3">报表管理</el-menu-item>
             <el-menu-item index="4">配置管理</el-menu-item>
-            <el-menu-item index="4">关于</el-menu-item>
+            <el-menu-item index="5">关于</el-menu-item>
           </el-menu>
         </div>
         <div class="version-view">
@@ -26,16 +26,20 @@
                     V1.1.0
                 </div>
             </div>
-            <el-dropdown trigger="click">
-              <span class="el-dropdown-link">
-                <i class="el-icon-setting" style="font-size: 18px;margin-right: 14px;"></i>
-              </span>
+            <el-dropdown trigger="click" style="line-height: 0;">
+              <i class="el-icon-setting" style="font-size: 18px;margin-right: 14px;"></i>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-key">修改密码</el-dropdown-item>
-                <el-dropdown-item icon="el-icon-upload2" @click="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-full-screen">全屏/取消全屏&nbsp;&nbsp;Ctrl+F11</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <el-avatar :src="require('./img/header.png')" size="small" style="margin-right:10px;"></el-avatar>
+            <el-dropdown trigger="click" @command="handelCommand" style="line-height: 0;">
+              <el-avatar :src="require('./img/header.png')" size="small" style="margin-right:10px;"></el-avatar>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item icon="el-icon-close" style="color: #f04134;">注销用户</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-key" command="updatePassword">修改密码</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-upload2" command="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
             <div class="el-divider el-divider--vertical"></div>
         </div>
         <div class="maskDiv-top-min" @click="minWindow"><i class="el-icon-minus" style="font-size:18px;font-weight:600;"></i></div>
@@ -49,12 +53,27 @@
         </keep-alive>
       </div>
     </div>
+    <el-dialog title="修改密码" :visible.sync="dialogFormVisible" append-to-body :close-on-click-modal="false">
+      <el-form :model="updatePasswordForm">
+        <el-form-item label="请输入新密码" label-width="120px">
+          <el-input v-model="updatePasswordForm.newPassword" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="确定密码" label-width="120px">
+          <el-input v-model="updatePasswordForm.newPasswordAgain" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancelUpdatePassword">取 消</el-button>
+        <el-button type="primary" @click="updatePasswordMethod">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { ipcRenderer } from 'electron'
 import StatusMonitor from '@/components/StatusMonitoring.vue'
+import HttpUtil from '@/utils/HttpUtil'
 export default {
   name: "HomePage",
   components: {
@@ -65,7 +84,12 @@ export default {
     return {
       activeIndex: '1',
       windowSize: 'max-window',
-      showLogout: true
+      showLogout: true,
+      dialogFormVisible: false,
+      updatePasswordForm: {
+        newPassword: '',
+        newPasswordAgain: ''
+      }
     };
   },
   watch: {},
@@ -76,30 +100,38 @@ export default {
         // welcomPage
         case '1':
           this.$nextTick(() => {
-            this.$router.replace({
-              path: '/homePage/welcomPage'
-            });
+            if (this.$route.path !== '/homePage/welcomPage') {
+              this.$router.replace({
+                path: '/homePage/welcomPage'
+              });
+            }
           });
           break;
         case '2':
           this.$nextTick(() => {
-            this.$router.replace({
-              path: '/homePage/orderList'
-            });
+            if (this.$route.path !== '/homePage/orderList') {
+              this.$router.replace({
+                path: '/homePage/orderList'
+              });
+            }
           });
           break;
         case '3':
           this.$nextTick(() => {
-            this.$router.replace({
-              path: '/homePage/report'
-            });
+            if (this.$route.path !== '/homePage/report') {
+              this.$router.replace({
+                path: '/homePage/report'
+              });
+            }
           });
           break;
         case '4':
           this.$nextTick(() => {
-            this.$router.replace({
-              path: '/homePage/config'
-            });
+            if (this.$route.path !== '/homePage/config') {
+              this.$router.replace({
+                path: '/homePage/config'
+              });
+            }
           });
           break;
         default:
@@ -116,24 +148,97 @@ export default {
       this.windowSize = this.windowSize === 'unmax-window' ? 'max-window' : 'unmax-window';
       ipcRenderer.send('max-window', this.windowSize)
     },
-    logout() {
-      // 改变窗口大小
+    logoutMethod() {
       this.$nextTick(() => {
         this.$router.replace({
           path: '/'
         });
       });
-      this.$notify({
-        title: '已退出登录！',
-        message: '退出登录！',
-        type: 'success',
-        duration: 2000
-      });
+      window.sessionStorage.removeItem('userInfo');
+    },
+    handelCommand(command) {
+      switch (command) {
+        case 'logout':
+          this.$notify({
+            title: '已退出登录！',
+            message: '退出登录！',
+            type: 'success',
+            duration: 2000
+          });
+          this.logoutMethod();
+          break;
+        case 'updatePassword':
+          this.$prompt('请输入注册账号时保存的姓名：', '敏感操作！验证用户！', {
+            confirmButtonText: '验证',
+            cancelButtonText: '取消'
+          }).then(({ value }) => {
+            // 验证姓名是否正确
+            const param = {
+              userName: value,
+              userCode: JSON.parse(window.sessionStorage.getItem('userInfo')).userCode
+            }
+            HttpUtil.post('/userInfo/verifyName', param).then((res)=> {
+              if(res.data) {
+                this.$message.success('验证通过！');
+                // 打开修改密码的弹窗，可以修改密码
+                this.dialogFormVisible = true
+              } else {
+                this.$message.error('验证未通过！');
+              }
+            }).catch((err)=> {
+              this.$message.error('验证未通过！请重试！');
+            });
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '取消验证！'
+            });       
+          });
+          break;
+        default:
+          break;
+      }
     },
     changeIcon() {
       ipcRenderer.on('mainWin-max', (e, status) => {
         this.windowSize = status
       })
+    },
+    cancelUpdatePassword() {
+      this.dialogFormVisible = false
+      this.updatePasswordForm.newPassword = '';
+      this.updatePasswordForm.newPasswordAgain = '';
+    },
+    updatePasswordMethod() {
+      if(this.updatePasswordForm.newPassword == '') {
+        this.$message.error('密码不可为空，请输入！')
+        return false;
+      }
+      if(this.updatePasswordForm.newPassword !== this.updatePasswordForm.newPasswordAgain) {
+        this.$message.error('密码输入不一致，请重新输入！')
+        return false;
+      }
+      const param = {
+        userPassword: this.updatePasswordForm.newPassword,
+        userCode: JSON.parse(window.sessionStorage.getItem('userInfo')).userCode
+      }
+      HttpUtil.post('/userInfo/updatePassword', param).then((res)=> {
+        if(res.data > 0) {
+          this.$notify({
+            title: '修改成功！',
+            message: '修改成功！请重新登陆！',
+            type: 'success',
+            duration: 2000
+          });
+          // 打开修改密码的弹窗，可以修改密码
+          this.dialogFormVisible = false
+          this.logoutMethod()
+        } else {
+          this.$message.error('修改失败！');
+        }
+      }).catch((err)=> {
+        this.$message.error('修改失败！');
+      });
     }
   },
   created() {

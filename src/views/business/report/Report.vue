@@ -14,6 +14,8 @@
           <div class="search">
             <span>订单编号</span>
             <el-input placeholder="请输入订单编号" v-model="orderNoInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
+            <span style="margin-left: 10px;">批次编号</span>
+            <el-input placeholder="请输入批次编号" v-model="orderNoInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
             <span style="margin-left: 10px;">箱编号</span>
             <el-input placeholder="请输入箱编号" v-model="boxImitateIdInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
             <el-button style="margin-left: 10px;" size="small" type="primary" @click="getReportList">查询</el-button>

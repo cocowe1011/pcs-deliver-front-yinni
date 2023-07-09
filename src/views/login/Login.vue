@@ -23,12 +23,12 @@
         <p class="title" style="text-align: center;">创建账户</p>
         <p class="intro" style="width: 100%;text-align: center;">已有帐户？<span id="look-help" @click="loginPage">登录</span></p>
         <div class="login-form">
-          <el-input placeholder="请输入姓名" class="user-code-register" v-model="userNameReg" @blur="showUserNameTips = false" @focus="showUserNameTips = true"></el-input>
+          <el-input placeholder="请输入姓名" ref="userNameRegRef" class="user-code-register" v-model="userNameReg" @blur="showUserNameTips = false" @focus="showUserNameTips = true"></el-input>
           <p class="tips" style="margin-bottom: 0;line-height: 3px;" v-show="showUserNameTips">登录人姓名，用于记录订单操作人。</p>
-          <el-input placeholder="请输入注册账号" class="user-code-register" v-model="userCodeReg" style="margin-top: 15px;" @blur="showUserCodeTips = false" @focus="showUserCodeTips = true" @input="restrictInput"></el-input>
+          <el-input placeholder="请输入注册账号" ref="userCodeRegRef" class="user-code-register" v-model="userCodeReg" style="margin-top: 15px;" @blur="showUserCodeTips = false" @focus="showUserCodeTips = true" @input="restrictInput"></el-input>
           <p class="tips" style="margin-bottom: 0;line-height: 3px;" v-show="showUserCodeTips">注册账号为数字字母下划线，用于登录系统</p>
           <el-input placeholder="请输入密码" class="user-password-register" type="password" v-model="userPasswordReg" autocomplete="off" style="margin-top: 15px;"></el-input>
-          <el-input placeholder="确认密码" class="user-password-register" type="password" v-model="userPasswordAgain" autocomplete="off" style="margin-top: 15px;"></el-input>
+          <el-input placeholder="确认密码" ref="userPasswordAgainRef" class="user-password-register" type="password" v-model="userPasswordAgain" autocomplete="off" style="margin-top: 15px;"></el-input>
           <el-button class="user-login-button" type="primary" @click="registerUser" :loading="registerStatus" style="margin-top: 15px;">立即注册</el-button>
         </div>
       </div>
@@ -66,7 +66,27 @@ export default {
   methods: {
     registerUser() {
       this.registerStatus = true;
+      // 判断非空项
+      if(this.userNameReg == '') {
+        this.$refs.userNameRegRef.focus();
+        this.$message.error('姓名不可为空，请输入！')
+        this.registerStatus = false;
+        return false;
+      }
+      if(this.userCodeReg == '') {
+        this.$refs.userCodeRegRef.focus();
+        this.$message.error('注册账号不可为空，请输入！')
+        this.registerStatus = false;
+        return false;
+      }
+      if(this.userPasswordReg == '') {
+        this.$refs.userPasswordAgainRef.focus();
+        this.$message.error('密码不可为空，请输入！')
+        this.registerStatus = false;
+        return false;
+      }
       if(this.userPasswordReg !== this.userPasswordAgain) {
+        this.$refs.userPasswordAgainRef.focus();
         this.$message.error('密码输入不一致，请重新输入！')
         this.registerStatus = false;
         return false;
@@ -87,13 +107,19 @@ export default {
           });
           this.pageMark = 'login';
         } else {
+          console.log(res)
           // 注册失败，请重试
-          this.$message.error('注册失败，请重试！')
+          if(res.code  == '0001') {
+            this.$refs.userCodeRegRef.focus();
+            this.$message.error('注册失败！' + this.userCodeReg + res.message)
+          } else {
+            this.$message.error('注册失败！'+ res.message)
+          }
         }
         this.registerStatus = false;
       }).catch((err)=> {
         // 注册失败，请重试
-        this.$message.error('注册失败，请重试！')
+        this.$message.error('注册失败！' + err)
         this.registerStatus = false;
       });
     },
@@ -116,6 +142,7 @@ export default {
       }
       HttpUtil.post('/login/login', param).then((res)=> {
         if(res.data) {
+          window.sessionStorage.setItem('userInfo', JSON.stringify(res.data));
           setTimeout(() => {
             this.loadingStatus = false;
             // 跳转主页

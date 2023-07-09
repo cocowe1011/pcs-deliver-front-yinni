@@ -82,7 +82,9 @@ export default {
         this.warningTimeOut = setTimeout(() => {
           // 说明已经2s没有更新数据，PLC断连了，报警
           this.plcStatus = false
-          this.$message.error('PLC断开连接！');
+          if(this.$route.path != '/login') {
+            this.$message.error('PLC断开连接！');
+          }
         }, 2000);
       }
     }
