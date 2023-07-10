@@ -47,8 +47,8 @@ export default {
   props: {},
   data() {
     return {
-      userCode: '',
-      userPassword: '',
+      userCode: 'admin',
+      userPassword: '1',
       loadingStatus: false,
       pageMark: 'login',
       showUserNameTips: false,

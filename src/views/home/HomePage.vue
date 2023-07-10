@@ -134,6 +134,15 @@ export default {
             }
           });
           break;
+        case '5':
+          this.$nextTick(() => {
+            if (this.$route.path !== '/homePage/aboutPage') {
+              this.$router.replace({
+                path: '/homePage/aboutPage'
+              });
+            }
+          });
+          break;
         default:
           break;
       }

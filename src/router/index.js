@@ -32,9 +32,9 @@ const routes = [
         name: 'OrderList'
       },
       {
-        path: 'dynamicGraph',
-        component: () => import('../views/business/dynamicgraph/DynamicGraph.vue'),
-        name: 'DynamicGraph'
+        path: 'aboutPage',
+        component: () => import('../views/home/AboutPage.vue'),
+        name: 'AboutPage'
       },
       {
         path: 'report',
