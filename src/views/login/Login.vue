@@ -10,7 +10,7 @@
         <div class="login-right-top-close" @click="closewindow"><i class="el-icon-close" style="font-size:18px;font-weight:600;"></i></div>
       </div>
       <div class="login-right-down" v-if="pageMark == 'login'">
-        <p class="title">全自动束下输送系统</p>
+        <p class="title">全自动束下输送CCS系统</p>
         <p class="intro">欢迎使用全自动束下输送系统。简洁、易用的操作页面，全自动化管理全力帮助您提高效率。</p>
         <div class="login-form">
           <el-input placeholder="请输入用户名" class="user-code" v-model="userCode"></el-input>
@@ -47,8 +47,8 @@ export default {
   props: {},
   data() {
     return {
-      userCode: 'admin',
-      userPassword: '1',
+      userCode: '',
+      userPassword: '',
       loadingStatus: false,
       pageMark: 'login',
       showUserNameTips: false,
@@ -177,7 +177,7 @@ export default {
     }
   },
   created() {
-    ipcRenderer.send('logStatus','logout');
+    // ipcRenderer.send('logStatus','logout');
   },
   mounted() {
   }
@@ -239,7 +239,7 @@ export default {
       margin-top: 75px;
       .title {
         font-weight: 400;
-        font-size: 36px;
+        font-size: 32px;
         line-height: 25px;
         color: #262626;
       }

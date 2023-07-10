@@ -63,18 +63,18 @@ export default {
     }
     .main-left-title {
       position: relative;
-      top: 32%;
-      font-size: 20px;
+      top: 33%;
+      font-size: 26px;
       color: #fff;
       margin: 0 0 25px 0;
     }
     .content {
       position: relative;
-      top: 32%;
+      top: 33%;
       .main-left-content {
         color: rgb(255, 255, 255);
         font-family: 隶书;
-        font-size: 17px;
+        font-size: 24px;
         margin: 0px 0px 10px;
       }
     }

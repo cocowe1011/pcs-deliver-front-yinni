@@ -26,10 +26,10 @@
                     V1.1.0
                 </div>
             </div>
-            <el-dropdown trigger="click" style="line-height: 0;">
+            <el-dropdown trigger="click" style="line-height: 0;" @command="setCommand">
               <i class="el-icon-setting" style="font-size: 18px;margin-right: 14px;"></i>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-full-screen">全屏/取消全屏&nbsp;&nbsp;Ctrl+F11</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-full-screen" command="full_screen">全屏/取消全屏&nbsp;&nbsp;Ctrl+F11</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
             <el-dropdown trigger="click" @command="handelCommand" style="line-height: 0;">
@@ -148,6 +148,9 @@ export default {
       this.windowSize = this.windowSize === 'unmax-window' ? 'max-window' : 'unmax-window';
       ipcRenderer.send('max-window', this.windowSize)
     },
+    fullScreen() {
+      ipcRenderer.send('full_screen')
+    },
     logoutMethod() {
       this.$nextTick(() => {
         this.$router.replace({
@@ -155,6 +158,7 @@ export default {
         });
       });
       window.sessionStorage.removeItem('userInfo');
+      ipcRenderer.send('logStatus','logout')
     },
     handelCommand(command) {
       switch (command) {
@@ -194,6 +198,16 @@ export default {
               message: '取消验证！'
             });       
           });
+          break;
+        default:
+          break;
+      }
+    },
+    setCommand(command) {
+      console.log(command)
+      switch (command) {
+        case 'full_screen':
+          this.fullScreen();
           break;
         default:
           break;

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, dialog, Tray } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, Menu, dialog, Tray } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import nodes7 from 'nodes7';
 import HttpUtil from '@/utils/HttpUtil'
@@ -49,6 +49,7 @@ app.on('ready', () => {
     // mainWindow.webContents.openDevTools();
   }
   ipcMain.on('logStatus', (event, arg) => {
+    console.log(arg)
     if(arg === 'login') {
       mainWindow.setResizable(true)
       mainWindow.maximize();
@@ -104,15 +105,15 @@ app.on('ready', () => {
       }
     })
   });
-  let revert = false;
-  setInterval(() => {
-    if(revert) {
-      mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-    } else {
-      mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-    }
-    revert = !revert;
-  }, 100);
+  // let revert = false;
+  // setInterval(() => {
+  //   if(revert) {
+  //     mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  //   } else {
+  //     mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  //   }
+  //   revert = !revert;
+  // }, 100);
 
   setAppTray();
   if (process.env.NODE_ENV === 'production') {
@@ -166,7 +167,17 @@ app.on('ready', () => {
   }).catch((err)=> {
     console.log('config error!')
   });
-  
+  // 开发者工具
+  globalShortcut.register('CommandOrControl+L', () => {
+    mainWindow.webContents.openDevTools()
+  })
+  globalShortcut.register('CommandOrControl+F11', () => {
+    mainWindow.isFullScreen() ? mainWindow.setFullScreen(false) : mainWindow.setFullScreen(true);
+  })
+  // 定义自定义事件
+  ipcMain.on('full_screen', function() {
+    mainWindow.isFullScreen() ? mainWindow.setFullScreen(false) : mainWindow.setFullScreen(true);
+  })
 });
 
 var variables = {

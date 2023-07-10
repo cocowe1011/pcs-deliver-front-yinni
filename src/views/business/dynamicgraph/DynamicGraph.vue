@@ -44,16 +44,16 @@
             </div>
             <div class="data-card" style="padding: 7px 10px 14px 20px;">
               <div class="data-card-border">
-                <div class="data-card-border-borderTop granient-text">运行系数</div>
-                <div class="data-card-border-borderDown">k25=0.00</div>
+                <div class="data-card-border-borderTop granient-text">订单圈数</div>
+                <div class="data-card-border-borderDown">{{ orderMainDy.numberTurns }}</div>
               </div>
             </div>
-            <div class="data-card" style="padding: 7px 10px 14px 10px;">
+            <!-- <div class="data-card" style="padding: 7px 10px 14px 10px;">
               <div class="data-card-border">
                 <div class="data-card-border-borderTop">订单圈数</div>
                 <div class="data-card-border-borderDown">{{ orderMainDy.numberTurns }}</div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -449,19 +449,23 @@ export default {
             this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + boxImitateId + '进入A点', 'log');
           } else {
             // 把GH队列最开始箱子加入AB对接，并修改圈数
-            this.arrAB.push(this.arrGH[this.nowOutNum]);
-            this.arrGH.splice(this.nowOutNum,1)
-            this.arrAB[this.arrAB.length - 1].numberTurns = this.arrAB[this.arrAB.length - 1].numberTurns + 1;
-            const nowTurns = this.arrAB[this.arrAB.length - 1].numberTurns;
-            this.arrAB[this.arrAB.length - 1].turnsInfoList.push({numberTurns: nowTurns, passATime: moment().format('YYYY-MM-DD HH:mm:ss')});
-            // 显示箱子模拟id
-            this.nowABoxImitateId = this.arrAB[this.arrAB.length - 1].boxImitateId;
-            // 生成日志
-            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.nowABoxImitateId + '进入A点', 'log');
+            if(this.arrGH[this.nowOutNum] != undefined) {
+              this.arrAB.push(this.arrGH[this.nowOutNum]);
+              this.arrGH.splice(this.nowOutNum,1)
+              this.arrAB[this.arrAB.length - 1].numberTurns = this.arrAB[this.arrAB.length - 1].numberTurns + 1;
+              const nowTurns = this.arrAB[this.arrAB.length - 1].numberTurns;
+              this.arrAB[this.arrAB.length - 1].turnsInfoList.push({numberTurns: nowTurns, passATime: moment().format('YYYY-MM-DD HH:mm:ss')});
+              // 显示箱子模拟id
+              this.nowABoxImitateId = this.arrAB[this.arrAB.length - 1].boxImitateId;
+              // 生成日志
+              this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.nowABoxImitateId + '进入A点', 'log');
+            }
           }
         } else if(this.enteringPonitA && newVal === '0' && oldVal === '1') { // 货物走出A点
           this.enteringPonitA = false
-          this.dealBoxLogic('A')
+          if(this.arrAB[this.arrAB.length - 1] != undefined) {
+            this.dealBoxLogic('A')
+          }
         } else {
           // 先暂定报警吧，因为肯定不会出现这种情况，出现了视为异常，不做任何处理
           alert('异常！程序走到一个不该走到的地方！')
@@ -472,18 +476,22 @@ export default {
       handler(newVal, oldVal) {
         // enteringPonitB
         if(!this.enteringPonitB && newVal === '1' && oldVal === '0') { //货物开始进入B点
-          this.$message.success('开始进入B点')
           this.enteringPonitB = true
-          // 进入B的下降沿，获取AB队列第一个，开始计算时间，到时间后，进行工艺对比，判断货物是否合格
-          const boxImitateId = this.arrAB[0].boxImitateId;
-          // 计算时间
-          setTimeout(() => {
-            this.getUndercutProcess(boxImitateId);
-          }, this.calculateMilliseconds((Number(this.l11)/Number(this.lightBeamRealTimeSpeed)).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
+          if(this.arrAB.length > 0) {
+            this.$message.success('开始进入B点')
+            // 进入B的下降沿，获取AB队列第一个，开始计算时间，到时间后，进行工艺对比，判断货物是否合格
+            const boxImitateId = this.arrAB[0].boxImitateId;
+            // 计算时间
+            setTimeout(() => {
+              this.getUndercutProcess(boxImitateId);
+            }, this.calculateMilliseconds((Number(this.l11)/Number(this.lightBeamRealTimeSpeed)).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
+          }
         } else if(this.enteringPonitB && newVal === '0' && oldVal === '1') { // 货物走出B点
           this.$message.warning('货物走出B点')
           this.enteringPonitB = false
-          this.dealBoxLogic('B')
+          if(this.arrAB.length > 0) {
+            this.dealBoxLogic('B')
+          }
         } else {
           // 先暂定报警吧，因为肯定不会出现这种情况，出现了视为异常，不做任何处理
           alert('异常！程序走到一个不该走到的地方！')
@@ -492,18 +500,24 @@ export default {
     },
     pointC: {
       handler(newVal, oldVal) {
-        this.dealBoxLogic('C')
+        if(this.arrBC.length > 0) {
+          this.dealBoxLogic('C')
+        }
       }
     },
     pointD: {
       handler(newVal, oldVal) {
-        this.dealBoxLogic('D')
+        if(this.arrCD.length > 0) {
+          this.dealBoxLogic('D')
+        }
       }
     },
     pointE: {
       handler(newVal, oldVal) {
         // 进入E点的，剔除不合格的箱子，给PLC发送剔除指令
-        this.dealBoxLogic('E')
+        if(this.arrDG.length > 0) {
+          this.dealBoxLogic('E')
+        }
       }
     },
     pointF: {
@@ -513,12 +527,16 @@ export default {
     },
     pointG: {
       handler(newVal, oldVal) {
-        this.dealBoxLogic('G')
+        if(this.arrDG.length > 0) {
+          this.dealBoxLogic('G')
+        }
       }
     },
     pointH: {
       handler(newVal, oldVal) {
-        this.dealBoxLogic('H')
+        if(this.arrGH.length > 0) {
+          this.dealBoxLogic('H')
+        }  
       }
     },
     err1: {
@@ -866,16 +884,18 @@ export default {
           break;
         case 'F':
           if(this.pointF === '1') {
-            this.nowTiChuNum++;
-            // tempArrF 缓存队列第一个一定是经过F点的箱子
-            this.arrF.push(this.tempArrF[0]);
-            // 删除tempArrF 第一个箱子
-            this.tempArrF.splice(0, 1);
-            // 在DG数组移除元素
-            for (let index = 0; index < this.arrDG.length; index++) {
-              if(this.arrF[this.arrF.length - 1].boxImitateId == this.arrDG[index].boxImitateId) {
-                this.arrDG.splice(index, 1);
-                break;
+            if(this.tempArrF.length > 0) {
+              this.nowTiChuNum++;
+              // tempArrF 缓存队列第一个一定是经过F点的箱子
+              this.arrF.push(this.tempArrF[0]);
+              // 删除tempArrF 第一个箱子
+              this.tempArrF.splice(0, 1);
+              // 在DG数组移除元素
+              for (let index = 0; index < this.arrDG.length; index++) {
+                if(this.arrF[this.arrF.length - 1].boxImitateId == this.arrDG[index].boxImitateId) {
+                  this.arrDG.splice(index, 1);
+                  break;
+                }
               }
             }
           }
@@ -935,6 +955,11 @@ export default {
       }
     },
     judgeIfDGqualified(index) {
+      // 如果是下一批第一个箱子经过E，则取消下货预警和报警
+      if(this.arrDG[index].boxImitateId == this.judgeBanLoadBoxImitateId) {
+        this.yujingShow = false;
+        this.baojingShow = false;
+      }
       this.nowEBoxImitateId = this.arrDG[index].boxImitateId;
       this.lastRouteEPoint = this.arrDG[index].boxImitateId;
       // 更新进入E点时间
@@ -1107,15 +1132,15 @@ export default {
     // 订阅<状态球>eventBus发布的消息
     EventBus.$on('pushPLCMessage', eventData => {
       // --------无PLC测试时，这里以下代码毙掉--------
-      // this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
-      // this.pointA = this.guangDianStatusArr[7];
-      // this.pointB = this.guangDianStatusArr[6];
-      // this.pointC = this.guangDianStatusArr[5];
-      // this.pointD = this.guangDianStatusArr[4];
-      // this.pointE = this.guangDianStatusArr[3];
-      // this.pointF = this.guangDianStatusArr[2];
-      // this.pointG = this.guangDianStatusArr[1];
-      // this.pointH = this.guangDianStatusArr[0];
+      this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
+      this.pointA = this.guangDianStatusArr[7];
+      this.pointB = this.guangDianStatusArr[6];
+      this.pointC = this.guangDianStatusArr[5];
+      this.pointD = this.guangDianStatusArr[4];
+      this.pointE = this.guangDianStatusArr[3];
+      this.pointF = this.guangDianStatusArr[2];
+      this.pointG = this.guangDianStatusArr[1];
+      this.pointH = this.guangDianStatusArr[0];
       // --------无PLC测试时，这里以上代码毙掉--------
       this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
       this.lightBeamRealTimeSpeed = Number(eventData.DBW68);
