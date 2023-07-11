@@ -62,16 +62,16 @@
           <div class="card-title">操作区</div>
           <div class="card-content" style="display: flex;align-items: center;">
             <!-- 操作按钮 -->
-            <div class="img" @click="sendMsgToPLC('suspend')">
+            <div :class="['img', fullPause?'img-active':'']" @click="operationConfirm('suspend')">
               全线<br/>暂停
             </div>
-            <div class="img" @click="sendMsgToPLC('run')">
+            <div :class="['img', fullRun?'img-active':'']" @click="operationConfirm('run')">
               全线<br/>启动
             </div>
-            <div class="img" @click="sendMsgToPLC('stop')">
+            <div :class="['img', fullStop?'img-active':'']" @click="operationConfirm('stop')">
               全线<br/>停止
             </div>
-            <div class="img" @click="clearAllData()">
+            <div class="img" @click="operationConfirm('clear')">
               全线<br/>清空
             </div>
           </div>
@@ -419,7 +419,10 @@ export default {
       err8: '', // PLC报警8
       err9: '', // PLC报警9
       err10: '', // PLC报警10
-      logPageFlag: 'log' // 日志是显示传送带运行日常日志还是报警日志
+      logPageFlag: 'log', // 日志是显示传送带运行日常日志还是报警日志
+      fullPause: false,
+      fullRun: false,
+      fullStop: false
     };
   },
   watch: {
@@ -831,6 +834,7 @@ export default {
     },
     showOrderInfo(orderMain) {
       this.orderMainDy = JSON.parse(JSON.stringify(orderMain))
+      this.fullRun = true
     },
     dragStart(index) {
       // 将被拖动的元素的索引存储在数据传输对象中
@@ -1135,7 +1139,7 @@ export default {
           ipcRenderer.send('writeValuesToPLC', 'DBW8', 1);
           this.$notify({
             title: '指令发送成功！',
-            message: '全线暂停指令已成功发送！',
+            message: '全线启动指令已成功发送！',
             type: 'success',
             duration: 2000
           });
@@ -1144,7 +1148,7 @@ export default {
           ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
           this.$notify({
             title: '指令发送成功！',
-            message: '全线暂停指令已成功发送！',
+            message: '全线停止指令已成功发送！',
             type: 'success',
             duration: 2000
           });
@@ -1160,6 +1164,7 @@ export default {
       const boxMainList = [...this.arrAB, ...this.arrBC, ...this.arrCD, ...this.arrDG, ...this.arrGH];
       await HttpUtil.post('/box/save', boxMainList).then((res)=> {
         if(res.data == 1) {
+          this.clearAllData();
           this.$emit('returnGenerateBatchReport',true)
         } else {
           this.$emit('returnGenerateBatchReport',false)
@@ -1255,6 +1260,92 @@ export default {
     },
     showErrorlog() {
       this.logPageFlag = 'error-log';
+    },
+    operationConfirm(command) {
+    switch (command) {
+      case 'suspend':
+        this.$confirm('此操作将全线暂停, 是否继续?', '警告！', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.fullPause = true
+          this.fullRun = false
+          this.fullStop = false
+          this.sendMsgToPLC('suspend');
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          });          
+        });
+        break;
+      case 'run':
+        this.$confirm('此操作将全线启动, 是否继续?', '警告！', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.fullPause = false
+          this.fullRun = true
+          this.fullStop = false
+          this.sendMsgToPLC('run');
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          });          
+        });
+        break;
+      case 'stop':
+        this.$confirm('此操作将全线停止, 是否继续?', '警告！', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.fullPause = false
+          this.fullRun = false
+          this.fullStop = true
+          this.sendMsgToPLC('stop');
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作！'
+          });          
+        });
+        break;
+      case 'clear':
+        this.$prompt('请输入登录账号的密码：', '敏感操作！验证用户！', {
+          confirmButtonText: '验证',
+          cancelButtonText: '取消',
+          inputType: 'password'
+        }).then(({ value }) => {
+          // 验证姓名是否正确
+          const param = {
+            userPassword: value,
+            userCode: JSON.parse(window.sessionStorage.getItem('userInfo')).userCode
+          }
+          HttpUtil.post('/userInfo/verifyPassword', param).then((res)=> {
+            if(res.data) {
+              this.$message.success('验证通过！');
+              this.clearAllData();
+              this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 用户：' + JSON.parse(window.sessionStorage.getItem('userInfo')).userName + '进行了全线清空操作！', 'log');
+            } else {
+              this.$message.error('验证未通过！');
+            }
+          }).catch((err)=> {
+            this.$message.error('验证未通过！请重试！');
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消验证！'
+          });       
+        });
+        break;
+      default:
+        break;
+    }
     }
   },
   created() {
@@ -1482,6 +1573,14 @@ export default {
           0 0 0 rgba(255, 255, 255, 0.8),
           inset 18px 18px 30px rgba(0, 0, 0, 0.1),
           inset -18px -18px 30px rgba(255, 255, 255, 1);
+        }
+        .img-active{
+          cursor: pointer;
+          box-shadow: 0 0 0 rgba(0, 0, 0, 0.2),
+          0 0 0 rgba(255, 255, 255, 0.8),
+          inset 18px 18px 30px rgba(0, 0, 0, 0.1),
+          inset -18px -18px 30px rgba(255, 255, 255, 1);
+          color: blue;
         }
       }
     }

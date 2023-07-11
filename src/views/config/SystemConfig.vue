@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="footer">
-        <el-button type="primary" @click="allowEdit=true" v-show="!allowEdit">页面已锁定，点击修改配置</el-button>
+        <el-button type="info" plain @click="allowEdit=true" v-show="!allowEdit">页面已锁定，点击修改配置</el-button>
         <el-button type="primary" @click="update" v-show="allowEdit">保存</el-button>
         <el-button @click="allowEdit=false" v-show="allowEdit">取消</el-button>
       </div>

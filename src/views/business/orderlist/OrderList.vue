@@ -126,7 +126,12 @@
               </el-form-item>
             </el-form>
             <div class="content-bottom" v-show="isNewSave || isEdit">
-              <el-button type="primary" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading" v-if="isNewSave">保存</el-button>
+              <el-button type="warning" plain size="small" v-if="isNewSave" style="margin-right: 6px;">
+                <i class="iconfont icon-saoma" style="font-size: 12px;"></i>
+                扫码添加
+              </el-button>
+              <el-divider direction="vertical" style="height: 1.2em;" v-if="isNewSave"></el-divider>
+              <el-button type="primary" style="margin-left: 6px;" size="small" icon="el-icon-success" @click="saveOrder" :loading="saveLoading" v-if="isNewSave">保存</el-button>
               <el-button type="primary" size="small" icon="el-icon-success" @click="updateOrder" :loading="editLoading" v-else>修改</el-button>
               <el-button size="small" style="margin-left: 15px;" icon="el-icon-error" @click="cancelEditOrSave">取消</el-button>
             </div>
@@ -136,11 +141,16 @@
         <div class="listDiv">
           <div class="list-top">
             <el-button type="primary" icon="el-icon-plus" size="small" @click="newOrderClick">新建</el-button>
-            <el-button icon="el-icon-refresh-right" size="small" @click="getOrderList" style="margin-left: 15px;">刷新</el-button>
+            <el-button icon="el-icon-refresh-right" size="small" @click="getOrderList" style="margin-left: 15px;margin-right: 6px;">刷新</el-button>
+            <el-divider direction="vertical" style="height: 1.2em;" v-if="nowRunOrderId != ''"></el-divider>
+            <el-tooltip content="点击快速定位到运行订单→" placement="top" v-if="nowRunOrderId != ''">
+              <el-button type="primary" plain size="small" icon="el-icon-loading" style="margin-left: 6px;" @click="positionOrder">当前正在运行的订单：{{ nowRunOrderId }}</el-button>
+            </el-tooltip>
           </div>
           <div class="list-middle">
             <el-table
               :data="tableData"
+              ref="singleTable"
               border
               style="width: 100%"
               highlight-current-row
@@ -169,11 +179,11 @@
                 width="320">
                 <template slot-scope="scope">
                   <el-link type="primary" icon="el-icon-edit" @click.stop="editClick(scope.row)">编辑</el-link>
-                  <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="!scope.row.isRunning" :disabled="scope.row.orderId !== currentSelect.orderId" @click="runPLC(scope.row)">启动</el-link>
-                  <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="scope.row.orderId !== currentSelect.orderId">运行中</el-link>
-                  <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="scope.row.orderId !== currentSelect.orderId">停止</el-link>
-                  <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="scope.row.orderId !== currentSelect.orderId" @click="generateBatchReport">完成</el-link>
-                  <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph(scope.row)" :disabled="scope.row.orderId !== currentSelect.orderId">动态图</el-link>
+                  <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="scope.row.orderId != nowRunOrderId" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)" @click="runPLC(scope.row)">启动</el-link>
+                  <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)">运行中</el-link>
+                  <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId) || nowRunOrderId == ''">停止</el-link>
+                  <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)" @click="generateBatchReport">完成</el-link>
+                  <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph(scope.row)" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)">动态图</el-link>
                 </template>
               </el-table-column>
             </el-table>
@@ -214,7 +224,8 @@ export default {
       isNewSave: false,
       currentSelect: {},
       isDynamicGraphShow: false,
-      getOrderListLoading: false
+      getOrderListLoading: false,
+      nowRunOrderId: ''
     };
   },
   watch: {},
@@ -293,14 +304,8 @@ export default {
       });
       // this.tableData = [{revertFlag: '翻转', orderId: '202306160001', orderName: '威高一次性管路'}];
     },
-    handleClick(){},
-    showDynamicGraph(orderMain) {
+    showDynamicGraph() {
       this.isDynamicGraphShow = true;
-      // 将订单信息同步到动态图组件
-      this.$nextTick(() => {
-        this.$refs.dynamicGraph.showOrderInfo(orderMain);
-      });
-      
     },
     closeDynamicGraphShow() {
       this.isDynamicGraphShow = false
@@ -315,7 +320,11 @@ export default {
         throw new Error("A 方法异常");
       }
       // 运行
-      this.$set(obj, 'isRunning', 'true')
+      this.nowRunOrderId = obj.orderId;
+      // 将订单信息同步到动态图组件
+      this.$nextTick(() => {
+        this.$refs.dynamicGraph.showOrderInfo(obj);
+      });
       this.writeValuesToPLC(obj);
       this.$message.success('已启动！');
     },
@@ -364,6 +373,7 @@ export default {
     },
     stop() {
       ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
+      this.nowRunOrderId = ''
     },
     indexMethod(index) {
       return index + 1;
@@ -387,6 +397,11 @@ export default {
       } else {
         this.$message.error('生成失败！请重试！');
       }
+    },
+    positionOrder() {
+      // 通过 nowRunOrderId 定位当前运行订单在tableData的index
+      const index = this.tableData.findIndex(element => element.orderId == this.nowRunOrderId);
+      this.$refs.singleTable.setCurrentRow(this.tableData[index]);
     }
   },
   created() {
