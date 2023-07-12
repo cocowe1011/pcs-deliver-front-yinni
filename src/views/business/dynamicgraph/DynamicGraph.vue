@@ -1145,7 +1145,8 @@ export default {
           });
           break;
         case 'stop':
-          ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
+          // ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
+          this.$emit('stopMethod')
           this.$notify({
             title: '指令发送成功！',
             message: '全线停止指令已成功发送！',
@@ -1164,6 +1165,10 @@ export default {
       const boxMainList = [...this.arrAB, ...this.arrBC, ...this.arrCD, ...this.arrDG, ...this.arrGH];
       await HttpUtil.post('/box/save', boxMainList).then((res)=> {
         if(res.data == 1) {
+          this.fullPause = false;
+          this.fullRun = false;
+          this.fullStop = false;
+          this.orderMainDy = {};
           this.clearAllData();
           this.$emit('returnGenerateBatchReport',true)
         } else {
@@ -1261,91 +1266,97 @@ export default {
     showErrorlog() {
       this.logPageFlag = 'error-log';
     },
+    stopOrder() {
+      this.fullPause = false
+      this.fullRun = false
+      this.fullStop = true
+    },
     operationConfirm(command) {
-    switch (command) {
-      case 'suspend':
-        this.$confirm('此操作将全线暂停, 是否继续?', '警告！', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.fullPause = true
-          this.fullRun = false
-          this.fullStop = false
-          this.sendMsgToPLC('suspend');
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消操作！'
-          });          
-        });
-        break;
-      case 'run':
-        this.$confirm('此操作将全线启动, 是否继续?', '警告！', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.fullPause = false
-          this.fullRun = true
-          this.fullStop = false
-          this.sendMsgToPLC('run');
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消操作！'
-          });          
-        });
-        break;
-      case 'stop':
-        this.$confirm('此操作将全线停止, 是否继续?', '警告！', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.fullPause = false
-          this.fullRun = false
-          this.fullStop = true
-          this.sendMsgToPLC('stop');
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消操作！'
-          });          
-        });
-        break;
-      case 'clear':
-        this.$prompt('请输入登录账号的密码：', '敏感操作！验证用户！', {
-          confirmButtonText: '验证',
-          cancelButtonText: '取消',
-          inputType: 'password'
-        }).then(({ value }) => {
-          // 验证姓名是否正确
-          const param = {
-            userPassword: value,
-            userCode: JSON.parse(window.sessionStorage.getItem('userInfo')).userCode
-          }
-          HttpUtil.post('/userInfo/verifyPassword', param).then((res)=> {
-            if(res.data) {
-              this.$message.success('验证通过！');
-              this.clearAllData();
-              this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 用户：' + JSON.parse(window.sessionStorage.getItem('userInfo')).userName + '进行了全线清空操作！', 'log');
-            } else {
-              this.$message.error('验证未通过！');
-            }
-          }).catch((err)=> {
-            this.$message.error('验证未通过！请重试！');
+      switch (command) {
+        case 'suspend':
+          this.$confirm('此操作将全线暂停, 是否继续?', '警告！', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.fullPause = true
+            this.fullRun = false
+            this.fullStop = false
+            this.sendMsgToPLC('suspend');
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '取消操作！'
+            });          
           });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消验证！'
-          });       
-        });
-        break;
-      default:
-        break;
-    }
+          break;
+        case 'run':
+          this.$confirm('此操作将全线启动, 是否继续?', '警告！', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.fullPause = false
+            this.fullRun = true
+            this.fullStop = false
+            this.sendMsgToPLC('run');
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '取消操作！'
+            });          
+          });
+          break;
+        case '  ':
+          this.$confirm('此操作将全线停止, 是否继续?', '警告！', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.fullPause = false
+            this.fullRun = false
+            this.fullStop = true
+            this.sendMsgToPLC('stop');
+            
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '取消操作！'
+            });          
+          });
+          break;
+        case 'clear':
+          this.$prompt('请输入登录账号的密码：', '敏感操作！验证用户！', {
+            confirmButtonText: '验证',
+            cancelButtonText: '取消',
+            inputType: 'password'
+          }).then(({ value }) => {
+            // 验证姓名是否正确
+            const param = {
+              userPassword: value,
+              userCode: JSON.parse(window.sessionStorage.getItem('userInfo')).userCode
+            }
+            HttpUtil.post('/userInfo/verifyPassword', param).then((res)=> {
+              if(res.data) {
+                this.$message.success('验证通过！');
+                this.clearAllData();
+                this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 用户：' + JSON.parse(window.sessionStorage.getItem('userInfo')).userName + '进行了全线清空操作！', 'log');
+              } else {
+                this.$message.error('验证未通过！');
+              }
+            }).catch((err)=> {
+              this.$message.error('验证未通过！请重试！');
+            });
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '取消验证！'
+            });       
+          });
+          break;
+        default:
+          break;
+      }
     }
   },
   created() {

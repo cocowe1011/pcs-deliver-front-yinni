@@ -61,68 +61,68 @@
               <el-form-item label="合格箱数：">
                 <el-input size="small" v-model="orderMainForm.qualifiedBoxNum" placeholder="合格箱数" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item> -->
-              <el-form-item label="束下速度上限：">
-                <el-input type="number" size="small" v-model="orderMainForm.sxSpeedUpperLimit" placeholder="束下速度上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="束下速度下限：">
+                <el-input type="number" size="small" v-model="orderMainForm.sxSpeedLowerLimit" placeholder="束下速度下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="束下速度值：">
                 <el-input type="number" size="small" v-model="orderMainForm.sxSpeedSet" placeholder="束下速度值" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="束下速度下限：">
-                <el-input type="number" size="small" v-model="orderMainForm.sxSpeedLowerLimit" placeholder="束下速度下限" :readonly="!(isNewSave || isEdit)"></el-input>
-              </el-form-item>
-              <el-form-item label="束流上限：">
-                <el-input type="number" size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
-              </el-form-item>
-              <el-form-item label="束流设定值：">
-                <el-input type="number" size="small" v-model="orderMainForm.slSet" placeholder="束流设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="束下速度上限：">
+                <el-input type="number" size="small" v-model="orderMainForm.sxSpeedUpperLimit" placeholder="束下速度上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="束流下限：">
                 <el-input type="number" size="small" v-model="orderMainForm.slLowerLimit" placeholder="束流下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="功率上限：">
-                <el-input type="number" size="small" v-model="orderMainForm.glUpperLimit" placeholder="功率上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="束流设定值：">
+                <el-input type="number" size="small" v-model="orderMainForm.slSet" placeholder="束流设定值" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="功率设定值：">
-                <el-input type="number" size="small" v-model="orderMainForm.glSet" placeholder="功率设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="束流上限：">
+                <el-input type="number" size="small" v-model="orderMainForm.slUpperLimit" placeholder="束流上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="功率下限：">
                 <el-input type="number" size="small" v-model="orderMainForm.glLowerLimit" placeholder="功率下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="扫宽上限：">
-                <el-input type="number" size="small" v-model="orderMainForm.skUpperLimit" placeholder="扫宽上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="功率设定值：">
+                <el-input type="number" size="small" v-model="orderMainForm.glSet" placeholder="功率设定值" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="扫宽设定值：">
-                <el-input type="number" size="small" v-model="orderMainForm.skSet" placeholder="扫宽设定值" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="功率上限：">
+                <el-input type="number" size="small" v-model="orderMainForm.glUpperLimit" placeholder="功率上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="扫宽下限：">
                 <el-input type="number" size="small" v-model="orderMainForm.skLowerLimit" placeholder="扫宽下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="扫描频率上限：">
-                <el-input type="number" size="small" v-model="orderMainForm.smplUpperLimit" placeholder="扫描频率上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="扫宽设定值：">
+                <el-input type="number" size="small" v-model="orderMainForm.skSet" placeholder="扫宽设定值" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="扫描频率设定：">
-                <el-input type="number" size="small" v-model="orderMainForm.smplSet" placeholder="扫描频率设定" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="扫宽上限：">
+                <el-input type="number" size="small" v-model="orderMainForm.skUpperLimit" placeholder="扫宽上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="扫描频率下限：">
                 <el-input type="number" size="small" v-model="orderMainForm.smplLowerLimit" placeholder="扫描频率下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="PFN电压上限：">
-                <el-input type="number" size="small" v-model="orderMainForm.pfnUpperLimit" placeholder="PFN电压上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="扫描频率设定：">
+                <el-input type="number" size="small" v-model="orderMainForm.smplSet" placeholder="扫描频率设定" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="PFN电压设定：">
-                <el-input type="number" size="small" v-model="orderMainForm.pfnSet" placeholder="PFN电压设定" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="扫描频率上限：">
+                <el-input type="number" size="small" v-model="orderMainForm.smplUpperLimit" placeholder="扫描频率上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="PFN电压下限：">
                 <el-input type="number" size="small" v-model="orderMainForm.pfnLowerLimit" placeholder="PFN电压下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="能量上限：">
-                <el-input type="number" size="small" v-model="orderMainForm.nlUpperLimit" placeholder="能量上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="PFN电压设定：">
+                <el-input type="number" size="small" v-model="orderMainForm.pfnSet" placeholder="PFN电压设定" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="PFN电压上限：">
+                <el-input type="number" size="small" v-model="orderMainForm.pfnUpperLimit" placeholder="PFN电压上限" :readonly="!(isNewSave || isEdit)"></el-input>
+              </el-form-item>
+              <el-form-item label="能量下限：">
+                <el-input type="number" size="small" v-model="orderMainForm.nlLowerLimit" placeholder="能量下限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
               <el-form-item label="能量设定值：">
                 <el-input type="number" size="small" v-model="orderMainForm.nlSet" placeholder="能量设定值" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
-              <el-form-item label="能量下限：">
-                <el-input type="number" size="small" v-model="orderMainForm.nlLowerLimit" placeholder="能量下限" :readonly="!(isNewSave || isEdit)"></el-input>
+              <el-form-item label="能量上限：">
+                <el-input type="number" size="small" v-model="orderMainForm.nlUpperLimit" placeholder="能量上限" :readonly="!(isNewSave || isEdit)"></el-input>
               </el-form-item>
             </el-form>
             <div class="content-bottom" v-show="isNewSave || isEdit">
@@ -181,7 +181,7 @@
                   <el-link type="primary" icon="el-icon-edit" @click.stop="editClick(scope.row)">编辑</el-link>
                   <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="scope.row.orderId != nowRunOrderId" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)" @click="runPLC(scope.row)">启动</el-link>
                   <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)">运行中</el-link>
-                  <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId) || nowRunOrderId == ''">停止</el-link>
+                  <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop(true)" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId) || nowRunOrderId == ''">停止</el-link>
                   <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)" @click="generateBatchReport">完成</el-link>
                   <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph(scope.row)" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)">动态图</el-link>
                 </template>
@@ -192,7 +192,7 @@
       </div>
     </div>
     <div style="width:100%;height: 100%;" v-show="isDynamicGraphShow">
-      <DynamicGraph @closeDynamicGraphShow="closeDynamicGraphShow" @returnGenerateBatchReport="returnGenerateBatchReport" ref="dynamicGraph"></DynamicGraph>
+      <DynamicGraph @closeDynamicGraphShow="closeDynamicGraphShow" @returnGenerateBatchReport="returnGenerateBatchReport" @stopMethod="stop(false)" ref="dynamicGraph"></DynamicGraph>
     </div>
   </div>
   
@@ -331,7 +331,9 @@ export default {
     async getId() {
       await HttpUtil.post('/box/getId').then((res)=> {
         if(res.data >= 0) {
-          this.$refs.dynamicGraph.setBeginCountNum(res.data)
+          this.$nextTick(() => {
+            this.$refs.dynamicGraph.setBeginCountNum(res.data)
+          });
         } else {
           throw new Error();
         }
@@ -371,9 +373,15 @@ export default {
     delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
-    stop() {
+    stop(flag) {
       ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
-      this.nowRunOrderId = ''
+      this.nowRunOrderId = '';
+      if(flag) {
+        // 当前订单页面停止，需要同步更新动态图组件的按钮状态，如果是动态图调用则无需走这方法
+        this.$nextTick(() => {
+          this.$refs.dynamicGraph.stopOrder();
+        });
+      }
     },
     indexMethod(index) {
       return index + 1;
@@ -388,7 +396,9 @@ export default {
       }
     },
     generateBatchReport() {
-      this.$refs.dynamicGraph.generateBatchReport()
+      this.$nextTick(() => {
+        this.$refs.dynamicGraph.generateBatchReport()
+      });
     },
     returnGenerateBatchReport(res) {
       if (res) {
@@ -401,7 +411,9 @@ export default {
     positionOrder() {
       // 通过 nowRunOrderId 定位当前运行订单在tableData的index
       const index = this.tableData.findIndex(element => element.orderId == this.nowRunOrderId);
-      this.$refs.singleTable.setCurrentRow(this.tableData[index]);
+      this.$nextTick(() => {
+        this.$refs.singleTable.setCurrentRow(this.tableData[index]);
+      });
     }
   },
   created() {
