@@ -177,12 +177,15 @@ export default {
     printView(printObj, reportPath) {
       console.log(printObj)
       var args = {
-        type: "preview", //设置不同的属性可以执行不同的任务，如：preview print pdf xls csv txt rtf img grd
+        // type: "preview", //设置不同的属性可以执行不同的任务，如：preview print pdf xls csv txt rtf img grd
+        type: "pdf",
         report: grwebapp.urlAddRandomNo(reportPath),
         PrinterName: "XP-58", //指定要输出的打印机名称
-        showOptionDlg: false,
         //实际应用中，data应该为程序中通过各种途径获取到的数据，最后要将数据转换为报表需要的XML或JSON格式的字符串数据
-        data: printObj
+        data: printObj,
+        showOptionDlg: false,  //指定不显示导出选项对话框
+        filename: "d:\\test.pdf", //指定导出的文件路径与文件名
+        open: false  //指定导出后不自动打开文件
       };
       grwebapp.webapp_ws_ajax_run(args);
     },

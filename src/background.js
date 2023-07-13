@@ -54,6 +54,8 @@ app.on('ready', () => {
       mainWindow.setResizable(true)
       mainWindow.maximize();
     } else {
+      // 太几把坑了，windows系统setSize center方法失效 必须先mainWindow.unmaximize()
+      mainWindow.unmaximize()
       mainWindow.setSize(1100, 600);
       mainWindow.center();
       // mainWindow.setResizable(false)
@@ -107,12 +109,14 @@ app.on('ready', () => {
   });
   let revert = false;
   setInterval(() => {
-    if(revert) {
-      mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-    } else {
-      mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+    if(mainWindow) {
+      if(revert) {
+        mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+      } else {
+        mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+      }
+      revert = !revert;
     }
-    revert = !revert;
   }, 100);
 
   setAppTray();
@@ -135,38 +139,40 @@ app.on('ready', () => {
   }
 
   // 查询配置
-  HttpUtil.get('/cssConfig/getConfig').then((res)=> {
-    conn.initiateConnection( { port: Number(res.data.plcPort), host: res.data.plcIp, rack: 0, slot: 1, debug: false }, (err) => {
-      if (typeof(err) !== "undefined") {
-        // We have an error. Maybe the PLC is not reachable.
-        console.log(err);
-        // process.exit();
-      }
-      conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
+  // HttpUtil.get('/cssConfig/getConfig').then((res)=> {
+  //   conn.initiateConnection( { port: Number(res.data.plcPort), host: res.data.plcIp, rack: 0, slot: 1, debug: false }, (err) => {
+  //     if (typeof(err) !== "undefined") {
+  //       // We have an error. Maybe the PLC is not reachable.
+  //       console.log(err);
+  //       // process.exit();
+  //     }
+  //     conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
 
-      // PLC看门狗心跳
-      conn.addItems('DBW60')
-      // 故障信息
-      conn.addItems('DBW66')
-      // 束下实时反馈速度
-      conn.addItems('DBW68')
-      // 关键点光电信号
-      conn.addItems('DBW70');
-      // 电机运行信号
-      conn.addItems('DBW72');
-      // 上料固定扫码
-      conn.addItems('DBB100');
-      // 迷宫出口固定扫码
-      conn.addItems('DBB130');
+  //     // PLC看门狗心跳
+  //     conn.addItems('DBW60')
+  //     // 故障信息
+  //     conn.addItems('DBW66')
+  //     // 输送线不允许加速器写
+  //     conn.addItems('DBW64')
+  //     // 束下实时反馈速度
+  //     conn.addItems('DBW68')
+  //     // 关键点光电信号
+  //     conn.addItems('DBW70');
+  //     // 电机运行信号
+  //     conn.addItems('DBW72');
+  //     // 上料固定扫码
+  //     conn.addItems('DBB100');
+  //     // 迷宫出口固定扫码
+  //     conn.addItems('DBB130');
       
-      // 读DBW6和DBW62
-      setInterval(() => {
-        conn.readAllItems(valuesReady);
-      }, 50);
-    });
-  }).catch((err)=> {
-    console.log('config error!')
-  });
+  //     // 读DBW6和DBW62
+  //     setInterval(() => {
+  //       conn.readAllItems(valuesReady);
+  //     }, 50);
+  //   });
+  // }).catch((err)=> {
+  //   console.log('config error!')
+  // });
   // 开发者工具
   globalShortcut.register('CommandOrControl+L', () => {
     mainWindow.webContents.openDevTools()
@@ -194,6 +200,7 @@ var variables = {
   DBW22: 'DB101,INT22', // 纸箱宽度
   DBW24: 'DB101,INT24', // 纸箱长度
   DBW26: 'DB101,INT26', // 不允许上货
+  DBW34: 'DB101,INT34', // 扫码信息不一致报警
   DBW36: 'DB101,INT36', // 允许上货
   DBW60: 'DB101,INT60', // 看门狗心跳
   DBW62: 'DB101,INT62',
@@ -208,8 +215,8 @@ var variables = {
 
 // 给PLC写值
 function writeValuesToPLC(add, values) {
-  console.log(add)
-  console.log(values)
+  // console.log(add)
+  // console.log(values)
   // nodes7 代码
   conn.writeItems(add, values, valuesWritten); // This writes a single boolean item (one bit) to true
   // console.log(add +','+values)

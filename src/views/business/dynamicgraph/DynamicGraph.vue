@@ -940,7 +940,16 @@ export default {
             this.arrAB[this.arrAB.length - 1].loadScanCode = this.loadScanCode;
           } else {
             // 走出A 读码
-            this.loadScanCode = this.arrAB[this.arrAB.length - 1].loadScanCode;
+            this.loadScanCode = this.loadScanCodeTemp.replace(/\s/g,'');
+            // 判断当前箱子的二维码和扫出来的码是否一致
+            if(this.arrAB[this.arrAB.length - 1].loadScanCode == '' || this.arrAB[this.arrAB.length - 1].loadScanCode == null || this.arrAB[this.arrAB.length - 1].loadScanCode == undefined) {
+              this.arrAB[this.arrAB.length - 1].loadScanCode = this.loadScanCode;
+            } else {
+              if(this.loadScanCode != '' && this.loadScanCode != this.arrAB[this.arrAB.length - 1].loadScanCode) {
+                ipcRenderer.send('writeValuesToPLC', 'DBW34', 1);
+              }
+            }
+            this.arrAB[this.arrAB.length - 1].loadScanCode;
           }
           // 判断是否满足可上货条件，就是当前这批消毒的箱子，最后一个满足圈数并且离开A，即可上货
           if(this.arrAB[this.arrAB.length - 1].boxImitateId == this.lastNewBoxPassABoxImitateId) {
@@ -1307,7 +1316,7 @@ export default {
             });          
           });
           break;
-        case '  ':
+        case 'stop':
           this.$confirm('此操作将全线停止, 是否继续?', '警告！', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -1317,7 +1326,6 @@ export default {
             this.fullRun = false
             this.fullStop = true
             this.sendMsgToPLC('stop');
-            
           }).catch(() => {
             this.$message({
               type: 'info',

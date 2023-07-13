@@ -167,7 +167,9 @@ export default {
         });
       });
       window.sessionStorage.removeItem('userInfo');
-      ipcRenderer.send('logStatus','logout')
+      this.$nextTick(() => {
+        ipcRenderer.send('logStatus','logout')
+      })
     },
     handelCommand(command) {
       switch (command) {
