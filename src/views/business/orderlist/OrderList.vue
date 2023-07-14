@@ -147,12 +147,13 @@
               <el-button type="primary" plain size="small" icon="el-icon-loading" style="margin-left: 6px;" @click="positionOrder">当前正在运行的订单：{{ nowRunOrderId }}</el-button>
             </el-tooltip>
           </div>
-          <div class="list-middle">
+          <div class="list-middle" ref="listMiddle">
             <el-table
               :data="tableData"
               ref="singleTable"
               border
               style="width: 100%"
+              :max-height="tableMaxHeight"
               highlight-current-row
               @current-change="handleCurrentChange"
               v-loading="getOrderListLoading">
@@ -225,7 +226,8 @@ export default {
       currentSelect: {},
       isDynamicGraphShow: false,
       getOrderListLoading: false,
-      nowRunOrderId: ''
+      nowRunOrderId: '',
+      tableMaxHeight: 0
     };
   },
   watch: {},
@@ -404,6 +406,7 @@ export default {
       if (res) {
         this.$message.success('生成成功！');
         this.getOrderList();
+        this.nowRunOrderId = '';
       } else {
         this.$message.error('生成失败！请重试！');
       }
@@ -414,12 +417,23 @@ export default {
       this.$nextTick(() => {
         this.$refs.singleTable.setCurrentRow(this.tableData[index]);
       });
+    },
+    autoCalMaxHeight() {
+      this.tableMaxHeight = this.$refs.listMiddle.offsetHeight - 55;
     }
   },
   created() {
     this.getOrderList()
   },
-  mounted() {}
+  mounted() {
+    this.$nextTick(() => {
+      this.tableMaxHeight = this.$refs.listMiddle.offsetHeight - 55;
+      window.addEventListener('resize', this.autoCalMaxHeight);
+    })
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.autoCalMaxHeight);
+  }
 };
 </script>
 <style lang="less" scoped>
@@ -530,6 +544,7 @@ export default {
     .listDiv {
       box-sizing: border-box;
       padding: 0px 16px;
+      height: calc(100% - 330px);
       ::v-deep {
         .el-link [class*=el-icon-]+span {
           margin-left: 2px;

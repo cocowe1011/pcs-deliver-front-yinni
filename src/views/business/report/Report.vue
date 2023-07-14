@@ -15,7 +15,7 @@
             <span>订单编号</span>
             <el-input placeholder="请输入订单编号" v-model="orderNoInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
             <span style="margin-left: 10px;">批次编号</span>
-            <el-input placeholder="请输入批次编号" v-model="orderNoInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
+            <el-input placeholder="请输入批次编号" v-model="batchIdInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
             <span style="margin-left: 10px;">箱编号</span>
             <el-input placeholder="请输入箱编号" v-model="boxImitateIdInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
             <el-button style="margin-left: 10px;" size="small" type="primary" @click="getReportList">查询</el-button>
@@ -24,6 +24,7 @@
             <el-table
               :data="tableData"
               border
+              height="100%"
               style="width: 100%">
               <el-table-column type="index" width="80" :index="indexMethod" fixed="left" label="序号">
               </el-table-column>
@@ -72,6 +73,16 @@
               </el-table-column>
             </el-table>
           </div>
+          <div class="fenye">
+            <el-pagination
+              style="margin-right: 2px;"
+              background
+              layout="prev, pager, next"
+              :page-size="pageSize"
+              @current-change="currentChange"
+              :total="pageTotal">
+            </el-pagination>
+          </div>
           <!-- <div @click="getData">打印预览箱报告</div>
           <div @click="getDataPi">打印预览批报告</div> -->
         </div>
@@ -99,8 +110,12 @@ export default {
       tableData: [],
       orderNoInput: '',
       boxImitateIdInput: '',
+      batchIdInput: '',
       openBoxLoading: false,
-      openOrderLoading: false
+      openOrderLoading: false,
+      pageSize: 12,
+      pageNum: 1,
+      pageTotal: 0
     };
   },
   watch: {},
@@ -142,13 +157,26 @@ export default {
         this.$message.success('文件已成功打开！');
       });
     },
+    currentChange(pageNum) {
+      if(pageNum != undefined) {
+        this.pageNum = pageNum
+        this.getReportList();
+      }
+    },
     async getReportList() {
       const param = {
         boxImitateId: this.boxImitateIdInput,
-        orderNo: this.orderNoInput
+        orderNo: this.orderNoInput,
+        batchId: this.batchIdInput,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize
       }
       await HttpUtil.post('/order/getReportList', param).then((res)=> {
-        this.tableData = res.data
+        if(res.data) {
+          this.pageTotal = res.data.total;
+          this.tableData = res.data.list;
+        }
+        console.log(res)
       }).catch((err)=> {
         // 网络异常 稍后再试
         this.$message.error('查询失败！' + err);
@@ -177,15 +205,15 @@ export default {
     printView(printObj, reportPath) {
       console.log(printObj)
       var args = {
-        // type: "preview", //设置不同的属性可以执行不同的任务，如：preview print pdf xls csv txt rtf img grd
-        type: "pdf",
+        type: "preview", //设置不同的属性可以执行不同的任务，如：preview print pdf xls csv txt rtf img grd
+        // type: "pdf",
         report: grwebapp.urlAddRandomNo(reportPath),
         PrinterName: "XP-58", //指定要输出的打印机名称
         //实际应用中，data应该为程序中通过各种途径获取到的数据，最后要将数据转换为报表需要的XML或JSON格式的字符串数据
         data: printObj,
-        showOptionDlg: false,  //指定不显示导出选项对话框
-        filename: "d:\\test.pdf", //指定导出的文件路径与文件名
-        open: false  //指定导出后不自动打开文件
+        showOptionDlg: false  //指定不显示导出选项对话框
+        // filename: "d:\\test.pdf", //指定导出的文件路径与文件名
+        // open: false  //指定导出后不自动打开文件
       };
       grwebapp.webapp_ws_ajax_run(args);
     },
@@ -247,6 +275,7 @@ export default {
     .listDiv {
       box-sizing: border-box;
       padding: 0px 16px;
+      height: calc(100% - 190px);
       .search {
         height: 43px;
         width: 100%;
@@ -258,8 +287,14 @@ export default {
         margin-bottom: 5px;
       }
       .tableDiv {
-        height: calc(100% - 43px);
+        height: calc(100% - 110px);
         width: 100%;
+      }
+      .fenye {
+        height: 50px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
       }
     }
   }

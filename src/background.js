@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, Menu, dialog, Tray } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, Menu, dialog, Tray, screen } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import nodes7 from 'nodes7';
 import HttpUtil from '@/utils/HttpUtil'
@@ -37,7 +37,6 @@ app.on('ready', () => {
     },
     icon: './build/icons/icon.ico'
   });
-
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     mainWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
@@ -52,7 +51,7 @@ app.on('ready', () => {
     console.log(arg)
     if(arg === 'login') {
       mainWindow.setResizable(true)
-      mainWindow.maximize();
+      mainWindow.setBounds({ x: 0, y: 0, width: screen.getPrimaryDisplay().workAreaSize.width, height: screen.getPrimaryDisplay().workAreaSize.height });
     } else {
       // 太几把坑了，windows系统setSize center方法失效 必须先mainWindow.unmaximize()
       mainWindow.unmaximize()
@@ -79,6 +78,7 @@ app.on('ready', () => {
       return mainWindow.maximize()
     }
     mainWindow.unmaximize()
+    mainWindow.setBounds({ x: 10, y: 10, width: screen.getPrimaryDisplay().workAreaSize.width - 20, height: screen.getPrimaryDisplay().workAreaSize.height - 20 });
   })
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send('mainWin-max', 'max-window')
@@ -120,9 +120,9 @@ app.on('ready', () => {
   }, 100);
 
   setAppTray();
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || true) {
     // 启动Java进程
-    const java = spawn(path.join(__static, './jre', 'jre1.8.0_251', 'bin', 'java'), ['-jar', path.join(__static, './jarlib', 'pcs-deliver-middle.jar')]);
+    const java = spawn(path.join(__static, './jre', 'jre1.8.0_251', 'bin', 'java'), ['-Xmx4096m', '-Xms4096m', '-jar', path.join(__static, './jarlib', 'ccs-deliver-middle.jar')]);
     // 监听Java进程的输出
     java.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
