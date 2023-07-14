@@ -100,7 +100,8 @@ export default {
       // 处理看门狗心跳
       this.watchDog = values.DBW60;
       // console.log(this.watchDog)
-    })}
+    })
+  }
 };
 </script>
 <style lang="less" scoped>
