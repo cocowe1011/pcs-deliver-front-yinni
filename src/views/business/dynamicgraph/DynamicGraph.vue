@@ -422,7 +422,8 @@ export default {
       logPageFlag: 'log', // 日志是显示传送带运行日常日志还是报警日志
       fullPause: false,
       fullRun: false,
-      fullStop: false
+      fullStop: false,
+      judgeSpeedInterval: null // 工艺对比添加 束下实际速度与设定速度对比，不合格报警 DBW4 加速器允许货物进入辐照区
     };
   },
   watch: {
@@ -834,7 +835,21 @@ export default {
     },
     showOrderInfo(orderMain) {
       this.orderMainDy = JSON.parse(JSON.stringify(orderMain))
-      this.fullRun = true
+      this.fullRun = true;
+      this.fullPause = false;
+      this.fullStop = false;
+      // 开始监听束下实际速度和设定速度
+      this.judgeSpeedInterval = setInterval(() => {
+        if(this.lightBeamRealTimeSpeed != null && this.lightBeamRealTimeSpeed != undefined && this.lightBeamRealTimeSpeed != '') {
+          if((Number(this.lightBeamRealTimeSpeed) >= Number(this.orderMainDy.sxSpeedLowerLimit)) && (Number(this.lightBeamRealTimeSpeed) <= Number(this.orderMainDy.sxSpeedUpperLimit))) {
+            ipcRenderer.send('writeValuesToPLC', 'DBW4', 1);
+          } else {
+            ipcRenderer.send('writeValuesToPLC', 'DBW4', 0);
+          }
+        } else {
+          ipcRenderer.send('writeValuesToPLC', 'DBW4', 0);
+        }
+      }, 1000);
     },
     dragStart(index) {
       // 将被拖动的元素的索引存储在数据传输对象中
@@ -1032,6 +1047,8 @@ export default {
               this.nowTiChuNum++;
               // tempArrF 缓存队列第一个一定是经过F点的箱子
               this.arrF.push(this.tempArrF[0]);
+              // 执行剔除日志
+              this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.tempArrF[0].boxImitateId + '经过F点，扫码信息：' + this.tempArrF[0].loadScanCode + '。被剔除！', 'log');
               // 删除tempArrF 第一个箱子
               this.tempArrF.splice(0, 1);
               // 在DG数组移除元素
@@ -1046,6 +1063,7 @@ export default {
           break;
         case 'G':
           if(this.pointG === '1') {
+            this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrDG[0].boxImitateId + '经过G点，扫码信息：' + this.arrDG[0].loadScanCode + '。当前 ' + this.arrDG[0].numberTurns + ' 圈，剩余 ' + (Number(this.orderMainDy.numberTurns) - Number(this.arrDG[0].numberTurns)) + ' 圈', 'log');
             // 判断是否符合下货条件
             if (this.arrDG[0].numberTurns >= this.orderMainDy.numberTurns) {
               // 符合下货条件，展示预警，货物需要下线标识。
@@ -1179,6 +1197,8 @@ export default {
           this.fullStop = false;
           this.orderMainDy = {};
           this.clearAllData();
+          clearInterval(this.judgeSpeedInterval);
+          this.judgeSpeedInterval = null;
           this.$emit('returnGenerateBatchReport',true)
         } else {
           this.$emit('returnGenerateBatchReport',false)
@@ -1279,6 +1299,8 @@ export default {
       this.fullPause = false
       this.fullRun = false
       this.fullStop = true
+      clearInterval(this.judgeSpeedInterval);
+      this.judgeSpeedInterval = null;
     },
     operationConfirm(command) {
       switch (command) {
@@ -1325,6 +1347,8 @@ export default {
             this.fullPause = false
             this.fullRun = false
             this.fullStop = true
+            clearInterval(this.judgeSpeedInterval);
+            this.judgeSpeedInterval = null;
             this.sendMsgToPLC('stop');
           }).catch(() => {
             this.$message({
