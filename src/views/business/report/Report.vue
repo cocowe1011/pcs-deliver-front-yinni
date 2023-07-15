@@ -105,8 +105,8 @@ export default {
   data() {
     return {
       printObj: {recordset:[]},
-      boxReportPath: 'D://boxreport.grf',
-      orderReportPath: 'D://batchReport.grf',
+      boxReportPath: 'D://css_temp_data/report/boxreport.grf',
+      orderReportPath: 'D://css_temp_data/report/batchReport.grf',
       tableData: [],
       orderNoInput: '',
       boxImitateIdInput: '',
@@ -122,7 +122,7 @@ export default {
   computed: {},
   methods: {
     openReport(filePath) {
-      if (filePath == 'D://batchReport.grf') {
+      if (filePath == this.orderReportPath) {
         this.openOrderLoading = true
       } else {
         this.openBoxLoading = true
@@ -186,7 +186,7 @@ export default {
       const param = {orderNo: row.orderNo}
       await HttpUtil.post('/order/getOrderMainReport', param).then((res)=> {
         this.printObj.recordset = res.data
-        this.printView(this.printObj, "D://batchReport.grf")
+        this.printView(this.printObj, this.orderReportPath)
       }).catch((err)=> {
         // 网络异常 稍后再试
         this.$message.error('查询失败！' + err);
@@ -196,7 +196,7 @@ export default {
       const param = {boxImitateId: row.boxImitateId}
       await HttpUtil.post('/box/getBoxReport', param).then((res)=> {
         this.printObj.recordset = res.data
-        this.printView(this.printObj, "D://boxreport.grf")
+        this.printView(this.printObj, this.boxReportPath)
       }).catch((err)=> {
         // 网络异常 稍后再试
         this.$message.error('查询失败！' + err);

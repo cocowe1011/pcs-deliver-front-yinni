@@ -4,6 +4,7 @@ import nodes7 from 'nodes7';
 import HttpUtil from '@/utils/HttpUtil'
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 var appTray = null;
 let closeStatus = false;
 var conn = new nodes7;
@@ -57,6 +58,11 @@ app.on('ready', () => {
       mainWindow.unmaximize()
       mainWindow.setSize(1100, 600);
       mainWindow.center();
+      mainWindow.webContents.executeJavaScript(`
+        (function(){ 
+          window.sessionStorage.removeItem('userInfo')
+        })()
+      `)
       // mainWindow.setResizable(false)
     }
   })
@@ -120,22 +126,22 @@ app.on('ready', () => {
   }, 100);
 
   setAppTray();
-  if (process.env.NODE_ENV === 'production' || true) {
+  if (process.env.NODE_ENV === 'production') {
     // 启动Java进程
     const java = spawn(path.join(__static, './jre', 'jre1.8.0_251', 'bin', 'java'), ['-Xmx4096m', '-Xms4096m', '-jar', path.join(__static, './jarlib', 'ccs-deliver-middle.jar')]);
     // 监听Java进程的输出
-    java.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-    });
+    // java.stdout.on('data', (data) => {
+    //   console.log(`stdout: ${data}`);
+    // });
   
-    java.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-    });
+    // java.stderr.on('data', (data) => {
+    //   console.error(`stderr: ${data}`);
+    // });
   
-    // 当Java进程退出时关闭Electron应用程序
-    java.on('exit', (code) => {
-      app.quit();
-    });
+    // // 当Java进程退出时关闭Electron应用程序
+    // java.on('exit', (code) => {
+    //   app.quit();
+    // });
   }
 
   // 查询配置
@@ -160,6 +166,8 @@ app.on('ready', () => {
   //     conn.addItems('DBW70');
   //     // 电机运行信号
   //     conn.addItems('DBW72');
+  //     // 束下前输送速度比
+  //     conn.addItems('DBW76');
   //     // 上料固定扫码
   //     conn.addItems('DBB100');
   //     // 迷宫出口固定扫码
@@ -184,7 +192,59 @@ app.on('ready', () => {
   ipcMain.on('full_screen', function() {
     mainWindow.isFullScreen() ? mainWindow.setFullScreen(false) : mainWindow.setFullScreen(true);
   })
+  // setUserInfo
+  ipcMain.on('setUserInfo', (event, arg) => {
+    mainWindow.webContents.executeJavaScript(`
+      (function(){ 
+        window.sessionStorage.setItem("userInfo", '${JSON.stringify(arg)}')
+      })()
+    `)
+  })
+  // 程序启动时判断是否存在报表、日志等本地文件夹，没有就创建
+  createFile('batchReport.grf');
+  createFile('boxreport.grf');
 });
+
+function createFile(fileNameVal) {
+  const sourcePath = path.join(__static, './report', fileNameVal);// 要复制的文件的路径=
+  const destinationPath = 'D://css_temp_data/report'; // 目标文件夹的路径
+
+  // 检查源文件是否存在
+  if (!fs.existsSync(sourcePath)) {
+    console.error('源文件不存在');
+    return;
+  }
+
+  // 获取源文件的文件名
+  const fileName = path.basename(sourcePath);
+
+  // 构建目标文件的完整路径
+  const destinationFilePath = path.join(destinationPath, fileName);
+
+  // 检查目标文件夹是否存在，如果不存在则创建它
+  if (!fs.existsSync(destinationPath)) {
+    try {
+      fs.mkdirSync(destinationPath, { recursive: true });
+      console.log('目标文件夹已成功创建');
+    } catch (err) {
+      console.error('创建目标文件夹时出现错误：', err);
+      return;
+    }
+  }
+
+  // 检查目标文件是否已经存在
+  if (fs.existsSync(destinationFilePath)) {
+    console.log('目标文件已存在，跳过复制操作');
+  } else {
+    try {
+      // 使用流的方式复制文件
+      fs.copyFileSync(sourcePath, destinationFilePath);
+      console.log('文件已成功复制到目标文件夹');
+    } catch (err) {
+      console.error('文件复制过程中出现错误：', err);
+    }
+  }
+}
 
 var variables = {
   DBW2: 'DB101,INT2', // 加速器设定输送线速度
@@ -209,6 +269,7 @@ var variables = {
   DBW68: 'DB101,INT68',
   DBW70: 'DB101,INT70',
   DBW72: 'DB101,INT72',
+  DBW76: 'DB101,INT76', // 束下前输送速度比
   DBB100: 'DB101,C100.30',
   DBB130: 'DB101,C130.30'
 };

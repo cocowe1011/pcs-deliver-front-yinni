@@ -166,7 +166,7 @@ export default {
           path: '/'
         });
       });
-      window.sessionStorage.removeItem('userInfo');
+      // window.sessionStorage.removeItem('userInfo');
       this.$nextTick(() => {
         ipcRenderer.send('logStatus','logout')
       })

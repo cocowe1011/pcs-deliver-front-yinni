@@ -80,11 +80,11 @@
       <div class="dynamic-left-down">
         <div>
           <div class="card-title">
-            <el-badge :value="1" class="item" :hidden="true">
+            <el-badge :value="logNotReadNumber" :max="99" class="item" :hidden="logNotReadNumber==0">
               <div :class="['log-class', logPageFlag == 'log'?'log-class-active':'']" @click="showRunlog">操作日志</div>
             </el-badge>
             &nbsp;/&nbsp;
-            <el-badge :value="3" class="item">
+            <el-badge :value="errorLogNotReadNumber" :max="99" class="item" :hidden="errorLogNotReadNumber==0">
               <div :class="['log-class', logPageFlag == 'error-log'?'log-class-active':'']" @click="showErrorlog">报警日志</div>
             </el-badge>
           </div>
@@ -423,7 +423,10 @@ export default {
       fullPause: false,
       fullRun: false,
       fullStop: false,
-      judgeSpeedInterval: null // 工艺对比添加 束下实际速度与设定速度对比，不合格报警 DBW4 加速器允许货物进入辐照区
+      judgeSpeedInterval: null, // 工艺对比添加 束下实际速度与设定速度对比，不合格报警 DBW4 加速器允许货物进入辐照区
+      shuxiaSpeedProportion: 1, // 束下前输送速度比
+      logNotReadNumber: 0, // 日志未读数量
+      errorLogNotReadNumber: 0 // 错误日志未读数量
     };
   },
   watch: {
@@ -491,7 +494,7 @@ export default {
             // 计算时间
             setTimeout(() => {
               this.getUndercutProcess(boxImitateId);
-            }, this.calculateMilliseconds((Number(this.l11)/Number(this.lightBeamRealTimeSpeed)).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
+            }, this.calculateMilliseconds((Number(this.l11)/(Number(this.lightBeamRealTimeSpeed) * this.shuxiaSpeedProportion)).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
           }
         } else if(this.enteringPonitB && newVal === '0' && oldVal === '1') { // 货物走出B点
           this.$message.warning('货物走出B点')
@@ -673,8 +676,16 @@ export default {
         this.$nextTick(() => {
           this.scrollToBottom();
         });
+        // 如果当前日志在显示的是报警列表，运行日志有新日志要徽标提示
+        if(this.logPageFlag == 'error-log') {
+          this.logNotReadNumber++;
+        }
       } else {
         this.errorLogArr.push({text: msg})
+        // 如果当前日志在显示的是运行列表，报警日志有新日志要徽标提示
+        if(this.logPageFlag == 'error-log') {
+          this.errorLogNotReadNumber++;
+        }
       }
     },
     scrollToBottom() {
@@ -850,6 +861,20 @@ export default {
           ipcRenderer.send('writeValuesToPLC', 'DBW4', 0);
         }
       }, 1000);
+      const param = {
+        orderId: this.orderMainDy.orderId,
+        startTime: moment().format('YYYY-MM-DD HH:mm:ss')
+      }
+      // 更新订单开始时间
+      HttpUtil.post('/order/update', param).then((res)=> {
+        if(res.data == 1) {
+          this.$message.success('更新订单开始时间成功！')
+        } else {
+          this.$message.error('更新订单开始时间失败！')
+        }
+      }).catch((err)=> {
+        this.$message.success('更新订单开始时间失败！')
+      });
     },
     dragStart(index) {
       // 将被拖动的元素的索引存储在数据传输对象中
@@ -1069,6 +1094,23 @@ export default {
               // 符合下货条件，展示预警，货物需要下线标识。
               this.yujingShow = true;
               this.nowOutNum++;
+              const param = {
+                boxMainDTOList: [this.arrDG[0]],
+                finishOrder: false
+              }
+              // 生成箱报告
+              await HttpUtil.post('/box/save', param).then((res)=> {
+                if(res.data == 1) {
+                  this.$message.success('货物：' + this.arrDG[0].boxImitateId + '，已生成箱报告！')
+                  this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrDG[0].boxImitateId + '，已生成箱报告！', 'log');
+                } else {
+                  this.$message.error('货物：' + this.arrDG[0].boxImitateId + '，生成箱报告失败！')
+                  this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrDG[0].boxImitateId + '，生成箱报告失败！', 'log');
+                }
+              }).catch((err)=> {
+                this.$message.error('货物：' + this.arrDG[0].boxImitateId + '，生成箱报告失败！' + err)
+                this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrDG[0].boxImitateId + '，生成箱报告失败！' + err, 'log');
+              });
             }
             // 把DG队列第一个货物出列，进入GH
             this.arrGH.push(this.arrDG[0]);
@@ -1103,6 +1145,23 @@ export default {
               // 更新全局圈数 和 报警信号
               if (this.arrGH[indexHBox].numberTurns >= this.orderMainDy.numberTurns) {
                 this.baojingShow = true;
+                const param = {
+                  boxMainDTOList: [this.arrGH[indexHBox]],
+                  finishOrder: false
+                }
+                // 更新箱报告的H点的时间
+                await HttpUtil.post('/box/save', param).then((res)=> {
+                  if(res.data == 1) {
+                    this.$message.success('货物：' + this.arrGH[indexHBox].boxImitateId + '，已更新箱报告！')
+                    this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrGH[indexHBox].boxImitateId + '，已更新箱报告！', 'log');
+                  } else {
+                    this.$message.error('货物：' + this.arrGH[indexHBox].boxImitateId + '，更新箱报告失败！')
+                    this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrGH[indexHBox].boxImitateId + '，更新箱报告失败！', 'log');
+                  }
+                }).catch((err)=> {
+                  this.$message.error('货物：' + this.arrGH[indexHBox].boxImitateId + '，更新箱报告失败！' + err)
+                  this.createLog(moment().format('YYYY-MM-DD HH:mm:ss') + ' 货物' + this.arrGH[indexHBox].boxImitateId + '，更新箱报告失败！' + err, 'log');
+                });
               } else {
                 // 有货物的圈数和全局圈数一致时，则全局圈数加1
                 if(this.arrGH[indexHBox].boxImitateId == this.judgeBanLoadBoxImitateId) {
@@ -1189,8 +1248,12 @@ export default {
       this.beginCountNum = num
     },
     async generateBatchReport() {
-      const boxMainList = [...this.arrAB, ...this.arrBC, ...this.arrCD, ...this.arrDG, ...this.arrGH];
-      await HttpUtil.post('/box/save', boxMainList).then((res)=> {
+      // 生成批报告，并且更新一下所有箱子
+      const param = {
+        boxMainDTOList: [...this.arrAB, ...this.arrBC, ...this.arrCD, ...this.arrDG, ...this.arrGH],
+        finishOrder: true
+      }
+      await HttpUtil.post('/box/save', param).then((res)=> {
         if(res.data == 1) {
           this.fullPause = false;
           this.fullRun = false;
@@ -1291,9 +1354,11 @@ export default {
     },
     showRunlog() {
       this.logPageFlag = 'log';
+      this.logNotReadNumber = 0;
     },
     showErrorlog() {
       this.logPageFlag = 'error-log';
+      this.errorLogNotReadNumber = 0;
     },
     stopOrder() {
       this.fullPause = false
@@ -1417,6 +1482,8 @@ export default {
       this.loadScanCodeTemp = eventData.DBB100??'';
       // 迷宫出口固定扫码
       this.labyrinthScanCodeTemp = eventData.DBB130??'';
+      // 束下输送速度比
+      this.shuxiaSpeedProportion = Number(eventData.DBW76);
       // 监控报警日志
       if(eventData.DBW66 != null && eventData.DBW66 != undefined) {
         this.errorModArr = this.PrefixZero(eventData.DBW66.toString(2), 16);

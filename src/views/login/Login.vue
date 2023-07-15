@@ -157,7 +157,8 @@ export default {
       }
       HttpUtil.post('/login/login', param).then((res)=> {
         if(res.data) {
-          window.sessionStorage.setItem('userInfo', JSON.stringify(res.data));
+          ipcRenderer.send('setUserInfo', res.data)
+          // window.sessionStorage.setItem('userInfo', JSON.stringify(res.data));
           setTimeout(() => {
             this.loadingStatus = false;
             // 跳转主页
@@ -194,10 +195,8 @@ export default {
       axios.get(this.javaAppUrl).then((response) => {
         console.log(response)
         if (response.data === 'OK') {
-          setTimeout(() => {
-            this.javaAppStarted = true;
-            this.$message.success('已启动！')
-          }, 500);
+          this.javaAppStarted = true;
+          this.$message.success('已启动！')
         } else {
           if (retries < this.maxRetries) {
             setTimeout(() => this.checkJavaAppStatus(retries + 1), this.retryInterval);
@@ -218,7 +217,9 @@ export default {
     // ipcRenderer.send('logStatus','logout');
   },
   mounted() {
-    this.checkJavaAppStatus();
+    if(!this.javaAppStarted) {
+      this.checkJavaAppStatus();
+    }
   }
 };
 </script>
