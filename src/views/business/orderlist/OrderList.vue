@@ -182,7 +182,7 @@
                   <el-link type="primary" icon="el-icon-edit" @click.stop="editClick(scope.row)">编辑</el-link>
                   <el-link type="success" icon="el-icon-switch-button" style="margin-left: 10px;" v-if="scope.row.orderId != nowRunOrderId" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)" @click="runPLC(scope.row)">启动</el-link>
                   <el-link type="success" icon="el-icon-loading" style="margin-left: 10px;" v-else :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)">运行中</el-link>
-                  <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop(true)" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId) || nowRunOrderId == ''">停止</el-link>
+                  <el-link type="danger" icon="el-icon-error" style="margin-left: 10px;" @click="stop(scope.row, true)" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId) || nowRunOrderId == ''">停止</el-link>
                   <el-link type="primary" icon="el-icon-success" style="margin-left: 10px;" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)" @click="generateBatchReport">完成</el-link>
                   <el-link type="primary" icon="el-icon-pie-chart" style="margin-left: 10px;" @click="showDynamicGraph(scope.row)" :disabled="(scope.row.orderId !== currentSelect.orderId) || (nowRunOrderId != '' && scope.row.orderId != nowRunOrderId)">动态图</el-link>
                 </template>
@@ -193,7 +193,7 @@
       </div>
     </div>
     <div style="width:100%;height: 100%;" v-show="isDynamicGraphShow">
-      <DynamicGraph @closeDynamicGraphShow="closeDynamicGraphShow" @returnGenerateBatchReport="returnGenerateBatchReport" @stopMethod="stop(false)" ref="dynamicGraph"></DynamicGraph>
+      <DynamicGraph @closeDynamicGraphShow="closeDynamicGraphShow" @returnGenerateBatchReport="returnGenerateBatchReport" @stopMethod="stop" ref="dynamicGraph"></DynamicGraph>
     </div>
   </div>
   
@@ -375,7 +375,7 @@ export default {
     delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
-    stop(flag) {
+    stop(obj, flag) {
       ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
       this.nowRunOrderId = '';
       if(flag) {
@@ -384,6 +384,19 @@ export default {
           this.$refs.dynamicGraph.stopOrder();
         });
       }
+      // 更新订单状态300
+      const param = {
+        orderId: obj.orderId,
+        orderStatus: 300
+      }
+      // 更新300状态
+      HttpUtil.post('/order/update', param).then((res)=> {
+        if(res.data == 1) {
+          this.$message.error('更新订单运行状态失败！')
+        }
+      }).catch((err)=> {
+        this.$message.success('更新订单运行状态失败！')
+      });
     },
     indexMethod(index) {
       return index + 1;

@@ -863,7 +863,8 @@ export default {
       }, 1000);
       const param = {
         orderId: this.orderMainDy.orderId,
-        startTime: moment().format('YYYY-MM-DD HH:mm:ss')
+        startTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+        orderStatus: 200
       }
       // 更新订单开始时间
       HttpUtil.post('/order/update', param).then((res)=> {
@@ -1232,7 +1233,7 @@ export default {
           break;
         case 'stop':
           // ipcRenderer.send('writeValuesToPLC', 'DBW10', 1);
-          this.$emit('stopMethod')
+          this.$emit('stopMethod', this.orderMainDy, false)
           this.$notify({
             title: '指令发送成功！',
             message: '全线停止指令已成功发送！',
