@@ -113,17 +113,17 @@ app.on('ready', () => {
       }
     })
   });
-  let revert = false;
-  setInterval(() => {
-    if(mainWindow) {
-      if(revert) {
-        mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-      } else {
-        mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
-      }
-      revert = !revert;
-    }
-  }, 100);
+  // let revert = false;
+  // setInterval(() => {
+  //   if(mainWindow) {
+  //     if(revert) {
+  //       mainWindow.webContents.send('receivedMsg', {DBW60:0, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  //     } else {
+  //       mainWindow.webContents.send('receivedMsg', {DBW60:1, DBW68:99,DBW70:512,DBW72: -1793,DBB100:'HF800SR-1-H                   ',DBB130:'83048880004868800784          '})
+  //     }
+  //     revert = !revert;
+  //   }
+  // }, 100);
 
   setAppTray();
   if (process.env.NODE_ENV === 'production') {
@@ -145,42 +145,42 @@ app.on('ready', () => {
   }
 
   // 查询配置
-  // HttpUtil.get('/cssConfig/getConfig').then((res)=> {
-  //   conn.initiateConnection( { port: Number(res.data.plcPort), host: res.data.plcIp, rack: 0, slot: 1, debug: false }, (err) => {
-  //     if (typeof(err) !== "undefined") {
-  //       // We have an error. Maybe the PLC is not reachable.
-  //       console.log(err);
-  //       // process.exit();
-  //     }
-  //     conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
+  HttpUtil.get('/cssConfig/getConfig').then((res)=> {
+    conn.initiateConnection( { port: Number(res.data.plcPort), host: res.data.plcIp, rack: 0, slot: 1, debug: false }, (err) => {
+      if (typeof(err) !== "undefined") {
+        // We have an error. Maybe the PLC is not reachable.
+        console.log(err);
+        // process.exit();
+      }
+      conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
 
-  //     // PLC看门狗心跳
-  //     conn.addItems('DBW60')
-  //     // 故障信息
-  //     conn.addItems('DBW66')
-  //     // 输送线不允许加速器写
-  //     conn.addItems('DBW64')
-  //     // 束下实时反馈速度
-  //     conn.addItems('DBW68')
-  //     // 关键点光电信号
-  //     conn.addItems('DBW70');
-  //     // 电机运行信号
-  //     conn.addItems('DBW72');
-  //     // 束下前输送速度比
-  //     conn.addItems('DBW76');
-  //     // 上料固定扫码
-  //     conn.addItems('DBB100');
-  //     // 迷宫出口固定扫码
-  //     conn.addItems('DBB130');
+      // PLC看门狗心跳
+      conn.addItems('DBW60')
+      // 故障信息
+      conn.addItems('DBW66')
+      // 输送线不允许加速器写
+      conn.addItems('DBW64')
+      // 束下实时反馈速度
+      conn.addItems('DBW68')
+      // 关键点光电信号
+      conn.addItems('DBW70');
+      // 电机运行信号
+      conn.addItems('DBW72');
+      // 束下前输送速度比
+      conn.addItems('DBW76');
+      // 上料固定扫码
+      conn.addItems('DBB100');
+      // 迷宫出口固定扫码
+      conn.addItems('DBB130');
       
-  //     // 读DBW6和DBW62
-  //     setInterval(() => {
-  //       conn.readAllItems(valuesReady);
-  //     }, 50);
-  //   });
-  // }).catch((err)=> {
-  //   console.log('config error!')
-  // });
+      // 读DBW6和DBW62
+      setInterval(() => {
+        conn.readAllItems(valuesReady);
+      }, 50);
+    });
+  }).catch((err)=> {
+    console.log('config error!')
+  });
   // 开发者工具
   globalShortcut.register('CommandOrControl+L', () => {
     mainWindow.webContents.openDevTools()

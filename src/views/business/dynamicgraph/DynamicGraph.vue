@@ -494,7 +494,7 @@ export default {
             // 计算时间
             setTimeout(() => {
               this.getUndercutProcess(boxImitateId);
-            }, this.calculateMilliseconds((Number(this.l11)/(Number(this.lightBeamRealTimeSpeed) * this.shuxiaSpeedProportion)).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
+            }, this.calculateMilliseconds((Number(this.l11)/(Number(this.lightBeamRealTimeSpeed) * (this.shuxiaSpeedProportion/10))).toFixed(2),(Number(this.l2)/Number(this.lightBeamRealTimeSpeed)).toFixed(2)));
           }
         } else if(this.enteringPonitB && newVal === '0' && oldVal === '1') { // 货物走出B点
           this.$message.warning('货物走出B点')
@@ -1455,6 +1455,13 @@ export default {
         default:
           break;
       }
+    },
+    convertToWord(value) {
+      if (value < 0) {
+        return (value & 0xFFFF) >>> 0; // 负数转换为无符号的16位整数
+      } else {
+        return value; // 非负数保持不变
+      }
     }
   },
   created() {
@@ -1467,17 +1474,17 @@ export default {
     // 订阅<状态球>eventBus发布的消息
     EventBus.$on('pushPLCMessage', eventData => {
       // --------无PLC测试时，这里以下代码毙掉--------
-      // this.guangDianStatusArr = this.PrefixZero(eventData.DBW70.toString(2), 16);
-      // this.pointA = this.guangDianStatusArr[7];
-      // this.pointB = this.guangDianStatusArr[6];
-      // this.pointC = this.guangDianStatusArr[5];
-      // this.pointD = this.guangDianStatusArr[4];
-      // this.pointE = this.guangDianStatusArr[3];
-      // this.pointF = this.guangDianStatusArr[2];
-      // this.pointG = this.guangDianStatusArr[1];
-      // this.pointH = this.guangDianStatusArr[0];
+      this.guangDianStatusArr = this.PrefixZero(this.convertToWord(eventData.DBW70).toString(2), 16);
+      this.pointA = this.guangDianStatusArr[7];
+      this.pointB = this.guangDianStatusArr[6];
+      this.pointC = this.guangDianStatusArr[5];
+      this.pointD = this.guangDianStatusArr[4];
+      this.pointE = this.guangDianStatusArr[3];
+      this.pointF = this.guangDianStatusArr[2];
+      this.pointG = this.guangDianStatusArr[1];
+      this.pointH = this.guangDianStatusArr[0];
       // --------无PLC测试时，这里以上代码毙掉--------
-      this.dianJiStatusArr = this.PrefixZero(eventData.DBW72.toString(2), 16);
+      this.dianJiStatusArr = this.PrefixZero(this.convertToWord(eventData.DBW72).toString(2), 16);
       this.lightBeamRealTimeSpeed = Number(eventData.DBW68);
       // 上料固定扫码
       this.loadScanCodeTemp = eventData.DBB100??'';
@@ -1487,7 +1494,7 @@ export default {
       this.shuxiaSpeedProportion = Number(eventData.DBW76);
       // 监控报警日志
       if(eventData.DBW66 != null && eventData.DBW66 != undefined) {
-        this.errorModArr = this.PrefixZero(eventData.DBW66.toString(2), 16);
+        this.errorModArr = this.PrefixZero(this.convertToWord(eventData.DBW66).toString(2), 16);
         this.err1 = this.errorModArr[7];
         this.err2 = this.errorModArr[6];
         this.err3 = this.errorModArr[5];
