@@ -359,6 +359,27 @@ export default {
     showOrderInfo(orderMain) {
       this.orderMainDy = JSON.parse(JSON.stringify(orderMain))
     },
+    async getBoxReportData(row) {
+      // 最新的箱子变化了
+      this.boxIdNow = row.boxId;
+      this.boxObj = row;
+      this.pdfLoading = true;
+      this.pdfPath = '';
+      const param = {boxImitateId: row.boxImitateId}
+      await HttpUtil.post('/box/getBoxReport', param).then((res)=> {
+        this.printObj.recordset = res.data;
+        this.generatePDF(this.printObj, this.boxReportPath)
+        this.openPdf = setTimeout(() => {
+          this.pdfPath = 'D://pcs_temp_data/report/temp/temp.pdf'
+          this.pdfLoading = false;
+          this.loadScanCode = this.boxObj.loadScanCode,
+          this.boxImitateId = this.boxObj.boxImitateId
+        }, 2000);
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('生成pdf失败！' + err);
+      });
+    },
     getNewBoxReport() {
       // 通过订单号，查询最新一次的箱报告
       const param = {
@@ -367,19 +388,7 @@ export default {
       HttpUtil.post('/box/getBoxReportLatest', param).then((res)=> {
         if(res.data != null) {
           if(res.data.boxId != this.boxIdNow) {
-            // 最新的箱子变化了
-            this.boxIdNow = res.data.boxId;
-            this.boxObj = res.data;
-            this.pdfLoading = true;
-            this.pdfPath = ''
-            this.printObj.recordset = [res.data];
-            this.generatePDF(this.printObj, this.boxReportPath)
-            this.openPdf = setTimeout(() => {
-              this.pdfPath = 'D://pcs_temp_data/report/temp/temp.pdf'
-              this.pdfLoading = false;
-              this.loadScanCode = this.boxObj.loadScanCode,
-              this.boxImitateId = this.boxObj.boxImitateId
-            }, 2000);
+            this.getBoxReportData(res.data);
           }
         } else {
           this.pdfPath = '';
@@ -414,6 +423,7 @@ export default {
     }
   },
   created() {
+    grwebapp.webapp_urlprotocol_startup();
   },
   mounted() {
     this.getNewBoxReport()
