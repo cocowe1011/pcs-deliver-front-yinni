@@ -74,10 +74,7 @@ app.on('ready', () => {
   ipcMain.on('min-window', (event, arg) => {
     mainWindow.minimize();
   })
-  // writeValuesToPLC
-  ipcMain.on('writeValuesToPLC', (event, arg1, arg2) => {
-    writeValuesToPLC(arg1, arg2);
-  })
+
   // 定义自定义事件
   ipcMain.on('max-window', (event, arg) => {
     if (arg === 'max-window') {
@@ -114,6 +111,25 @@ app.on('ready', () => {
     })
   });
   setAppTray();
+
+  if (process.env.NODE_ENV === 'production') {
+    // 启动Java进程
+    const java = spawn(path.join(__static, './jre', 'jre1.8.0_251', 'bin', 'java'), ['-Xmx4096m', '-Xms4096m', '-jar', path.join(__static, './jarlib', 'ccs-deliver-middle.jar')]);
+    // 监听Java进程的输出
+    // java.stdout.on('data', (data) => {
+    //   console.log(`stdout: ${data}`);
+    // });
+  
+    // java.stderr.on('data', (data) => {
+    //   console.error(`stderr: ${data}`);
+    // });
+  
+    // // 当Java进程退出时关闭Electron应用程序
+    // java.on('exit', (code) => {
+    //   app.quit();
+    // });
+  }
+
   // 开发者工具
   globalShortcut.register('CommandOrControl+L', () => {
     mainWindow.webContents.openDevTools()
@@ -189,52 +205,6 @@ function createFile(fileNameVal) {
   }
 }
 
-var variables = {
-  DBW2: 'DB101,INT2', // 加速器设定输送线速度
-  DBW4: 'DB101,INT4', // 加速器允许货物进入辐照区
-  DBW6: 'DB101,INT6', // 暂停按钮
-  DBW8: 'DB101,INT8', // 启动输送线
-  DBW10: 'DB101,INT10', // 停止输送线
-  DBW12: 'DB101,INT12', // 翻转模式
-  DBW14: 'DB101,INT14', // 回流模式
-  DBW16: 'DB101,INT16', // 下货
-  DBW18: 'DB101,INT18', // 剔除指令
-  DBW20: 'DB101,INT20', // 单独启动105
-  DBW22: 'DB101,INT22', // 纸箱宽度
-  DBW24: 'DB101,INT24', // 纸箱长度
-  DBW26: 'DB101,INT26', // 不允许上货
-  DBW34: 'DB101,INT34', // 扫码信息不一致报警
-  DBW36: 'DB101,INT36', // 允许上货
-  DBW60: 'DB101,INT60', // 看门狗心跳
-  DBW62: 'DB101,INT62',
-  DBW64: 'DB101,INT64',
-  DBW66: 'DB101,INT66', // 故障信息
-  DBW68: 'DB101,INT68',
-  DBW70: 'DB101,INT70',
-  DBW72: 'DB101,INT72',
-  DBW76: 'DB101,INT76', // 束下前输送速度比
-  DBB100: 'DB101,C100.30',
-  DBB130: 'DB101,C130.30'
-};
-
-// 给PLC写值
-function writeValuesToPLC(add, values) {
-  // console.log(add)
-  // console.log(values)
-  // nodes7 代码
-  conn.writeItems(add, values, valuesWritten); // This writes a single boolean item (one bit) to true
-  // console.log(add +','+values)
-}
-
-function valuesWritten(anythingBad) {
-  if (anythingBad) { console.log("SOMETHING WENT WRONG WRITING VALUES!!!!"); }
-}
-
-function valuesReady(anythingBad, values) {
-  if (anythingBad) { console.log("SOMETHING WENT WRONG READING VALUES!!!!"); }
-  console.log(values)
-  mainWindow.webContents.send('receivedMsg', values)
-}
 
 const setAppTray = () => {  
   // 系统托盘右键菜单

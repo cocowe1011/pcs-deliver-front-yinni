@@ -58,8 +58,8 @@ export default {
   props: {},
   data() {
     return {
-      userCode: 'admin',
-      userPassword: '1',
+      userCode: '',
+      userPassword: '',
       loadingStatus: false,
       pageMark: 'login',
       showUserNameTips: false,
