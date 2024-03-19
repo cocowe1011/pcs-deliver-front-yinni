@@ -18,7 +18,8 @@
             <el-input placeholder="请输入灭菌批号" v-model="batchIdInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
             <span style="margin-left: 10px;">箱编号</span>
             <el-input placeholder="请输入箱编号" v-model="boxImitateIdInput" style="width: 200px;margin-left: 10px;" size="small"></el-input>
-            <el-button style="margin-left: 10px;" size="small" type="primary" @click="getReportList">查询</el-button>
+            <el-button style="margin-left: 10px;" size="small" type="primary" @click="getReportSearch">查询</el-button>
+            <el-link style="position: absolute; right: 40px;" icon="el-icon-edit" type="primary" @click="showViewOrderList">修改已完成订单</el-link>
           </div>
           <div class="tableDiv">
             <el-table
@@ -88,7 +89,8 @@
               layout="prev, pager, next"
               :page-size="pageSize"
               @current-change="currentChange"
-              :total="pageTotal">
+              :total="pageTotal"
+              :current-page.sync="pageNum">
             </el-pagination>
           </div>
           <!-- <div @click="getData">打印预览箱报告</div>
@@ -96,6 +98,15 @@
         </div>
       </div>
     </div>
+    <el-dialog
+      title="修改已完成订单"
+      :visible.sync="dialogVisible"
+      width="1400px"
+      :before-close="handleClose"
+      append-to-body
+      destroy-on-close>
+      <ViewOrderList/>
+    </el-dialog>
   </div>
   
 </template>
@@ -106,9 +117,12 @@ import { Debugger, ipcRenderer } from 'electron'
 import grwebapp from '@/utils/grwebapp'
 const { exec } = require('child_process');
 const os = require('os');
+import ViewOrderList from '../orderlist/ViewOrderList.vue'
 export default {
   name: "Report",
-  components: {},
+  components: {
+    ViewOrderList
+  },
   props: {},
   data() {
     return {
@@ -123,12 +137,19 @@ export default {
       openOrderLoading: false,
       pageSize: 12,
       pageNum: 1,
-      pageTotal: 0
+      pageTotal: 0,
+      dialogVisible: false
     };
   },
   watch: {},
   computed: {},
   methods: {
+    showViewOrderList() {
+      this.dialogVisible = true
+    },
+    handleClose() {
+      this.dialogVisible = false
+    },
     openReport(filePath) {
       if (filePath == this.orderReportPath) {
         this.openOrderLoading = true
@@ -171,6 +192,27 @@ export default {
         this.getReportList();
       }
     },
+    async getReportSearch() {
+      this.pageNum = 1
+      this.tableData = [];
+      this.pageTotal = 0;
+      const param = {
+        boxImitateId: this.boxImitateIdInput,
+        orderNo: this.orderNoInput,
+        batchId: this.batchIdInput,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize
+      }
+      await HttpUtil.post('/order/getReportList', param).then((res)=> {
+        if(res.data.list.length > 0) {
+          this.pageTotal = res.data.total;
+          this.tableData = res.data.list;
+        }
+      }).catch((err)=> {
+        // 网络异常 稍后再试
+        this.$message.error('查询失败！' + err);
+      });
+    },
     async getReportList() {
       const param = {
         boxImitateId: this.boxImitateIdInput,
@@ -180,11 +222,17 @@ export default {
         pageSize: this.pageSize
       }
       await HttpUtil.post('/order/getReportList', param).then((res)=> {
-        if(res.data) {
+        if(res.data.list.length > 0) {
           this.pageTotal = res.data.total;
           this.tableData = res.data.list;
+          if(res.data.pages < this.pageNum) {
+            this.pageNum = 1
+          }
+        } else {
+          this.pageTotal = 0;
+          this.tableData = [];
+          this.pageNum = 1
         }
-        console.log(res)
       }).catch((err)=> {
         // 网络异常 稍后再试
         this.$message.error('查询失败！' + err);
@@ -306,5 +354,8 @@ export default {
       }
     }
   }
+}
+::v-deep .el-dialog__body {
+  padding: 8px 20px;
 }
 </style>
