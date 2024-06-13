@@ -221,6 +221,13 @@ const messages = {
       cancel: 'Cancel'
     },
     dynamicGraph: {
+      yunxingdingdanxinxi: 'Running Order Information',
+      dingdanhao: 'Order Number',
+      huowumingcheng: 'Goods Name',
+      moniid: 'Simulation ID Number',
+      saomaxinxi: 'Scan Information',
+      gongyiyaoqiu: 'Process Requirements',
+      xiangbaogaoshishiyulan: 'Box Report Real-time Preview',
       ceshijiasuqi: 'Test Accelerator',
       shishishuju: 'Real-time Data Monitoring',
       miejunpihao: 'Batch Number',
@@ -528,6 +535,13 @@ const messages = {
       cancel: '取消'
     },
     dynamicGraph: {
+      yunxingdingdanxinxi: '运行订单信息',
+      dingdanhao: '订单号',
+      huowumingcheng: '货物名称',
+      moniid: '模拟id号',
+      saomaxinxi: '扫码信息',
+      gongyiyaoqiu: '工艺要求',
+      xiangbaogaoshishiyulan: '箱报告实时预览',
       ceshijiasuqi: '测试加速器',
       shishishuju: '实时数据监控',
       miejunpihao: '灭菌批号',

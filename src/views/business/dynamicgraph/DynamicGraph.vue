@@ -4,29 +4,29 @@
     <div class="dynamic-left">
       <div class="dynamic-left-top">
         <div>
-          <div class="card-title">运行订单信息</div>
+          <div class="card-title">{{ $t('dynamicGraph.yunxingdingdanxinxi') }}</div>
           <div class="card-content">
             <div class="data-card" style="padding:14px 10px 7px 20px">
               <div class="data-card-border">
-                <div class="data-card-border-borderTop granient-text">订单号</div>
+                <div class="data-card-border-borderTop granient-text">{{ $t('dynamicGraph.dingdanhao') }}</div>
                 <div class="data-card-border-borderDown" style="font-size: 1.3vw;">{{ orderMainDy.orderNo }}</div>
               </div>
             </div>
             <div class="data-card" style="padding:14px 14px 7px 6px">
               <div class="data-card-border">
-                <div class="data-card-border-borderTop">货物名称</div>
+                <div class="data-card-border-borderTop">{{ $t('dynamicGraph.huowumingcheng') }}</div>
                 <div class="data-card-border-borderDown">{{ orderMainDy.productName }}</div>
               </div>
             </div>
             <div class="data-card" style="padding: 10px 10px 7px 20px;">
               <div class="data-card-border">
-                <div class="data-card-border-borderTop">模拟id号</div>
+                <div class="data-card-border-borderTop">{{ $t('dynamicGraph.moniid') }}</div>
                 <div class="data-card-border-borderDown">{{ boxImitateId }}</div>
               </div>
             </div>
             <div class="data-card" style="padding: 10px 14px 7px 6px;">
               <div class="data-card-border">
-                <div class="data-card-border-borderTop">扫码信息</div>
+                <div class="data-card-border-borderTop">{{ $t('dynamicGraph.saomaxinxi') }}</div>
                 <div class="data-card-border-borderDown">{{ loadScanCode }}</div>
               </div>
             </div>
@@ -36,7 +36,7 @@
       <div class="dynamic-left-down">
         <div>
           <div class="card-title">
-            工艺要求
+            {{ $t('dynamicGraph.gongyiyaoqiu') }}
           </div>
           <div class="card-content">
             <el-row :gutter="20">
@@ -46,7 +46,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.numberTurns.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    圈数
+                    {{ $t('processParameters.quanshu') }}
                   </div>
                 </div>
               </el-col>
@@ -56,7 +56,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.boxLength.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    箱子长度
+                    {{ $t('processParameters.xiangzichangdu') }}
                   </div>
                 </div>
               </el-col>
@@ -66,7 +66,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.boxHeight.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    箱子高度
+                    {{ $t('processParameters.xiangzigaodu') }}
                   </div>
                 </div>
               </el-col>
@@ -76,7 +76,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.boxWidth.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    箱子宽度
+                    {{ $t('processParameters.xiangzikuandu') }}
                   </div>
                 </div>
               </el-col>
@@ -86,17 +86,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.boxWeight.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    箱子重量
-                  </div>
-                </div>
-              </el-col>
-              <el-col :span="4">
-                <div class="gongyi-card">
-                  <div class="gongyi-card-top">
-                    {{ orderMainDy.numberTurns == undefined?'': orderMainDy.orderBoxNum.toFixed(0) }}
-                  </div>
-                  <div class="gongyi-card-down">
-                    订单箱数
+                    {{ $t('processParameters.xiangzizhongliang') }}
                   </div>
                 </div>
               </el-col>
@@ -106,7 +96,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.sxSpeedLowerLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    束下速度下限
+                    {{ $t('processParameters.shuxiasuduxiaxian') }}
                   </div>
                 </div>
               </el-col>
@@ -116,7 +106,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.sxSpeedSet.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    束下速度值
+                    {{ $t('processParameters.shuxiasuduzhi') }}
                   </div>
                 </div>
               </el-col>
@@ -126,7 +116,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.sxSpeedUpperLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    束下速度上限
+                    {{ $t('processParameters.shuxiasudushangxian') }}
                   </div>
                 </div>
               </el-col>
@@ -136,7 +126,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.slLowerLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    束流下限
+                    {{ $t('processParameters.shuliuxiaxian') }}
                   </div>
                 </div>
               </el-col>
@@ -146,7 +136,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.slSet.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    束流设定值
+                    {{ $t('processParameters.shuliusheding') }}
                   </div>
                 </div>
               </el-col>
@@ -156,7 +146,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.slUpperLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    束流上限
+                    {{ $t('processParameters.shuliushangxina') }}
                   </div>
                 </div>
               </el-col>
@@ -166,7 +156,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.glLowerLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    功率下限
+                    {{ $t('processParameters.gonglvxiaxian') }}
                   </div>
                 </div>
               </el-col>
@@ -176,7 +166,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.glSet.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    功率设定值
+                    {{ $t('processParameters.gonglvsheding') }}
                   </div>
                 </div>
               </el-col>
@@ -186,7 +176,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.glUpperLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    功率上限
+                    {{ $t('processParameters.gonglvshangxian') }}
                   </div>
                 </div>
               </el-col>
@@ -196,7 +186,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.skLowerLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    扫宽下限
+                    {{ $t('processParameters.saokuanxiaxian') }}
                   </div>
                 </div>
               </el-col>
@@ -206,7 +196,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.skSet.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    扫宽设定值
+                    {{ $t('processParameters.saokuansheding') }}
                   </div>
                 </div>
               </el-col>
@@ -216,7 +206,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.skUpperLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    扫宽上限
+                    {{ $t('processParameters.saokuanshangxian') }}
                   </div>
                 </div>
               </el-col>
@@ -226,7 +216,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.smplLowerLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    扫描频率下限
+                    {{ $t('processParameters.saomiaopinlvxiaxian') }}
                   </div>
                 </div>
               </el-col>
@@ -236,7 +226,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.smplSet.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    扫描频率设定
+                    {{ $t('processParameters.saomiaopinlvsheding') }}
                   </div>
                 </div>
               </el-col>
@@ -246,7 +236,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.smplUpperLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    扫描频率上限
+                    {{ $t('processParameters.saomiaopinlvshangxian') }}
                   </div>
                 </div>
               </el-col>
@@ -256,7 +246,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.pfnLowerLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    PFN电压下限
+                    {{ $t('processParameters.pfnxiaxian') }}
                   </div>
                 </div>
               </el-col>
@@ -266,7 +256,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.pfnSet.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    PFN电压设定
+                    {{ $t('processParameters.pfnsheding') }}
                   </div>
                 </div>
               </el-col>
@@ -276,7 +266,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.pfnUpperLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    PFN电压上限
+                    {{ $t('processParameters.pfnshangxian') }}
                   </div>
                 </div>
               </el-col>
@@ -286,7 +276,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.nlLowerLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    能量下限
+                    {{ $t('processParameters.nengliangxiaxian') }}
                   </div>
                   <!-- <el-statistic group-separator="," :precision="2" :value="" title=""></el-statistic> -->
                 </div>
@@ -297,7 +287,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.nlSet.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    能量设定值
+                    {{ $t('processParameters.nengliangshedingzhi') }}
                   </div>
                 </div>
               </el-col>
@@ -307,7 +297,7 @@
                     {{ orderMainDy.numberTurns == undefined?'': orderMainDy.nlUpperLimit.toFixed(0) }}
                   </div>
                   <div class="gongyi-card-down">
-                    能量上限
+                    {{ $t('processParameters.nengliangshangxian') }}
                   </div>
                 </div>
               </el-col>
@@ -318,7 +308,7 @@
     </div>
     <div class="dynamic-right">
       <div>
-        <div class="card-title">箱报告实时预览</div>
+        <div class="card-title">{{ $t('processParameters.xiangbaogaoshishiyulan') }}</div>
         <div class="card-content" style="box-sizing: border-box; padding: 20px 10px 20px 10px;" v-loading="pdfLoading">
           <embed style="width: 100%;height:100%" :src="pdfPath" />
         </div>
@@ -377,7 +367,7 @@ export default {
         }, 2000);
       }).catch((err)=> {
         // 网络异常 稍后再试
-        this.$message.error('生成pdf失败！' + err);
+        this.$message.error('Failed to generate PDF!' + err);
       });
     },
     getNewBoxReport() {
