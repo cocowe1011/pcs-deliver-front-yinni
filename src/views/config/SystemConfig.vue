@@ -2,20 +2,27 @@
   <div class="config">
     <div>
       <div class="formDiv">
-        <div class="card-title">配置列表</div>
+        <div class="card-title">{{ $t('config.peizhiliebiao') }}</div>
         <div class="card-content">
           <el-form label-position="right" label-width="150px" :model="cssConfig" v-loading="loading">
-            <el-divider content-position="left">CSS数据库地址</el-divider>
-            <el-form-item label="ip地址：">
+            <el-divider content-position="left">PLC</el-divider>
+            <el-form-item :label="$t('config.ipaddress')">
               <el-input v-model="cssConfig.plcIp" style="width: 250px;"></el-input>
+            </el-form-item>
+            <el-divider content-position="left">{{ $t('config.yuyanshezhi') }}</el-divider>
+            <el-form-item :label="$t('config.yuyanshezhi') + '：'">
+              <el-select v-model="cssConfig.languageSet" style="width: 250px;">
+                <el-option label="中文" value="0"></el-option>
+                <el-option label="english" value="1"></el-option>
+              </el-select>
             </el-form-item>
           </el-form>
         </div>
       </div>
       <div class="footer">
-        <el-button type="info" plain @click="allowEdit=true" v-show="!allowEdit">页面已锁定，点击修改配置</el-button>
-        <el-button type="primary" @click="update" v-show="allowEdit">保存</el-button>
-        <el-button @click="allowEdit=false" v-show="allowEdit">取消</el-button>
+        <el-button type="info" plain @click="allowEdit=true" v-show="!allowEdit">{{ $t('config.yemiansuodingTip') }}</el-button>
+        <el-button type="primary" @click="update" v-show="allowEdit">{{ $t('config.save') }}</el-button>
+        <el-button @click="allowEdit=false" v-show="allowEdit">{{ $t('config.cancel') }}</el-button>
       </div>
     </div>
   </div>

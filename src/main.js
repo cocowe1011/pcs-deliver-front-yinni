@@ -7,6 +7,7 @@ import 'element-ui/lib/theme-chalk/index.css'; //全局引入element的样式
 import axios from 'axios';
 import VueCookies from 'vue-cookies'
 import './assets/iconfont.css'
+import i18n from './i18n'; // 引入 i18n 配置
 Vue.use(VueCookies)
 
 Vue.config.productionTip = false;
@@ -16,6 +17,7 @@ axios.defaults.timeout = 300000;
 
 new Vue({
   router,
+  i18n, // 使用 i18n
   store,
   render: (h) => h(App)
 }).$mount('#app');
