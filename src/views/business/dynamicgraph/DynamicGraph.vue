@@ -308,7 +308,7 @@
     </div>
     <div class="dynamic-right">
       <div>
-        <div class="card-title">{{ $t('processParameters.xiangbaogaoshishiyulan') }}</div>
+        <div class="card-title">{{ $t('dynamicGraph.xiangbaogaoshishiyulan') }}</div>
         <div class="card-content" style="box-sizing: border-box; padding: 20px 10px 20px 10px;" v-loading="pdfLoading">
           <embed style="width: 100%;height:100%" :src="pdfPath" />
         </div>
